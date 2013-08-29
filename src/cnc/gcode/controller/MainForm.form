@@ -109,12 +109,12 @@
                                       <EmptySpace type="separate" min="-2" max="-2" attributes="0"/>
                                       <Component id="jPanel10" max="32767" attributes="0"/>
                                       <EmptySpace type="separate" min="-2" max="-2" attributes="0"/>
-                                      <Component id="jPanel11" max="32767" attributes="0"/>
+                                      <Component id="jPanel5" max="32767" attributes="0"/>
                                   </Group>
                                   <Group type="102" alignment="1" attributes="0">
                                       <Component id="jPanel15" max="32767" attributes="0"/>
                                       <EmptySpace type="separate" max="-2" attributes="0"/>
-                                      <Component id="jBMove" pref="243" max="32767" attributes="0"/>
+                                      <Component id="jBMove" max="32767" attributes="0"/>
                                   </Group>
                                   <Group type="102" alignment="1" attributes="0">
                                       <Component id="jScrollPane4" max="32767" attributes="0"/>
@@ -126,15 +126,15 @@
                                       </Group>
                                   </Group>
                                   <Group type="102" alignment="0" attributes="0">
-                                      <Component id="jBHoming" max="32767" attributes="0"/>
+                                      <Component id="jBHoming" pref="92" max="32767" attributes="0"/>
                                       <EmptySpace min="-2" max="-2" attributes="0"/>
-                                      <Component id="jBPowerON" max="32767" attributes="0"/>
+                                      <Component id="jBPowerON" pref="95" max="32767" attributes="0"/>
                                       <EmptySpace min="-2" max="-2" attributes="0"/>
-                                      <Component id="JBPowerOFF" max="32767" attributes="0"/>
+                                      <Component id="jBPowerOFF" pref="99" max="32767" attributes="0"/>
                                       <EmptySpace min="-2" max="-2" attributes="0"/>
-                                      <Component id="jBSetPos" max="32767" attributes="0"/>
+                                      <Component id="jBSetPos" pref="103" max="32767" attributes="0"/>
                                       <EmptySpace min="-2" max="-2" attributes="0"/>
-                                      <Component id="jBGetPos" max="32767" attributes="0"/>
+                                      <Component id="jBGetPos" pref="103" max="32767" attributes="0"/>
                                   </Group>
                                   <Group type="102" alignment="0" attributes="0">
                                       <Component id="jPanel3" min="-2" max="-2" attributes="0"/>
@@ -167,11 +167,11 @@
                                       <Component id="jBGetPos" alignment="3" max="32767" attributes="0"/>
                                       <Component id="jBHoming" alignment="3" min="-2" max="-2" attributes="0"/>
                                       <Component id="jBPowerON" alignment="3" min="-2" max="-2" attributes="0"/>
-                                      <Component id="JBPowerOFF" alignment="3" min="-2" max="-2" attributes="0"/>
+                                      <Component id="jBPowerOFF" alignment="3" min="-2" max="-2" attributes="0"/>
                                   </Group>
                                   <Component id="jLabel18" alignment="0" min="-2" max="-2" attributes="0"/>
                               </Group>
-                              <EmptySpace pref="12" max="32767" attributes="0"/>
+                              <EmptySpace pref="15" max="32767" attributes="0"/>
                               <Group type="103" groupAlignment="0" attributes="0">
                                   <Group type="102" attributes="0">
                                       <EmptySpace min="3" pref="3" max="-2" attributes="0"/>
@@ -191,7 +191,7 @@
                                       </Group>
                                   </Group>
                               </Group>
-                              <EmptySpace pref="14" max="32767" attributes="0"/>
+                              <EmptySpace pref="15" max="32767" attributes="0"/>
                               <Group type="103" groupAlignment="0" attributes="0">
                                   <Component id="jLabel7" min="-2" max="-2" attributes="0"/>
                                   <Group type="102" alignment="0" attributes="0">
@@ -210,10 +210,10 @@
                                       <Component id="jPanel10" alignment="0" max="32767" attributes="0"/>
                                       <Component id="jPanel8" alignment="1" min="-2" pref="31" max="-2" attributes="0"/>
                                       <Component id="jPanel9" alignment="0" max="32767" attributes="0"/>
-                                      <Component id="jPanel11" alignment="1" min="-2" max="-2" attributes="0"/>
                                   </Group>
+                                  <Component id="jPanel5" alignment="1" min="-2" max="-2" attributes="0"/>
                               </Group>
-                              <EmptySpace pref="13" max="32767" attributes="0"/>
+                              <EmptySpace pref="7" max="32767" attributes="0"/>
                               <Group type="103" groupAlignment="0" attributes="0">
                                   <Group type="103" groupAlignment="0" max="-2" attributes="0">
                                       <Component id="jPanel12" max="32767" attributes="0"/>
@@ -222,7 +222,7 @@
                                   </Group>
                                   <Component id="jLabel14" min="-2" max="-2" attributes="0"/>
                               </Group>
-                              <EmptySpace pref="13" max="32767" attributes="0"/>
+                              <EmptySpace pref="14" max="32767" attributes="0"/>
                               <Group type="103" groupAlignment="0" attributes="0">
                                   <Group type="103" groupAlignment="1" max="-2" attributes="0">
                                       <Component id="jBMove" max="32767" attributes="0"/>
@@ -230,7 +230,7 @@
                                   </Group>
                                   <Component id="jLabel21" min="-2" max="-2" attributes="0"/>
                               </Group>
-                              <EmptySpace pref="15" max="32767" attributes="0"/>
+                              <EmptySpace pref="16" max="32767" attributes="0"/>
                           </Group>
                       </Group>
                     </DimensionLayout>
@@ -240,6 +240,9 @@
                       <Properties>
                         <Property name="text" type="java.lang.String" value="Set Position"/>
                       </Properties>
+                      <Events>
+                        <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="jBSetPosActionPerformed"/>
+                      </Events>
                     </Component>
                     <Container class="javax.swing.JPanel" name="jPanel3">
                       <Properties>
@@ -299,14 +302,14 @@
                       <Layout>
                         <DimensionLayout dim="0">
                           <Group type="103" groupAlignment="0" attributes="0">
-                              <Component id="JTFXd" alignment="1" max="32767" attributes="0"/>
+                              <Component id="jTFXd" alignment="1" max="32767" attributes="0"/>
                               <Component id="jTFYd" alignment="1" max="32767" attributes="0"/>
                           </Group>
                         </DimensionLayout>
                         <DimensionLayout dim="1">
                           <Group type="103" groupAlignment="0" attributes="0">
                               <Group type="102" alignment="0" attributes="0">
-                                  <Component id="JTFXd" min="-2" max="-2" attributes="0"/>
+                                  <Component id="jTFXd" min="-2" max="-2" attributes="0"/>
                                   <EmptySpace max="-2" attributes="0"/>
                                   <Component id="jTFYd" min="-2" max="-2" attributes="0"/>
                               </Group>
@@ -314,9 +317,15 @@
                         </DimensionLayout>
                       </Layout>
                       <SubComponents>
-                        <Component class="javax.swing.JTextField" name="JTFXd">
+                        <Component class="javax.swing.JTextField" name="jTFXd">
+                          <Events>
+                            <EventHandler event="focusLost" listener="java.awt.event.FocusListener" parameters="java.awt.event.FocusEvent" handler="axesLostFocus"/>
+                          </Events>
                         </Component>
                         <Component class="javax.swing.JTextField" name="jTFYd">
+                          <Events>
+                            <EventHandler event="focusLost" listener="java.awt.event.FocusListener" parameters="java.awt.event.FocusEvent" handler="axesLostFocus"/>
+                          </Events>
                         </Component>
                       </SubComponents>
                     </Container>
@@ -350,8 +359,14 @@
                       </Layout>
                       <SubComponents>
                         <Component class="javax.swing.JTextField" name="jTFXn">
+                          <Events>
+                            <EventHandler event="focusLost" listener="java.awt.event.FocusListener" parameters="java.awt.event.FocusEvent" handler="axesLostFocus"/>
+                          </Events>
                         </Component>
                         <Component class="javax.swing.JTextField" name="jTFYn">
+                          <Events>
+                            <EventHandler event="focusLost" listener="java.awt.event.FocusListener" parameters="java.awt.event.FocusEvent" handler="axesLostFocus"/>
+                          </Events>
                         </Component>
                       </SubComponents>
                     </Container>
@@ -466,6 +481,9 @@
                           <Properties>
                             <Property name="enabled" type="boolean" value="false"/>
                           </Properties>
+                          <Events>
+                            <EventHandler event="focusLost" listener="java.awt.event.FocusListener" parameters="java.awt.event.FocusEvent" handler="axesLostFocus"/>
+                          </Events>
                         </Component>
                       </SubComponents>
                     </Container>
@@ -494,34 +512,9 @@
                       </Layout>
                       <SubComponents>
                         <Component class="javax.swing.JTextField" name="jTFZd">
-                        </Component>
-                      </SubComponents>
-                    </Container>
-                    <Container class="javax.swing.JPanel" name="jPanel11">
-                      <Properties>
-                        <Property name="border" type="javax.swing.border.Border" editor="org.netbeans.modules.form.editors2.BorderEditor">
-                          <Border info="org.netbeans.modules.form.compat2.border.TitledBorderInfo">
-                            <TitledBorder title="New Position"/>
-                          </Border>
-                        </Property>
-                        <Property name="toolTipText" type="java.lang.String" value=""/>
-                        <Property name="name" type="java.lang.String" value="" noResource="true"/>
-                      </Properties>
-
-                      <Layout>
-                        <DimensionLayout dim="0">
-                          <Group type="103" groupAlignment="0" attributes="0">
-                              <Component id="jTFZn" alignment="1" max="32767" attributes="0"/>
-                          </Group>
-                        </DimensionLayout>
-                        <DimensionLayout dim="1">
-                          <Group type="103" groupAlignment="0" attributes="0">
-                              <Component id="jTFZn" min="-2" max="-2" attributes="0"/>
-                          </Group>
-                        </DimensionLayout>
-                      </Layout>
-                      <SubComponents>
-                        <Component class="javax.swing.JTextField" name="jTFZn">
+                          <Events>
+                            <EventHandler event="focusLost" listener="java.awt.event.FocusListener" parameters="java.awt.event.FocusEvent" handler="axesLostFocus"/>
+                          </Events>
                         </Component>
                       </SubComponents>
                     </Container>
@@ -529,6 +522,9 @@
                       <Properties>
                         <Property name="text" type="java.lang.String" value="Get Position"/>
                       </Properties>
+                      <Events>
+                        <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="jBGetPosActionPerformed"/>
+                      </Events>
                     </Component>
                     <Component class="javax.swing.JLabel" name="jLabel13">
                       <Properties>
@@ -560,21 +556,30 @@
                       <Layout>
                         <DimensionLayout dim="0">
                           <Group type="103" groupAlignment="0" attributes="0">
-                              <Component id="jTFTooldiameter" alignment="1" max="32767" attributes="0"/>
+                              <Component id="jCBdiameter" alignment="0" max="32767" attributes="0"/>
                           </Group>
                         </DimensionLayout>
                         <DimensionLayout dim="1">
                           <Group type="103" groupAlignment="0" attributes="0">
                               <Group type="102" alignment="0" attributes="0">
                                   <EmptySpace max="32767" attributes="0"/>
-                                  <Component id="jTFTooldiameter" min="-2" max="-2" attributes="0"/>
+                                  <Component id="jCBdiameter" min="-2" max="-2" attributes="0"/>
                                   <EmptySpace max="32767" attributes="0"/>
                               </Group>
                           </Group>
                         </DimensionLayout>
                       </Layout>
                       <SubComponents>
-                        <Component class="javax.swing.JTextField" name="jTFTooldiameter">
+                        <Component class="javax.swing.JComboBox" name="jCBdiameter">
+                          <Properties>
+                            <Property name="editable" type="boolean" value="true"/>
+                            <Property name="model" type="javax.swing.ComboBoxModel" editor="org.netbeans.modules.form.editors2.ComboBoxModelEditor">
+                              <StringArray count="0"/>
+                            </Property>
+                          </Properties>
+                          <Events>
+                            <EventHandler event="focusLost" listener="java.awt.event.FocusListener" parameters="java.awt.event.FocusEvent" handler="axesLostFocus"/>
+                          </Events>
                         </Component>
                       </SubComponents>
                     </Container>
@@ -637,21 +642,33 @@
                         <Component class="javax.swing.JButton" name="jBTXfp">
                           <Properties>
                             <Property name="text" type="java.lang.String" value="+"/>
+                            <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
+                              <Dimension value="[6, 23]"/>
+                            </Property>
                           </Properties>
                         </Component>
                         <Component class="javax.swing.JButton" name="jBTXhp">
                           <Properties>
                             <Property name="text" type="java.lang.String" value="+"/>
+                            <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
+                              <Dimension value="[6, 23]"/>
+                            </Property>
                           </Properties>
                         </Component>
                         <Component class="javax.swing.JButton" name="jBTXfm">
                           <Properties>
                             <Property name="text" type="java.lang.String" value="-"/>
+                            <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
+                              <Dimension value="[6, 23]"/>
+                            </Property>
                           </Properties>
                         </Component>
                         <Component class="javax.swing.JButton" name="jBTXhm">
                           <Properties>
                             <Property name="text" type="java.lang.String" value="-"/>
+                            <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
+                              <Dimension value="[6, 23]"/>
+                            </Property>
                           </Properties>
                         </Component>
                         <Component class="javax.swing.JLabel" name="jLabel16">
@@ -725,21 +742,33 @@
                         <Component class="javax.swing.JButton" name="jBTYfp">
                           <Properties>
                             <Property name="text" type="java.lang.String" value="+"/>
+                            <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
+                              <Dimension value="[6, 23]"/>
+                            </Property>
                           </Properties>
                         </Component>
                         <Component class="javax.swing.JButton" name="jBTYhp">
                           <Properties>
                             <Property name="text" type="java.lang.String" value="+"/>
+                            <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
+                              <Dimension value="[6, 23]"/>
+                            </Property>
                           </Properties>
                         </Component>
                         <Component class="javax.swing.JButton" name="jBTYfm">
                           <Properties>
                             <Property name="text" type="java.lang.String" value="-"/>
+                            <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
+                              <Dimension value="[6, 23]"/>
+                            </Property>
                           </Properties>
                         </Component>
                         <Component class="javax.swing.JButton" name="jBTYhm">
                           <Properties>
                             <Property name="text" type="java.lang.String" value="-"/>
+                            <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
+                              <Dimension value="[6, 23]"/>
+                            </Property>
                           </Properties>
                         </Component>
                         <Component class="javax.swing.JLabel" name="jLabel10">
@@ -782,16 +811,25 @@
                       <Properties>
                         <Property name="text" type="java.lang.String" value="Homeing"/>
                       </Properties>
+                      <Events>
+                        <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="jBHomingActionPerformed"/>
+                      </Events>
                     </Component>
                     <Component class="javax.swing.JButton" name="jBPowerON">
                       <Properties>
                         <Property name="text" type="java.lang.String" value="Power ON"/>
                       </Properties>
+                      <Events>
+                        <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="jBPowerONActionPerformed"/>
+                      </Events>
                     </Component>
-                    <Component class="javax.swing.JButton" name="JBPowerOFF">
+                    <Component class="javax.swing.JButton" name="jBPowerOFF">
                       <Properties>
                         <Property name="text" type="java.lang.String" value="Power OFF"/>
                       </Properties>
+                      <Events>
+                        <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="jBPowerOFFActionPerformed"/>
+                      </Events>
                     </Component>
                     <Container class="javax.swing.JPanel" name="jPanel15">
                       <Properties>
@@ -813,27 +851,23 @@
                                           <EmptySpace type="unrelated" min="-2" max="-2" attributes="0"/>
                                           <Component id="jLabel25" min="-2" max="-2" attributes="0"/>
                                           <EmptySpace min="-2" max="-2" attributes="0"/>
-                                          <Component id="jTFarcI" pref="52" max="32767" attributes="0"/>
+                                          <Component id="jCBarcI" pref="0" max="32767" attributes="0"/>
                                           <EmptySpace type="unrelated" min="-2" max="-2" attributes="0"/>
                                           <Component id="jLabel26" min="-2" max="-2" attributes="0"/>
+                                          <EmptySpace min="-2" max="-2" attributes="0"/>
+                                          <Component id="jCBarcJ" pref="0" max="32767" attributes="0"/>
+                                          <EmptySpace type="unrelated" max="-2" attributes="0"/>
+                                          <Component id="jCBarcCC" min="-2" max="-2" attributes="0"/>
+                                          <EmptySpace min="0" pref="0" max="-2" attributes="0"/>
                                       </Group>
                                       <Group type="102" alignment="0" attributes="0">
                                           <Component id="jLabel22" min="-2" max="-2" attributes="0"/>
                                           <EmptySpace type="separate" min="-2" max="-2" attributes="0"/>
-                                          <Component id="jTFFeedrate" pref="52" max="32767" attributes="0"/>
-                                          <EmptySpace min="18" pref="18" max="-2" attributes="0"/>
+                                          <Component id="jCBfeedrate" pref="0" max="32767" attributes="0"/>
+                                          <EmptySpace type="separate" min="-2" max="-2" attributes="0"/>
+                                          <Component id="jCBFastMode" min="-2" max="-2" attributes="0"/>
                                       </Group>
                                   </Group>
-                                  <EmptySpace min="-2" pref="6" max="-2" attributes="0"/>
-                                  <Group type="103" groupAlignment="0" attributes="0">
-                                      <Group type="102" attributes="0">
-                                          <Component id="jTFarcJ" pref="56" max="32767" attributes="0"/>
-                                          <EmptySpace min="-2" max="-2" attributes="0"/>
-                                          <Component id="jCBarcCC" min="-2" max="-2" attributes="0"/>
-                                      </Group>
-                                      <Component id="jCBFastMode" min="-2" max="-2" attributes="0"/>
-                                  </Group>
-                                  <EmptySpace min="-2" max="-2" attributes="0"/>
                               </Group>
                           </Group>
                         </DimensionLayout>
@@ -844,16 +878,16 @@
                                   <Group type="103" groupAlignment="3" attributes="0">
                                       <Component id="jCBarc" alignment="3" min="-2" max="-2" attributes="0"/>
                                       <Component id="jLabel25" alignment="3" min="-2" max="-2" attributes="0"/>
-                                      <Component id="jTFarcI" alignment="3" min="-2" max="-2" attributes="0"/>
                                       <Component id="jLabel26" alignment="3" min="-2" max="-2" attributes="0"/>
-                                      <Component id="jTFarcJ" alignment="3" min="-2" max="-2" attributes="0"/>
                                       <Component id="jCBarcCC" alignment="3" min="-2" max="-2" attributes="0"/>
+                                      <Component id="jCBarcI" alignment="3" min="-2" max="-2" attributes="0"/>
+                                      <Component id="jCBarcJ" alignment="3" min="-2" max="-2" attributes="0"/>
                                   </Group>
                                   <EmptySpace type="separate" max="-2" attributes="0"/>
                                   <Group type="103" groupAlignment="3" attributes="0">
                                       <Component id="jLabel22" alignment="3" min="-2" max="-2" attributes="0"/>
-                                      <Component id="jTFFeedrate" alignment="3" min="-2" max="-2" attributes="0"/>
                                       <Component id="jCBFastMode" alignment="3" min="-2" max="-2" attributes="0"/>
+                                      <Component id="jCBfeedrate" alignment="3" min="-2" max="-2" attributes="0"/>
                                   </Group>
                                   <EmptySpace max="32767" attributes="0"/>
                               </Group>
@@ -871,10 +905,6 @@
                             <Property name="text" type="java.lang.String" value="I:"/>
                           </Properties>
                         </Component>
-                        <Component class="javax.swing.JTextField" name="jTFarcI">
-                        </Component>
-                        <Component class="javax.swing.JTextField" name="jTFarcJ">
-                        </Component>
                         <Component class="javax.swing.JCheckBox" name="jCBarcCC">
                           <Properties>
                             <Property name="text" type="java.lang.String" value="cc"/>
@@ -890,12 +920,43 @@
                             <Property name="text" type="java.lang.String" value="Feedrate:"/>
                           </Properties>
                         </Component>
-                        <Component class="javax.swing.JTextField" name="jTFFeedrate">
-                        </Component>
                         <Component class="javax.swing.JCheckBox" name="jCBFastMode">
                           <Properties>
                             <Property name="text" type="java.lang.String" value="Fast Moves"/>
                           </Properties>
+                        </Component>
+                        <Component class="javax.swing.JComboBox" name="jCBarcI">
+                          <Properties>
+                            <Property name="editable" type="boolean" value="true"/>
+                            <Property name="model" type="javax.swing.ComboBoxModel" editor="org.netbeans.modules.form.editors2.ComboBoxModelEditor">
+                              <StringArray count="0"/>
+                            </Property>
+                          </Properties>
+                          <Events>
+                            <EventHandler event="focusLost" listener="java.awt.event.FocusListener" parameters="java.awt.event.FocusEvent" handler="axesLostFocus"/>
+                          </Events>
+                        </Component>
+                        <Component class="javax.swing.JComboBox" name="jCBarcJ">
+                          <Properties>
+                            <Property name="editable" type="boolean" value="true"/>
+                            <Property name="model" type="javax.swing.ComboBoxModel" editor="org.netbeans.modules.form.editors2.ComboBoxModelEditor">
+                              <StringArray count="0"/>
+                            </Property>
+                          </Properties>
+                          <Events>
+                            <EventHandler event="focusLost" listener="java.awt.event.FocusListener" parameters="java.awt.event.FocusEvent" handler="axesLostFocus"/>
+                          </Events>
+                        </Component>
+                        <Component class="javax.swing.JComboBox" name="jCBfeedrate">
+                          <Properties>
+                            <Property name="editable" type="boolean" value="true"/>
+                            <Property name="model" type="javax.swing.ComboBoxModel" editor="org.netbeans.modules.form.editors2.ComboBoxModelEditor">
+                              <StringArray count="0"/>
+                            </Property>
+                          </Properties>
+                          <Events>
+                            <EventHandler event="focusLost" listener="java.awt.event.FocusListener" parameters="java.awt.event.FocusEvent" handler="axesLostFocus"/>
+                          </Events>
                         </Component>
                       </SubComponents>
                     </Container>
@@ -931,11 +992,61 @@
                           <Properties>
                             <Property name="editable" type="boolean" value="false"/>
                           </Properties>
+                          <Events>
+                            <EventHandler event="focusLost" listener="java.awt.event.FocusListener" parameters="java.awt.event.FocusEvent" handler="axesLostFocus"/>
+                          </Events>
                         </Component>
                         <Component class="javax.swing.JTextField" name="jTFYa">
                           <Properties>
                             <Property name="editable" type="boolean" value="false"/>
                           </Properties>
+                          <Events>
+                            <EventHandler event="focusLost" listener="java.awt.event.FocusListener" parameters="java.awt.event.FocusEvent" handler="axesLostFocus"/>
+                          </Events>
+                        </Component>
+                      </SubComponents>
+                    </Container>
+                    <Container class="javax.swing.JPanel" name="jPanel5">
+                      <Properties>
+                        <Property name="border" type="javax.swing.border.Border" editor="org.netbeans.modules.form.editors2.BorderEditor">
+                          <Border info="org.netbeans.modules.form.compat2.border.TitledBorderInfo">
+                            <TitledBorder title="New Position"/>
+                          </Border>
+                        </Property>
+                      </Properties>
+
+                      <Layout>
+                        <DimensionLayout dim="0">
+                          <Group type="103" groupAlignment="0" attributes="0">
+                              <Component id="jCBZn" alignment="0" max="32767" attributes="0"/>
+                          </Group>
+                        </DimensionLayout>
+                        <DimensionLayout dim="1">
+                          <Group type="103" groupAlignment="0" attributes="0">
+                              <Group type="102" alignment="1" attributes="0">
+                                  <EmptySpace min="0" pref="0" max="32767" attributes="0"/>
+                                  <Component id="jCBZn" min="-2" max="-2" attributes="0"/>
+                              </Group>
+                          </Group>
+                        </DimensionLayout>
+                      </Layout>
+                      <SubComponents>
+                        <Component class="javax.swing.JComboBox" name="jCBZn">
+                          <Properties>
+                            <Property name="editable" type="boolean" value="true"/>
+                            <Property name="model" type="javax.swing.ComboBoxModel" editor="org.netbeans.modules.form.editors2.ComboBoxModelEditor">
+                              <StringArray count="0"/>
+                            </Property>
+                            <Property name="minimumSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
+                              <Dimension value="[6, 20]"/>
+                            </Property>
+                            <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
+                              <Dimension value="[6, 20]"/>
+                            </Property>
+                          </Properties>
+                          <Events>
+                            <EventHandler event="focusLost" listener="java.awt.event.FocusListener" parameters="java.awt.event.FocusEvent" handler="axesLostFocus"/>
+                          </Events>
                         </Component>
                       </SubComponents>
                     </Container>
@@ -1066,6 +1177,13 @@
                                   </Group>
                               </Group>
                               <Component id="jLabel19" alignment="0" min="-2" max="-2" attributes="0"/>
+                              <Group type="102" alignment="0" attributes="0">
+                                  <EmptySpace min="164" pref="164" max="-2" attributes="0"/>
+                                  <Component id="jBSWorkSpace" min="-2" max="-2" attributes="0"/>
+                                  <EmptySpace min="-2" pref="44" max="-2" attributes="0"/>
+                                  <Component id="jLSWorkSpace" min="-2" max="-2" attributes="0"/>
+                              </Group>
+                              <Component id="jLabel20" alignment="0" min="-2" max="-2" attributes="0"/>
                           </Group>
                           <EmptySpace pref="661" max="32767" attributes="0"/>
                       </Group>
@@ -1088,7 +1206,15 @@
                                   <Component id="jLSFastFeedrate" alignment="3" min="-2" max="-2" attributes="0"/>
                               </Group>
                           </Group>
-                          <EmptySpace pref="540" max="32767" attributes="0"/>
+                          <EmptySpace type="separate" max="-2" attributes="0"/>
+                          <Group type="103" groupAlignment="0" attributes="0">
+                              <Component id="jLabel20" alignment="0" min="-2" max="-2" attributes="0"/>
+                              <Group type="103" alignment="0" groupAlignment="3" attributes="0">
+                                  <Component id="jBSWorkSpace" alignment="3" min="-2" max="-2" attributes="0"/>
+                                  <Component id="jLSWorkSpace" alignment="3" min="-2" max="-2" attributes="0"/>
+                              </Group>
+                          </Group>
+                          <EmptySpace pref="499" max="32767" attributes="0"/>
                       </Group>
                   </Group>
                 </DimensionLayout>
@@ -1126,6 +1252,24 @@
                   </Events>
                 </Component>
                 <Component class="javax.swing.JLabel" name="jLSFastFeedrate">
+                  <Properties>
+                    <Property name="text" type="java.lang.String" value="Settings Text"/>
+                  </Properties>
+                </Component>
+                <Component class="javax.swing.JLabel" name="jLabel20">
+                  <Properties>
+                    <Property name="text" type="java.lang.String" value="Size of Workingspace"/>
+                  </Properties>
+                </Component>
+                <Component class="javax.swing.JButton" name="jBSWorkSpace">
+                  <Properties>
+                    <Property name="text" type="java.lang.String" value="Change"/>
+                  </Properties>
+                  <Events>
+                    <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="jBSettingsActionPerformed"/>
+                  </Events>
+                </Component>
+                <Component class="javax.swing.JLabel" name="jLSWorkSpace">
                   <Properties>
                     <Property name="text" type="java.lang.String" value="Settings Text"/>
                   </Properties>

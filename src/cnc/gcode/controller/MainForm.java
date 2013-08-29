@@ -8,9 +8,15 @@ import gnu.io.NRSerialPort;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
+import java.text.ParseException;
+import java.util.ArrayList;
 import java.util.Set;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.swing.DefaultComboBoxModel;
+import javax.swing.JComboBox;
 import javax.swing.JOptionPane;
+import javax.swing.JTextField;
 import javax.swing.SwingUtilities;
 import javax.swing.Timer;
 
@@ -18,21 +24,110 @@ import javax.swing.Timer;
  *
  * @author patrick
  */
-public class MainForm extends javax.swing.JFrame implements ActionListener{
-    Timer serialtimer;
-    SerialInterface serial= new SerialInterface(new java.awt.event.ActionListener() {
-            @Override
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jBConnectActionPerformed(evt);
+public final class MainForm extends javax.swing.JFrame implements ActionListener, SerialInterface.IEvent{
+
+    private class AxesManipulator
+    {
+        Object element;
+        
+        public AxesManipulator(Object element)
+        {
+            this.element=element;
+        }
+        
+        public void setFocus()
+        {
+            if(element instanceof JTextField)
+                ((JTextField)element).grabFocus();
+            else if(element instanceof JComboBox)
+                ((JComboBox)element).grabFocus();
+            else
+                throw new UnsupportedOperationException("Not yet implemented");
+        }
+
+        public void set(String text)
+        {
+            if(element instanceof JTextField)
+                ((JTextField)element).setText(text);
+            else if(element instanceof JComboBox)
+                ((JComboBox)element).setSelectedItem(text);
+            else
+                throw new UnsupportedOperationException("Not yet implemented");
+
+        }
+ 
+        public String get()
+        {
+            if(element instanceof JTextField)
+                return ((JTextField)element).getText();
+            else if(element instanceof JComboBox)
+                return ((JComboBox)element).getSelectedItem().toString();
+            else
+                throw new UnsupportedOperationException("Not yet implemented");
+        }
+
+        public void set(Double d)
+        {
+            set(Tools.dtostr(d));
+        }
+
+        
+        public Double getd() throws ParseException
+        {
+            return Tools.strtod(get());
+        }
+
+        /**
+         * Return 0.0 if its not a Number!
+         */
+        public Double getdsave()
+        {
+            try {
+                return Tools.strtod(get());
+            } catch (ParseException ex) {
+                return 0.0;
             }
-        });
+        }
+        
+        public boolean isObject(Object element)
+        {
+            return this.element==element;
+        }
+        
+    }
     
+    String[] axesName={"X","Y","Z"};
+    
+    AxesManipulator[][] axes;
+    SerialInterface serial= new SerialInterface(this);
+    String lastserialstring="";
+    Timer serialtimer;
+    boolean pharsnextserial=false;
+
+    
+    
+ 
     /**
      * Creates new form MainForm
      */
     public MainForm() {
         initComponents();
         
+        //Init Fileds:
+        axes= new AxesManipulator[][]   {
+                                        /*0*/    {new AxesManipulator(jTFXa),new AxesManipulator(jTFXd),new AxesManipulator(jTFXn)},
+                                        /*1*/    {new AxesManipulator(jTFYa),new AxesManipulator(jTFYd),new AxesManipulator(jTFYn)},
+                                        /*2*/    {new AxesManipulator(jTFZa),new AxesManipulator(jTFZd),new AxesManipulator(jCBZn)},
+                                        /*3*/    {new AxesManipulator(jCBarcI),new AxesManipulator(jCBarcJ)}, // I,J
+                                        /*4*/    {new AxesManipulator(jCBdiameter)}, //Diameter
+                                        /*5*/    {new AxesManipulator(jCBfeedrate)} //Feedrate
+                                        };
+        for(AxesManipulator[] axe:axes)
+            for(AxesManipulator field:axe)
+                field.set(0.0);
+        
+        
+                
         //Load Database
         if(!Database.getDatabase().load())
             JOptionPane.showMessageDialog(null,"Could not load Settings!");
@@ -40,6 +135,7 @@ public class MainForm extends javax.swing.JFrame implements ActionListener{
         jCBSpeed.setSelectedIndex(
                 Integer.parseInt(
                 Database.getDatabase().get("Speed","9")));
+        
         //update Settings
         jBSettingsActionPerformed(new ActionEvent(this, 0, "init"));
 
@@ -55,7 +151,7 @@ public class MainForm extends javax.swing.JFrame implements ActionListener{
         }
         else
         {
-            jCBPort.setModel(new javax.swing.DefaultComboBoxModel(ports.toArray(new String[0])));
+            jCBPort.setModel(new DefaultComboBoxModel(ports.toArray(new String[0])));
             int index=0;
             for (String port:ports) {
                 if(port.equals(Database.getDatabase().get("Port","")))
@@ -69,10 +165,12 @@ public class MainForm extends javax.swing.JFrame implements ActionListener{
         serialtimer= new Timer(1000, this);
         serialtimer.setRepeats(true);
         serialtimer.start();
-                
+        
+        //Update Comport Status
+        actionSerialStatusChanged();
+        
     }
 
-    String lastserialstring="";
     @Override
     public void actionPerformed(ActionEvent e) {
         if(e.getSource()==serialtimer)
@@ -80,20 +178,60 @@ public class MainForm extends javax.swing.JFrame implements ActionListener{
             if(serial.isConnect())
             {
                 String input = serial.get();
-                String[] inputs= input.split("\n");
-                inputs[0]= lastserialstring+inputs[0];
-                lastserialstring= inputs[inputs.length-1];
-                
-                for(int i=0; i < inputs.length-1;i++)
+                ArrayList<String> inputs= new ArrayList<>();
+                inputs.add("");
+                for(char c:input.toCharArray())
                 {
+                    if(c=='\n')
+                        inputs.add("");
+                    else
+                        inputs.set(inputs.size()-1, inputs.get(inputs.size()-1)+c);
+                }
                 
-                    ((DefaultComboBoxModel<SendListElement>)jLCInOut.getModel()).addElement(new SendListElement(inputs[i], SendListElement.EType.IN));
+                inputs.set(0,lastserialstring+inputs.get(0));
+                lastserialstring= inputs.get(inputs.size()-1);
+                
+                for(int i=0; i < inputs.size()-1;i++)
+                {
+                    ((DefaultComboBoxModel<SendListElement>)jLCInOut.getModel()).addElement(new SendListElement(inputs.get(i), SendListElement.EType.IN));
                     SwingUtilities.invokeLater(new Runnable() {
                         @Override
                         public void run() {
                             jLCInOut.ensureIndexIsVisible(jLCInOut.getModel().getSize()-1);
                         }
                     });
+                    if(pharsnextserial)
+                    {
+                        pharsnextserial=false;
+                        String in=inputs.get(i);
+                        Double[] values= new Double[3];
+                        for(int j=0;j<3;j++)
+                        {
+                            int pos =in.indexOf(axesName[j]+":");
+                            if(pos==-1)
+                            {
+                                values=null;
+                                break;
+                            }
+                            try {
+                                String temp=in.substring(pos+2);
+                                values[j]= Tools.strtod(temp);
+                            } catch (ParseException ex) {
+                                values=null;
+                                break;
+                            }
+                        }
+                        if(values!= null)
+                        {
+                            for(int j=0;j<3;j++)
+                                axes[j][0].set(values[j]);  
+                            JOptionPane.showMessageDialog(this, "Update done!");
+                        }
+                        else
+                        {
+                            JOptionPane.showMessageDialog(this, "Error reading Position");
+                       }
+                    }
                 }
             }
         }
@@ -101,21 +239,16 @@ public class MainForm extends javax.swing.JFrame implements ActionListener{
     
     private void send(String command)
     {
-        //Try to send
-//        if(!serial.isConnect())
-//        {
-//            JOptionPane.showMessageDialog(this, "Not Connected!");
-//        }
-//        else
+        if(serial.isConnect())
         {
-//            serial.send(command+"\n");
+            serial.send(command + "\n");
 
             //Add to list 
-            ((DefaultComboBoxModel<SendListElement>)jLCInOut.getModel()).addElement(new SendListElement(command, SendListElement.EType.OUT));
+            ((DefaultComboBoxModel<SendListElement>) jLCInOut.getModel()).addElement(new SendListElement(command, SendListElement.EType.OUT));
             SwingUtilities.invokeLater(new Runnable() {
                 @Override
                 public void run() {
-                    jLCInOut.ensureIndexIsVisible(jLCInOut.getModel().getSize()-1);
+                    jLCInOut.ensureIndexIsVisible(jLCInOut.getModel().getSize() - 1);
                 }
             });
         }
@@ -140,7 +273,7 @@ public class MainForm extends javax.swing.JFrame implements ActionListener{
         jLabel8 = new javax.swing.JLabel();
         jLabel9 = new javax.swing.JLabel();
         jPanel7 = new javax.swing.JPanel();
-        JTFXd = new javax.swing.JTextField();
+        jTFXd = new javax.swing.JTextField();
         jTFYd = new javax.swing.JTextField();
         jPanel6 = new javax.swing.JPanel();
         jTFXn = new javax.swing.JTextField();
@@ -158,13 +291,11 @@ public class MainForm extends javax.swing.JFrame implements ActionListener{
         jTFZa = new javax.swing.JTextField();
         jPanel10 = new javax.swing.JPanel();
         jTFZd = new javax.swing.JTextField();
-        jPanel11 = new javax.swing.JPanel();
-        jTFZn = new javax.swing.JTextField();
         jBGetPos = new javax.swing.JButton();
         jLabel13 = new javax.swing.JLabel();
         jLabel14 = new javax.swing.JLabel();
         jPanel13 = new javax.swing.JPanel();
-        jTFTooldiameter = new javax.swing.JTextField();
+        jCBdiameter = new javax.swing.JComboBox();
         jPanel14 = new javax.swing.JPanel();
         jBTXfp = new javax.swing.JButton();
         jBTXhp = new javax.swing.JButton();
@@ -184,20 +315,22 @@ public class MainForm extends javax.swing.JFrame implements ActionListener{
         jBMove = new javax.swing.JButton();
         jBHoming = new javax.swing.JButton();
         jBPowerON = new javax.swing.JButton();
-        JBPowerOFF = new javax.swing.JButton();
+        jBPowerOFF = new javax.swing.JButton();
         jPanel15 = new javax.swing.JPanel();
         jCBarc = new javax.swing.JCheckBox();
         jLabel25 = new javax.swing.JLabel();
-        jTFarcI = new javax.swing.JTextField();
-        jTFarcJ = new javax.swing.JTextField();
         jCBarcCC = new javax.swing.JCheckBox();
         jLabel26 = new javax.swing.JLabel();
         jLabel22 = new javax.swing.JLabel();
-        jTFFeedrate = new javax.swing.JTextField();
         jCBFastMode = new javax.swing.JCheckBox();
+        jCBarcI = new javax.swing.JComboBox();
+        jCBarcJ = new javax.swing.JComboBox();
+        jCBfeedrate = new javax.swing.JComboBox();
         jPanel16 = new javax.swing.JPanel();
         jTFXa = new javax.swing.JTextField();
         jTFYa = new javax.swing.JTextField();
+        jPanel5 = new javax.swing.JPanel();
+        jCBZn = new javax.swing.JComboBox();
         jPPaint = new cnc.gcode.controller.JPPaintable();
         jPanel2 = new javax.swing.JPanel();
         jScrollPane3 = new javax.swing.JScrollPane();
@@ -212,6 +345,9 @@ public class MainForm extends javax.swing.JFrame implements ActionListener{
         jLabel19 = new javax.swing.JLabel();
         jBSFastFeedrate = new javax.swing.JButton();
         jLSFastFeedrate = new javax.swing.JLabel();
+        jLabel20 = new javax.swing.JLabel();
+        jBSWorkSpace = new javax.swing.JButton();
+        jLSWorkSpace = new javax.swing.JLabel();
         jBConnect = new javax.swing.JButton();
         jLStatus = new javax.swing.JLabel();
         jCBPort = new javax.swing.JComboBox();
@@ -230,6 +366,11 @@ public class MainForm extends javax.swing.JFrame implements ActionListener{
         jSplitPane1.setDividerLocation(300);
 
         jBSetPos.setText("Set Position");
+        jBSetPos.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jBSetPosActionPerformed(evt);
+            }
+        });
 
         jPanel3.setToolTipText("");
         jPanel3.setName(""); // NOI18N
@@ -261,17 +402,29 @@ public class MainForm extends javax.swing.JFrame implements ActionListener{
         jPanel7.setToolTipText("");
         jPanel7.setName(""); // NOI18N
 
+        jTFXd.addFocusListener(new java.awt.event.FocusAdapter() {
+            public void focusLost(java.awt.event.FocusEvent evt) {
+                axesLostFocus(evt);
+            }
+        });
+
+        jTFYd.addFocusListener(new java.awt.event.FocusAdapter() {
+            public void focusLost(java.awt.event.FocusEvent evt) {
+                axesLostFocus(evt);
+            }
+        });
+
         javax.swing.GroupLayout jPanel7Layout = new javax.swing.GroupLayout(jPanel7);
         jPanel7.setLayout(jPanel7Layout);
         jPanel7Layout.setHorizontalGroup(
             jPanel7Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(JTFXd, javax.swing.GroupLayout.Alignment.TRAILING)
+            .addComponent(jTFXd, javax.swing.GroupLayout.Alignment.TRAILING)
             .addComponent(jTFYd, javax.swing.GroupLayout.Alignment.TRAILING)
         );
         jPanel7Layout.setVerticalGroup(
             jPanel7Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel7Layout.createSequentialGroup()
-                .addComponent(JTFXd, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(jTFXd, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jTFYd, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
         );
@@ -279,6 +432,18 @@ public class MainForm extends javax.swing.JFrame implements ActionListener{
         jPanel6.setBorder(javax.swing.BorderFactory.createTitledBorder("New Position"));
         jPanel6.setToolTipText("");
         jPanel6.setName(""); // NOI18N
+
+        jTFXn.addFocusListener(new java.awt.event.FocusAdapter() {
+            public void focusLost(java.awt.event.FocusEvent evt) {
+                axesLostFocus(evt);
+            }
+        });
+
+        jTFYn.addFocusListener(new java.awt.event.FocusAdapter() {
+            public void focusLost(java.awt.event.FocusEvent evt) {
+                axesLostFocus(evt);
+            }
+        });
 
         javax.swing.GroupLayout jPanel6Layout = new javax.swing.GroupLayout(jPanel6);
         jPanel6.setLayout(jPanel6Layout);
@@ -336,6 +501,11 @@ public class MainForm extends javax.swing.JFrame implements ActionListener{
         jPanel9.setName(""); // NOI18N
 
         jTFZa.setEnabled(false);
+        jTFZa.addFocusListener(new java.awt.event.FocusAdapter() {
+            public void focusLost(java.awt.event.FocusEvent evt) {
+                axesLostFocus(evt);
+            }
+        });
 
         javax.swing.GroupLayout jPanel9Layout = new javax.swing.GroupLayout(jPanel9);
         jPanel9.setLayout(jPanel9Layout);
@@ -352,6 +522,12 @@ public class MainForm extends javax.swing.JFrame implements ActionListener{
         jPanel10.setToolTipText("");
         jPanel10.setName(""); // NOI18N
 
+        jTFZd.addFocusListener(new java.awt.event.FocusAdapter() {
+            public void focusLost(java.awt.event.FocusEvent evt) {
+                axesLostFocus(evt);
+            }
+        });
+
         javax.swing.GroupLayout jPanel10Layout = new javax.swing.GroupLayout(jPanel10);
         jPanel10.setLayout(jPanel10Layout);
         jPanel10Layout.setHorizontalGroup(
@@ -363,22 +539,12 @@ public class MainForm extends javax.swing.JFrame implements ActionListener{
             .addComponent(jTFZd, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
         );
 
-        jPanel11.setBorder(javax.swing.BorderFactory.createTitledBorder("New Position"));
-        jPanel11.setToolTipText("");
-        jPanel11.setName(""); // NOI18N
-
-        javax.swing.GroupLayout jPanel11Layout = new javax.swing.GroupLayout(jPanel11);
-        jPanel11.setLayout(jPanel11Layout);
-        jPanel11Layout.setHorizontalGroup(
-            jPanel11Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jTFZn, javax.swing.GroupLayout.Alignment.TRAILING)
-        );
-        jPanel11Layout.setVerticalGroup(
-            jPanel11Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jTFZn, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-        );
-
         jBGetPos.setText("Get Position");
+        jBGetPos.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jBGetPosActionPerformed(evt);
+            }
+        });
 
         jLabel13.setFont(new java.awt.Font("Tahoma", 1, 24)); // NOI18N
         jLabel13.setText("X,Y:");
@@ -390,17 +556,24 @@ public class MainForm extends javax.swing.JFrame implements ActionListener{
         jPanel13.setToolTipText("");
         jPanel13.setName(""); // NOI18N
 
+        jCBdiameter.setEditable(true);
+        jCBdiameter.addFocusListener(new java.awt.event.FocusAdapter() {
+            public void focusLost(java.awt.event.FocusEvent evt) {
+                axesLostFocus(evt);
+            }
+        });
+
         javax.swing.GroupLayout jPanel13Layout = new javax.swing.GroupLayout(jPanel13);
         jPanel13.setLayout(jPanel13Layout);
         jPanel13Layout.setHorizontalGroup(
             jPanel13Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jTFTooldiameter, javax.swing.GroupLayout.Alignment.TRAILING)
+            .addComponent(jCBdiameter, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
         );
         jPanel13Layout.setVerticalGroup(
             jPanel13Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel13Layout.createSequentialGroup()
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addComponent(jTFTooldiameter, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(jCBdiameter, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
@@ -409,12 +582,16 @@ public class MainForm extends javax.swing.JFrame implements ActionListener{
         jPanel14.setName(""); // NOI18N
 
         jBTXfp.setText("+");
+        jBTXfp.setPreferredSize(new java.awt.Dimension(6, 23));
 
         jBTXhp.setText("+");
+        jBTXhp.setPreferredSize(new java.awt.Dimension(6, 23));
 
         jBTXfm.setText("-");
+        jBTXfm.setPreferredSize(new java.awt.Dimension(6, 23));
 
         jBTXhm.setText("-");
+        jBTXhm.setPreferredSize(new java.awt.Dimension(6, 23));
 
         jLabel16.setText("1");
 
@@ -445,13 +622,13 @@ public class MainForm extends javax.swing.JFrame implements ActionListener{
             jPanel14Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel14Layout.createSequentialGroup()
                 .addGroup(jPanel14Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jBTXfp)
-                    .addComponent(jBTXfm)
+                    .addComponent(jBTXfp, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jBTXfm, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(jLabel16))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 8, Short.MAX_VALUE)
                 .addGroup(jPanel14Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jBTXhp)
-                    .addComponent(jBTXhm)
+                    .addComponent(jBTXhp, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jBTXhm, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(jLabel17)))
         );
 
@@ -460,12 +637,16 @@ public class MainForm extends javax.swing.JFrame implements ActionListener{
         jPanel12.setName(""); // NOI18N
 
         jBTYfp.setText("+");
+        jBTYfp.setPreferredSize(new java.awt.Dimension(6, 23));
 
         jBTYhp.setText("+");
+        jBTYhp.setPreferredSize(new java.awt.Dimension(6, 23));
 
         jBTYfm.setText("-");
+        jBTYfm.setPreferredSize(new java.awt.Dimension(6, 23));
 
         jBTYhm.setText("-");
+        jBTYhm.setPreferredSize(new java.awt.Dimension(6, 23));
 
         jLabel10.setText("1");
 
@@ -496,13 +677,13 @@ public class MainForm extends javax.swing.JFrame implements ActionListener{
             jPanel12Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel12Layout.createSequentialGroup()
                 .addGroup(jPanel12Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jBTYfp)
-                    .addComponent(jBTYfm)
+                    .addComponent(jBTYfp, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jBTYfm, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(jLabel10))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addGroup(jPanel12Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jBTYhp)
-                    .addComponent(jBTYhm)
+                    .addComponent(jBTYhp, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jBTYhm, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(jLabel15)))
         );
 
@@ -516,10 +697,25 @@ public class MainForm extends javax.swing.JFrame implements ActionListener{
         jBMove.setText("Move");
 
         jBHoming.setText("Homeing");
+        jBHoming.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jBHomingActionPerformed(evt);
+            }
+        });
 
         jBPowerON.setText("Power ON");
+        jBPowerON.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jBPowerONActionPerformed(evt);
+            }
+        });
 
-        JBPowerOFF.setText("Power OFF");
+        jBPowerOFF.setText("Power OFF");
+        jBPowerOFF.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jBPowerOFFActionPerformed(evt);
+            }
+        });
 
         jPanel15.setBorder(javax.swing.BorderFactory.createTitledBorder(""));
 
@@ -535,6 +731,27 @@ public class MainForm extends javax.swing.JFrame implements ActionListener{
 
         jCBFastMode.setText("Fast Moves");
 
+        jCBarcI.setEditable(true);
+        jCBarcI.addFocusListener(new java.awt.event.FocusAdapter() {
+            public void focusLost(java.awt.event.FocusEvent evt) {
+                axesLostFocus(evt);
+            }
+        });
+
+        jCBarcJ.setEditable(true);
+        jCBarcJ.addFocusListener(new java.awt.event.FocusAdapter() {
+            public void focusLost(java.awt.event.FocusEvent evt) {
+                axesLostFocus(evt);
+            }
+        });
+
+        jCBfeedrate.setEditable(true);
+        jCBfeedrate.addFocusListener(new java.awt.event.FocusAdapter() {
+            public void focusLost(java.awt.event.FocusEvent evt) {
+                axesLostFocus(evt);
+            }
+        });
+
         javax.swing.GroupLayout jPanel15Layout = new javax.swing.GroupLayout(jPanel15);
         jPanel15.setLayout(jPanel15Layout);
         jPanel15Layout.setHorizontalGroup(
@@ -547,22 +764,20 @@ public class MainForm extends javax.swing.JFrame implements ActionListener{
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                         .addComponent(jLabel25)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(jTFarcI, javax.swing.GroupLayout.DEFAULT_SIZE, 52, Short.MAX_VALUE)
+                        .addComponent(jCBarcI, 0, 1, Short.MAX_VALUE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                        .addComponent(jLabel26))
+                        .addComponent(jLabel26)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(jCBarcJ, 0, 1, Short.MAX_VALUE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addComponent(jCBarcCC)
+                        .addGap(0, 0, 0))
                     .addGroup(jPanel15Layout.createSequentialGroup()
                         .addComponent(jLabel22)
                         .addGap(18, 18, 18)
-                        .addComponent(jTFFeedrate, javax.swing.GroupLayout.DEFAULT_SIZE, 52, Short.MAX_VALUE)
-                        .addGap(18, 18, 18)))
-                .addGap(6, 6, 6)
-                .addGroup(jPanel15Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(jPanel15Layout.createSequentialGroup()
-                        .addComponent(jTFarcJ, javax.swing.GroupLayout.DEFAULT_SIZE, 56, Short.MAX_VALUE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(jCBarcCC))
-                    .addComponent(jCBFastMode))
-                .addContainerGap())
+                        .addComponent(jCBfeedrate, 0, 1, Short.MAX_VALUE)
+                        .addGap(18, 18, 18)
+                        .addComponent(jCBFastMode))))
         );
         jPanel15Layout.setVerticalGroup(
             jPanel15Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -571,23 +786,33 @@ public class MainForm extends javax.swing.JFrame implements ActionListener{
                 .addGroup(jPanel15Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jCBarc)
                     .addComponent(jLabel25)
-                    .addComponent(jTFarcI, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(jLabel26)
-                    .addComponent(jTFarcJ, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jCBarcCC))
+                    .addComponent(jCBarcCC)
+                    .addComponent(jCBarcI, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jCBarcJ, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addGap(18, 18, 18)
                 .addGroup(jPanel15Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel22)
-                    .addComponent(jTFFeedrate, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jCBFastMode))
+                    .addComponent(jCBFastMode)
+                    .addComponent(jCBfeedrate, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
         jPanel16.setBorder(javax.swing.BorderFactory.createTitledBorder("Akt Position"));
 
         jTFXa.setEditable(false);
+        jTFXa.addFocusListener(new java.awt.event.FocusAdapter() {
+            public void focusLost(java.awt.event.FocusEvent evt) {
+                axesLostFocus(evt);
+            }
+        });
 
         jTFYa.setEditable(false);
+        jTFYa.addFocusListener(new java.awt.event.FocusAdapter() {
+            public void focusLost(java.awt.event.FocusEvent evt) {
+                axesLostFocus(evt);
+            }
+        });
 
         javax.swing.GroupLayout jPanel16Layout = new javax.swing.GroupLayout(jPanel16);
         jPanel16.setLayout(jPanel16Layout);
@@ -603,6 +828,30 @@ public class MainForm extends javax.swing.JFrame implements ActionListener{
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jTFYa, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+        );
+
+        jPanel5.setBorder(javax.swing.BorderFactory.createTitledBorder("New Position"));
+
+        jCBZn.setEditable(true);
+        jCBZn.setMinimumSize(new java.awt.Dimension(6, 20));
+        jCBZn.setPreferredSize(new java.awt.Dimension(6, 20));
+        jCBZn.addFocusListener(new java.awt.event.FocusAdapter() {
+            public void focusLost(java.awt.event.FocusEvent evt) {
+                axesLostFocus(evt);
+            }
+        });
+
+        javax.swing.GroupLayout jPanel5Layout = new javax.swing.GroupLayout(jPanel5);
+        jPanel5.setLayout(jPanel5Layout);
+        jPanel5Layout.setHorizontalGroup(
+            jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addComponent(jCBZn, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+        );
+        jPanel5Layout.setVerticalGroup(
+            jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel5Layout.createSequentialGroup()
+                .addGap(0, 0, Short.MAX_VALUE)
+                .addComponent(jCBZn, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
         );
 
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
@@ -627,11 +876,11 @@ public class MainForm extends javax.swing.JFrame implements ActionListener{
                         .addGap(18, 18, 18)
                         .addComponent(jPanel10, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                         .addGap(18, 18, 18)
-                        .addComponent(jPanel11, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                        .addComponent(jPanel5, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                     .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
                         .addComponent(jPanel15, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                         .addGap(18, 18, 18)
-                        .addComponent(jBMove, javax.swing.GroupLayout.DEFAULT_SIZE, 243, Short.MAX_VALUE))
+                        .addComponent(jBMove, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                     .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
                         .addComponent(jScrollPane4)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
@@ -640,15 +889,15 @@ public class MainForm extends javax.swing.JFrame implements ActionListener{
                             .addComponent(jBPosLoad, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                             .addComponent(jBPosSave, javax.swing.GroupLayout.PREFERRED_SIZE, 128, javax.swing.GroupLayout.PREFERRED_SIZE)))
                     .addGroup(jPanel1Layout.createSequentialGroup()
-                        .addComponent(jBHoming, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addComponent(jBHoming, javax.swing.GroupLayout.DEFAULT_SIZE, 92, Short.MAX_VALUE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(jBPowerON, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addComponent(jBPowerON, javax.swing.GroupLayout.DEFAULT_SIZE, 95, Short.MAX_VALUE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(JBPowerOFF, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addComponent(jBPowerOFF, javax.swing.GroupLayout.DEFAULT_SIZE, 99, Short.MAX_VALUE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(jBSetPos, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addComponent(jBSetPos, javax.swing.GroupLayout.DEFAULT_SIZE, 103, Short.MAX_VALUE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(jBGetPos, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                        .addComponent(jBGetPos, javax.swing.GroupLayout.DEFAULT_SIZE, 103, Short.MAX_VALUE))
                     .addGroup(jPanel1Layout.createSequentialGroup()
                         .addComponent(jPanel3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addGap(18, 18, 18)
@@ -675,9 +924,9 @@ public class MainForm extends javax.swing.JFrame implements ActionListener{
                         .addComponent(jBGetPos, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                         .addComponent(jBHoming)
                         .addComponent(jBPowerON)
-                        .addComponent(JBPowerOFF))
+                        .addComponent(jBPowerOFF))
                     .addComponent(jLabel18))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 12, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 15, Short.MAX_VALUE)
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(jPanel1Layout.createSequentialGroup()
                         .addGap(3, 3, 3)
@@ -691,7 +940,7 @@ public class MainForm extends javax.swing.JFrame implements ActionListener{
                             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
                                 .addGap(15, 15, 15)
                                 .addComponent(jPanel3, javax.swing.GroupLayout.PREFERRED_SIZE, 54, javax.swing.GroupLayout.PREFERRED_SIZE)))))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 14, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 15, Short.MAX_VALUE)
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(jLabel7)
                     .addGroup(jPanel1Layout.createSequentialGroup()
@@ -707,22 +956,22 @@ public class MainForm extends javax.swing.JFrame implements ActionListener{
                     .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                         .addComponent(jPanel10, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                         .addComponent(jPanel8, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, 31, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addComponent(jPanel9, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addComponent(jPanel11, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 13, Short.MAX_VALUE)
+                        .addComponent(jPanel9, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                    .addComponent(jPanel5, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 7, Short.MAX_VALUE)
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                         .addComponent(jPanel12, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                         .addComponent(jPanel13, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                         .addComponent(jPanel14, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                     .addComponent(jLabel14))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 13, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 14, Short.MAX_VALUE)
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
                         .addComponent(jBMove, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                         .addComponent(jPanel15, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                     .addComponent(jLabel21))
-                .addContainerGap(15, Short.MAX_VALUE))
+                .addContainerGap(16, Short.MAX_VALUE))
         );
 
         jScrollPane2.setViewportView(jPanel1);
@@ -809,6 +1058,17 @@ public class MainForm extends javax.swing.JFrame implements ActionListener{
 
         jLSFastFeedrate.setText("Settings Text");
 
+        jLabel20.setText("Size of Workingspace");
+
+        jBSWorkSpace.setText("Change");
+        jBSWorkSpace.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jBSettingsActionPerformed(evt);
+            }
+        });
+
+        jLSWorkSpace.setText("Settings Text");
+
         javax.swing.GroupLayout jPanel4Layout = new javax.swing.GroupLayout(jPanel4);
         jPanel4.setLayout(jPanel4Layout);
         jPanel4Layout.setHorizontalGroup(
@@ -826,7 +1086,13 @@ public class MainForm extends javax.swing.JFrame implements ActionListener{
                         .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addComponent(jLSFastFeedrate)
                             .addComponent(jLSHomeing)))
-                    .addComponent(jLabel19))
+                    .addComponent(jLabel19)
+                    .addGroup(jPanel4Layout.createSequentialGroup()
+                        .addGap(164, 164, 164)
+                        .addComponent(jBSWorkSpace)
+                        .addGap(44, 44, 44)
+                        .addComponent(jLSWorkSpace))
+                    .addComponent(jLabel20))
                 .addContainerGap(661, Short.MAX_VALUE))
         );
         jPanel4Layout.setVerticalGroup(
@@ -843,7 +1109,13 @@ public class MainForm extends javax.swing.JFrame implements ActionListener{
                     .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                         .addComponent(jBSFastFeedrate)
                         .addComponent(jLSFastFeedrate)))
-                .addContainerGap(540, Short.MAX_VALUE))
+                .addGap(18, 18, 18)
+                .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jLabel20)
+                    .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                        .addComponent(jBSWorkSpace)
+                        .addComponent(jLSWorkSpace)))
+                .addContainerGap(499, Short.MAX_VALUE))
         );
 
         jScrollPane1.setViewportView(jPanel4);
@@ -907,36 +1179,58 @@ public class MainForm extends javax.swing.JFrame implements ActionListener{
         System.exit(0);
     }//GEN-LAST:event_formWindowClosing
 
-    private void jBConnectActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jBConnectActionPerformed
-        if(evt.getSource()==jBConnect)
-        {
-            if(serial.isConnect())
-            {
-                serial.disconnect();
-            }
-            else
-            {
-                serial.connect((String)jCBPort.getModel().getSelectedItem(), Integer.parseInt((String)jCBPort.getSelectedItem()));
-                //Save config
-                Database.getDatabase().set("Port", (String)jCBPort.getModel().getSelectedItem());
-                Database.getDatabase().set("Speed", ((Integer)jCBPort.getSelectedIndex()).toString());
-            }
-        }
-        
+    @Override
+    public void actionSerialStatusChanged() {
         //Change Status 
         if(serial.isConnect())
         {
             jCBPort.setEnabled(false);
             jCBSpeed.setEnabled(false);
+            jBConnect.setText("Disconnect");
+            jBSend.setEnabled(true);
+            jBHoming.setEnabled(true);
+            jBPowerON.setEnabled(true);
+            jBPowerOFF.setEnabled(true);
+            jBSetPos.setEnabled(true);
+            jBGetPos.setEnabled(true);
+            jBMove.setEnabled(true);
         }
         else
         {
+            lastserialstring="";
             jCBPort.setEnabled(true);
             jCBSpeed.setEnabled(true);            
+            jBConnect.setText("Connect");
+            jBSend.setEnabled(false);
+            jBHoming.setEnabled(false);
+            jBPowerON.setEnabled(false);
+            jBPowerOFF.setEnabled(false);
+            jBSetPos.setEnabled(false);
+            jBGetPos.setEnabled(false);
+            jBMove.setEnabled(false);
         }
         
         jLStatus.setText(serial.getStatus());
-                
+    }
+
+    
+    
+    private void jBConnectActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jBConnectActionPerformed
+        if(serial.isConnect())
+        {
+            serial.disconnect();
+        }
+        else
+        {
+            serial.connect((String)jCBPort.getModel().getSelectedItem(), Integer.parseInt((String)jCBSpeed.getSelectedItem()));
+            //Save config
+            Database.getDatabase().set("Port", (String)jCBPort.getModel().getSelectedItem());
+            Database.getDatabase().set("Speed", ((Integer)jCBSpeed.getSelectedIndex()).toString());
+            
+            send("G90");
+        }
+        
+        actionSerialStatusChanged();
     }//GEN-LAST:event_jBConnectActionPerformed
 
     private void jBSendActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jBSendActionPerformed
@@ -970,36 +1264,143 @@ public class MainForm extends javax.swing.JFrame implements ActionListener{
         //MAXFEEDRATE
         if(evt.getSource()==jBSFastFeedrate)
         {
-            while(true)
+            Double[] d=Tools.getValues(new String[]{"Set the Feetrate for the fast move:"}, new Double[]{Tools.strtodsave(Database.getDatabase().get("MAXFEEDRATE", Tools.dtostr(600.0)))}, new Double[]{Double.MAX_VALUE}, new Double[]{0.0});
+
+            if(d!= null)
+                Database.getDatabase().set("MAXFEEDRATE", Tools.dtostr(d[0]));
+        }
+        
+        //WORKINGSPACE
+        if(evt.getSource()==jBSWorkSpace)
+        {
+            Double[] values = new Double[3];
+            String[] messages= new String[3];
+            
+            for(int i=0; i<3;i++ )
             {
-                Double d;
-                try
-                {
-                    d=Double.parseDouble(JOptionPane.showInputDialog("Set the Feetrate for the fast move:", Database.getDatabase().get("MAXFEEDRATE", "10")));
-                }
-                catch(NumberFormatException ex)
-                {
-                    JOptionPane.showMessageDialog(this, ex.toString() );
-                    continue;
-                }
-                catch(NullPointerException ex)
-                {
-                    break;
-                }
-                Database.getDatabase().set("MAXFEEDRATE", d.toString());
-                break;
+                values[i] = Tools.strtodsave(Database.getDatabase().get("WORKSPACE"+i, Tools.dtostr(200.0)));
+                messages[i] = "Set Size for the "+axesName[i]+" axis";
             }
+            values= Tools.getValues(messages, values, new Double[]{Double.MAX_VALUE, Double.MAX_VALUE, Double.MAX_VALUE}, new Double[]{0.0,0.0,0.0});
+            
+            if(values!= null)
+                for(int i=0; i<3;i++ )
+                    Database.getDatabase().set("WORKSPACE"+i, Tools.dtostr(values[i]));
         }
         
         //Akt Text
         jLSHomeing.setText(homeing[Integer.parseInt(Database.getDatabase().get("HOMEING", "0"))]); //Homeing
-        jLSFastFeedrate.setText(Database.getDatabase().get("MAXFEEDRATE", "10"));
+        jLSFastFeedrate.setText(Database.getDatabase().get("MAXFEEDRATE", Tools.dtostr(600.0)));
+        jLSWorkSpace.setText("");
+        for(int i=0; i<3;i++ )
+            jLSWorkSpace.setText(jLSWorkSpace.getText() +axesName[i]+" = "+ Database.getDatabase().get("WORKSPACE"+i, Tools.dtostr(200.0))+"   ");
         
     }//GEN-LAST:event_jBSettingsActionPerformed
 
+    private void jBHomingActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jBHomingActionPerformed
+        send("G28 X Y Z");
+        for(int i=0;i<3;i++)
+            axes[i][0].set(0.0);
+    }//GEN-LAST:event_jBHomingActionPerformed
+
+    private void jBPowerONActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jBPowerONActionPerformed
+        send("M80");
+    }//GEN-LAST:event_jBPowerONActionPerformed
+
+    private void jBPowerOFFActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jBPowerOFFActionPerformed
+        send("M81");
+    }//GEN-LAST:event_jBPowerOFFActionPerformed
+
+    private void jBSetPosActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jBSetPosActionPerformed
+        Double[] values=new Double[3];
+        Double[] max=new Double[3];
+        String[] messages= new String[3];
+        for(int i=0;i<3;i++)
+        {
+           messages[i]="Set the Value for the "+axesName[i]+" Axis";
+           values[i]= axes[i][0].getdsave();
+           max[i]= Tools.strtodsave(Database.getDatabase().get("WORKSPACE"+i, Tools.dtostr(200.0))); 
+        }
+        
+        values = Tools.getValues(messages, values, max, new Double[]{0.0,0.0,0.0});
+
+        if(values!= null)
+        {
+            String cmd= "G92";
+            for(int i=0;i<3;i++)
+            {
+                axes[i][0].set(values[i]);  
+                cmd+=" "+axesName[i]+Tools.dtostr(values[i]);
+            }
+            send(cmd);
+        }
+        
+
+    }//GEN-LAST:event_jBSetPosActionPerformed
+
+    private void jBGetPosActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jBGetPosActionPerformed
+        pharsnextserial=true;
+        send("M114");
+    }//GEN-LAST:event_jBGetPosActionPerformed
+
+    private void axesLostFocus(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_axesLostFocus
+        //Find Position
+        int cat=-1,num=-1;
+        for(int i=0;i<axes.length;i++)
+            for(int j=0;j<axes[i].length;j++)
+                if(axes[i][j].isObject(evt.getSource()))
+                {
+                    cat=i;
+                    num=j;
+                }
+
+        if(cat==-1)
+            throw new UnsupportedOperationException("Element not in Axes array!");
+        
+        Double value;
+        try {
+           value=axes[cat][num].getd();
+        } catch (ParseException ex) {
+            JOptionPane.showMessageDialog(this, ex.toString());
+            axes[cat][num].setFocus();
+            return;
+        }
+        
+        //Write back Value
+        axes[cat][num].set(value);
+        
+        //Calc other Fields
+        if(cat<=2)
+            switch(num)
+            {
+                case 0: //a
+                case 1: //d
+                    break;
+                case 2: //n
+                    break;
+            }
+        
+
+        //Test Range
+        switch(cat)
+        {
+            case 0: //X
+            case 1: //Y
+            case 2: //Z
+                break;
+            case 3: //I,J
+                break;
+            case 4: //Diameter
+                break;
+            case 5: //Feedrate
+                break;
+        }
+        
+        
+        
+    }//GEN-LAST:event_axesLostFocus
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JButton JBPowerOFF;
-    private javax.swing.JTextField JTFXd;
     private javax.swing.JButton jBConnect;
     private javax.swing.JButton jBGetPos;
     private javax.swing.JButton jBHoming;
@@ -1007,9 +1408,11 @@ public class MainForm extends javax.swing.JFrame implements ActionListener{
     private javax.swing.JButton jBPosLoad;
     private javax.swing.JButton jBPosRem;
     private javax.swing.JButton jBPosSave;
+    private javax.swing.JButton jBPowerOFF;
     private javax.swing.JButton jBPowerON;
     private javax.swing.JButton jBSFastFeedrate;
     private javax.swing.JButton jBSHomeing;
+    private javax.swing.JButton jBSWorkSpace;
     private javax.swing.JButton jBSend;
     private javax.swing.JButton jBSetPos;
     private javax.swing.JButton jBTXfm;
@@ -1023,11 +1426,17 @@ public class MainForm extends javax.swing.JFrame implements ActionListener{
     private javax.swing.JCheckBox jCBFastMode;
     private javax.swing.JComboBox jCBPort;
     private javax.swing.JComboBox jCBSpeed;
+    private javax.swing.JComboBox jCBZn;
     private javax.swing.JCheckBox jCBarc;
     private javax.swing.JCheckBox jCBarcCC;
+    private javax.swing.JComboBox jCBarcI;
+    private javax.swing.JComboBox jCBarcJ;
+    private javax.swing.JComboBox jCBdiameter;
+    private javax.swing.JComboBox jCBfeedrate;
     private javax.swing.JList jLCInOut;
     private javax.swing.JLabel jLSFastFeedrate;
     private javax.swing.JLabel jLSHomeing;
+    private javax.swing.JLabel jLSWorkSpace;
     private javax.swing.JList jLSave;
     private javax.swing.JLabel jLStatus;
     private javax.swing.JLabel jLabel10;
@@ -1041,6 +1450,7 @@ public class MainForm extends javax.swing.JFrame implements ActionListener{
     private javax.swing.JLabel jLabel18;
     private javax.swing.JLabel jLabel19;
     private javax.swing.JLabel jLabel2;
+    private javax.swing.JLabel jLabel20;
     private javax.swing.JLabel jLabel21;
     private javax.swing.JLabel jLabel22;
     private javax.swing.JLabel jLabel25;
@@ -1052,7 +1462,6 @@ public class MainForm extends javax.swing.JFrame implements ActionListener{
     private cnc.gcode.controller.JPPaintable jPPaint;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel10;
-    private javax.swing.JPanel jPanel11;
     private javax.swing.JPanel jPanel12;
     private javax.swing.JPanel jPanel13;
     private javax.swing.JPanel jPanel14;
@@ -1061,6 +1470,7 @@ public class MainForm extends javax.swing.JFrame implements ActionListener{
     private javax.swing.JPanel jPanel2;
     private javax.swing.JPanel jPanel3;
     private javax.swing.JPanel jPanel4;
+    private javax.swing.JPanel jPanel5;
     private javax.swing.JPanel jPanel6;
     private javax.swing.JPanel jPanel7;
     private javax.swing.JPanel jPanel8;
@@ -1070,20 +1480,18 @@ public class MainForm extends javax.swing.JFrame implements ActionListener{
     private javax.swing.JScrollPane jScrollPane3;
     private javax.swing.JScrollPane jScrollPane4;
     private javax.swing.JSplitPane jSplitPane1;
-    private javax.swing.JTextField jTFFeedrate;
     private javax.swing.JTextField jTFSend;
-    private javax.swing.JTextField jTFTooldiameter;
     private javax.swing.JTextField jTFXa;
+    private javax.swing.JTextField jTFXd;
     private javax.swing.JTextField jTFXn;
     private javax.swing.JTextField jTFYa;
     private javax.swing.JTextField jTFYd;
     private javax.swing.JTextField jTFYn;
     private javax.swing.JTextField jTFZa;
     private javax.swing.JTextField jTFZd;
-    private javax.swing.JTextField jTFZn;
-    private javax.swing.JTextField jTFarcI;
-    private javax.swing.JTextField jTFarcJ;
     private javax.swing.JTabbedPane jTabbedPane2;
     // End of variables declaration//GEN-END:variables
+
+    
 
 }

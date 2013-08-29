@@ -15,6 +15,12 @@ import java.io.OutputStream;
  * @author patrick
  */
 public class SerialInterface {
+    public interface IEvent
+    {
+        public void actionSerialStatusChanged();
+    }
+    
+    private IEvent changed;
     private NRSerialPort sp=null;
     private String status="Not Connected!";
     private InputStream is;
@@ -58,9 +64,7 @@ public class SerialInterface {
 //
 //    }
     
-    ActionListener changed;
-    
-    public SerialInterface(ActionListener changed)
+    public SerialInterface(IEvent changed)
     {
         this.changed=changed;
     }
@@ -75,15 +79,21 @@ public class SerialInterface {
     public void disconnect()
     {
         if(!isConnect())
+        {
+            changed.actionSerialStatusChanged();
             return;
+        }
         sp.disconnect();
         sp=null;
-        status="Disconneded";
+        status="Disconneded!";
     }
 
     public void connect(String port, int speed) {
         if(isConnect())
+        {
+            changed.actionSerialStatusChanged();
             return;
+        }
         try
         {
             sp = new NRSerialPort(port, speed);
@@ -101,6 +111,7 @@ public class SerialInterface {
             sp=null;
             status=e.toString();
         }
+        status="Connected!";
     }
 
     public void send(String command) {
@@ -110,7 +121,7 @@ public class SerialInterface {
                 status = ex.toString();
                 sp.disconnect();
                 sp=null;
-                changed.actionPerformed(new ActionEvent(this, 0, status));
+                changed.actionSerialStatusChanged();
         }
     }
 
@@ -128,7 +139,7 @@ public class SerialInterface {
                 status = ex.toString();
                 sp.disconnect();
                 sp=null;
-                changed.actionPerformed(new ActionEvent(this, 0, status));
+                changed.actionSerialStatusChanged();
                 return s;
             }
         }

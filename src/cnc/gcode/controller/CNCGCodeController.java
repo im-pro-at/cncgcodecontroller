@@ -4,10 +4,13 @@
  */
 package cnc.gcode.controller;
 
+import com.sun.xml.internal.bind.v2.schemagen.xmlschema.LocalAttribute;
 import gnu.io.NRSerialPort;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.util.Locale;
+import java.util.Locale;
 import java.util.Set;
 import javax.swing.JOptionPane;
 import javax.swing.UIManager;
@@ -23,7 +26,7 @@ public class CNCGCodeController {
      */
     public static void main(String[] args) throws IOException {
         // TODO code application logic here
-           
+
         try{
             UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
         }
