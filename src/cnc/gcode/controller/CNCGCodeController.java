@@ -4,16 +4,9 @@
  */
 package cnc.gcode.controller;
 
-import com.sun.xml.internal.bind.v2.schemagen.xmlschema.LocalAttribute;
-import gnu.io.NRSerialPort;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.util.Locale;
-import java.util.Locale;
-import java.util.Set;
-import javax.swing.JOptionPane;
 import javax.swing.UIManager;
+import javax.swing.UnsupportedLookAndFeelException;
 
 /**
  *
@@ -30,7 +23,7 @@ public class CNCGCodeController {
         try{
             UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
         }
-        catch(Exception e) {}
+        catch(ClassNotFoundException | InstantiationException | IllegalAccessException | UnsupportedLookAndFeelException e) {}
         
         
         //Run Mainwindow 

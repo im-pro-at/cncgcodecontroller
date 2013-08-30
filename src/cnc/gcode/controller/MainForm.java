@@ -5,15 +5,23 @@
 package cnc.gcode.controller;
 
 import gnu.io.NRSerialPort;
+import java.awt.Color;
+import java.awt.Graphics;
+import java.awt.Rectangle;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.FocusAdapter;
+import java.awt.event.FocusEvent;
+import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Set;
 import javax.swing.DefaultComboBoxModel;
+import javax.swing.JButton;
 import javax.swing.JComboBox;
+import javax.swing.JComponent;
 import javax.swing.JOptionPane;
 import javax.swing.JTextField;
 import javax.swing.SwingUtilities;
@@ -23,42 +31,66 @@ import javax.swing.Timer;
  *
  * @author patrick
  */
-public final class MainForm extends javax.swing.JFrame implements ActionListener, SerialInterface.IEvent{
-
+public final class MainForm extends javax.swing.JFrame {
+    
+    private interface IAxesEvent
+    {
+        void fired(AxesManipulator axis);
+    }
+    
     private class AxesManipulator
     {
-        Object element;
-        Object event;
-        
-        public AxesManipulator(Object element)
+        private final JComponent element;
+        private final IAxesEvent event;
+
+        public AxesManipulator(JComponent element,IAxesEvent event)
         {
             this.element=element;
+            this.event=event;
+            
+            FocusAdapter f=new FocusAdapter() {
+                        @Override
+                        public void focusLost(FocusEvent e) {
+                                AxesManipulator.this.event.fired(AxesManipulator.this);
+                        }
+                    };
+            KeyListener k= new KeyAdapter() {
+                    @Override
+                    public void keyReleased(KeyEvent e) {
+                        if(e.getKeyCode()== KeyEvent.VK_ENTER)
+                                AxesManipulator.this.event.fired(AxesManipulator.this);
+                    }
+                };
+
+            if(element instanceof JComboBox)
+            {
+                ((JComboBox)element).getEditor().getEditorComponent().addFocusListener(f);
+                ((JComboBox)element).getEditor().getEditorComponent().addKeyListener(k);
+                
+            }
+            else
+            {
+                element.addFocusListener(f);
+                element.addKeyListener(k);
+            }
         }
         
         public void setFocus()
         {
-            if(element instanceof JTextField)
-                ((JTextField)element).grabFocus();
-            else if(element instanceof JComboBox)
-                ((JComboBox)element).grabFocus();
-            else
-                throw new UnsupportedOperationException("Not yet implemented");
+            element.requestFocusInWindow();
         }
 
-        public void addFocusLost(FocusAdapter fa)
+        public void dispatchEvent()
         {
-            if(element instanceof JTextField)
-                ((JTextField)element).addFocusListener(fa);
-            else if(element instanceof JComboBox)
-                ((JComboBox)element).getEditor().getEditorComponent().addFocusListener(fa);
-            else
-                throw new UnsupportedOperationException("Not yet implemented");
+            event.fired(this);
         }
         
         public void set(String text)
         {
             if(element instanceof JTextField)
+            {
                 ((JTextField)element).setText(text);
+            }
             else if(element instanceof JComboBox)
                 ((JComboBox)element).setSelectedItem(text);
             else
@@ -98,20 +130,41 @@ public final class MainForm extends javax.swing.JFrame implements ActionListener
                 return 0.0;
             }
         }
-        
-        public boolean isObject(Object element)
-        {
-            if(this.element instanceof JComboBox && (((JComboBox)this.element).getEditor().getEditorComponent()==element))
-                return true;
-            return this.element==element;
+
+        private JComponent getComponent() {
+            return this.element;
         }
+    }
+    
+    public class PrintableElement {
+        boolean arc,ccw;
+        double axes[][] = new double[4][2];
+
+        public PrintableElement() {
+            arc=MainForm.this.jCBarc.isSelected();
+            ccw=MainForm.this.jCBarcCCW.isSelected();
+            for(int i=0;i<3;i++)
+            {
+                axes[i][0]=MainForm.this.axes[i][0].getdsave();
+                axes[i][1]=MainForm.this.axes[i][2].getdsave();
+            }
+            axes[3][0]=MainForm.this.axes[3][0].getdsave();
+            axes[3][1]=MainForm.this.axes[3][1].getdsave();
+        }
+        
         
     }
     
     String[] axesName={"X","Y","Z"};
     
     AxesManipulator[][] axes;
-    SerialInterface serial= new SerialInterface(this);
+    ArrayList<PrintableElement> printList= new ArrayList<PrintableElement>();
+    SerialInterface serial= new SerialInterface(new Tools.IEvent() {
+            @Override
+            public void fired() {
+                actionSerialStatusChanged();
+            }
+        });
     String lastserialstring="";
     Timer serialtimer;
     boolean pharsnextserial=false;
@@ -126,25 +179,24 @@ public final class MainForm extends javax.swing.JFrame implements ActionListener
         initComponents();
         
         //Init Fileds:
+        IAxesEvent event= new IAxesEvent() {
+            @Override
+            public void fired(AxesManipulator axis) {
+                axesEvent(axis);
+            }
+        };
+
         axes= new AxesManipulator[][]   {
-                                        /*0*/    {new AxesManipulator(jTFXa),new AxesManipulator(jTFXd),new AxesManipulator(jTFXn)},
-                                        /*1*/    {new AxesManipulator(jTFYa),new AxesManipulator(jTFYd),new AxesManipulator(jTFYn)},
-                                        /*2*/    {new AxesManipulator(jTFZa),new AxesManipulator(jTFZd),new AxesManipulator(jCBZn)},
-                                        /*3*/    {new AxesManipulator(jCBarcI),new AxesManipulator(jCBarcJ)}, // I,J
-                                        /*4*/    {new AxesManipulator(jCBdiameter)}, //Diameter
-                                        /*5*/    {new AxesManipulator(jCBfeedrate)} //Feedrate
+                                        /*0*/    {new AxesManipulator(jTFXa,event),new AxesManipulator(jTFXd,event),new AxesManipulator(jTFXn,event)},
+                                        /*1*/    {new AxesManipulator(jTFYa,event),new AxesManipulator(jTFYd,event),new AxesManipulator(jTFYn,event)},
+                                        /*2*/    {new AxesManipulator(jTFZa,event),new AxesManipulator(jTFZd,event),new AxesManipulator(jCBZn,event)},
+                                        /*3*/    {new AxesManipulator(jCBarcI,event),new AxesManipulator(jCBarcJ,event)}, // I,J
+                                        /*4*/    {new AxesManipulator(jCBdiameter,event)}, //Diameter
+                                        /*5*/    {new AxesManipulator(jCBfeedrate,event)} //Feedrate
                                         };
         for(AxesManipulator[] axe:axes)
             for(AxesManipulator field:axe)
-            {
                 field.set(0.0);
-                field.addFocusLost(new java.awt.event.FocusAdapter() {
-                    @Override
-                    public void focusLost(java.awt.event.FocusEvent evt) {
-                        axesLostFocus(evt);
-                    }
-                });            
-            }
         
                 
         //Load Database
@@ -181,76 +233,87 @@ public final class MainForm extends javax.swing.JFrame implements ActionListener
                 index++;
             }
         }
-        serialtimer= new Timer(1000, this);
+        serialtimer= new Timer(100, new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    serialtimerfired();
+                }
+            });
         serialtimer.setRepeats(true);
         serialtimer.start();
         
         //Update Comport Status
         actionSerialStatusChanged();
         
+        jPPaint.addPaintEventListener(new JPPaintableListener() {
+            @Override
+            public void paintComponent(JPPaintableEvent evt) {
+                paintAxesAria(evt.g);
+            }
+        });
+        
     }
 
-    @Override
-    public void actionPerformed(ActionEvent e) {
-        if(e.getSource()==serialtimer)
+    public void serialtimerfired() {
+        if(serial.isConnect())
         {
-            if(serial.isConnect())
+            String input = serial.get();
+            ArrayList<String> inputs= new ArrayList<>();
+            inputs.add("");
+            for(char c:input.toCharArray())
             {
-                String input = serial.get();
-                ArrayList<String> inputs= new ArrayList<>();
-                inputs.add("");
-                for(char c:input.toCharArray())
+                if(c=='\n')
+                    inputs.add("");
+                else
+                    inputs.set(inputs.size()-1, inputs.get(inputs.size()-1)+c);
+            }
+
+            inputs.set(0,lastserialstring+inputs.get(0));
+            lastserialstring= inputs.get(inputs.size()-1);
+
+            for(int i=0; i < inputs.size()-1;i++)
+            {
+                ((DefaultComboBoxModel<SendListElement>)jLCInOut.getModel()).addElement(new SendListElement(inputs.get(i), SendListElement.EType.IN));
+                SwingUtilities.invokeLater(new Runnable() {
+                    @Override
+                    public void run() {
+                        jLCInOut.ensureIndexIsVisible(jLCInOut.getModel().getSize()-1);
+                    }
+                });
+                if(pharsnextserial)
                 {
-                    if(c=='\n')
-                        inputs.add("");
-                    else
-                        inputs.set(inputs.size()-1, inputs.get(inputs.size()-1)+c);
-                }
-                
-                inputs.set(0,lastserialstring+inputs.get(0));
-                lastserialstring= inputs.get(inputs.size()-1);
-                
-                for(int i=0; i < inputs.size()-1;i++)
-                {
-                    ((DefaultComboBoxModel<SendListElement>)jLCInOut.getModel()).addElement(new SendListElement(inputs.get(i), SendListElement.EType.IN));
-                    SwingUtilities.invokeLater(new Runnable() {
-                        @Override
-                        public void run() {
-                            jLCInOut.ensureIndexIsVisible(jLCInOut.getModel().getSize()-1);
-                        }
-                    });
-                    if(pharsnextserial)
+                    pharsnextserial=false;
+                    String in=inputs.get(i);
+                    Double[] values= new Double[3];
+                    for(int j=0;j<3;j++)
                     {
-                        pharsnextserial=false;
-                        String in=inputs.get(i);
-                        Double[] values= new Double[3];
+                        int pos =in.indexOf(axesName[j]+":");
+                        if(pos==-1)
+                        {
+                            values=null;
+                            break;
+                        }
+                        try {
+                            String temp=in.substring(pos+2);
+                            values[j]= Tools.strtod(temp);
+                        } catch (ParseException ex) {
+                            values=null;
+                            break;
+                        }
+                    }
+                    if(values!= null)
+                    {
                         for(int j=0;j<3;j++)
                         {
-                            int pos =in.indexOf(axesName[j]+":");
-                            if(pos==-1)
-                            {
-                                values=null;
-                                break;
-                            }
-                            try {
-                                String temp=in.substring(pos+2);
-                                values[j]= Tools.strtod(temp);
-                            } catch (ParseException ex) {
-                                values=null;
-                                break;
-                            }
+                            axes[j][0].set(values[j]);  
+                            axes[j][0].dispatchEvent();
                         }
-                        if(values!= null)
-                        {
-                            for(int j=0;j<3;j++)
-                                axes[j][0].set(values[j]);  
-                            JOptionPane.showMessageDialog(this, "Update done!");
-                        }
-                        else
-                        {
-                            JOptionPane.showMessageDialog(this, "Error reading Position");
-                       }
+                        JOptionPane.showMessageDialog(this, "Update done!");
                     }
+                    else
+                    {
+                        JOptionPane.showMessageDialog(this, "Error reading Position");
+                   }
                 }
             }
         }
@@ -338,7 +401,7 @@ public final class MainForm extends javax.swing.JFrame implements ActionListener
         jPanel15 = new javax.swing.JPanel();
         jCBarc = new javax.swing.JCheckBox();
         jLabel25 = new javax.swing.JLabel();
-        jCBarcCC = new javax.swing.JCheckBox();
+        jCBarcCCW = new javax.swing.JCheckBox();
         jLabel26 = new javax.swing.JLabel();
         jLabel22 = new javax.swing.JLabel();
         jCBFastMode = new javax.swing.JCheckBox();
@@ -455,16 +518,43 @@ public final class MainForm extends javax.swing.JFrame implements ActionListener
                 .addComponent(jTFYn, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
         );
 
+        jLSave.setModel(new SortedComboBoxModel(new PositionListElement[0]));
+        jLSave.setSelectionMode(javax.swing.ListSelectionModel.SINGLE_SELECTION);
+        jLSave.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                jLSaveMouseClicked(evt);
+            }
+        });
+        jLSave.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyPressed(java.awt.event.KeyEvent evt) {
+                jLSaveKeyPressed(evt);
+            }
+        });
         jScrollPane4.setViewportView(jLSave);
 
         jLabel7.setFont(new java.awt.Font("Tahoma", 1, 24)); // NOI18N
         jLabel7.setText("Save:");
 
         jBPosSave.setText("Save Akt Position");
+        jBPosSave.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jBPosSaveActionPerformed(evt);
+            }
+        });
 
         jBPosLoad.setText("Load Position");
+        jBPosLoad.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jBPosLoadActionPerformed(evt);
+            }
+        });
 
         jBPosRem.setText("Remove Position");
+        jBPosRem.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jBPosRemActionPerformed(evt);
+            }
+        });
 
         jLabel11.setFont(new java.awt.Font("Tahoma", 1, 24)); // NOI18N
         jLabel11.setText("Z:");
@@ -496,11 +586,6 @@ public final class MainForm extends javax.swing.JFrame implements ActionListener
         jPanel9.setName(""); // NOI18N
 
         jTFZa.setEnabled(false);
-        jTFZa.addFocusListener(new java.awt.event.FocusAdapter() {
-            public void focusLost(java.awt.event.FocusEvent evt) {
-                axesLostFocus(evt);
-            }
-        });
 
         javax.swing.GroupLayout jPanel9Layout = new javax.swing.GroupLayout(jPanel9);
         jPanel9.setLayout(jPanel9Layout);
@@ -567,15 +652,35 @@ public final class MainForm extends javax.swing.JFrame implements ActionListener
 
         jBTXfp.setText("+");
         jBTXfp.setPreferredSize(new java.awt.Dimension(6, 23));
+        jBTXfp.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jBTool(evt);
+            }
+        });
 
         jBTXhp.setText("+");
         jBTXhp.setPreferredSize(new java.awt.Dimension(6, 23));
+        jBTXhp.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jBTool(evt);
+            }
+        });
 
         jBTXfm.setText("-");
         jBTXfm.setPreferredSize(new java.awt.Dimension(6, 23));
+        jBTXfm.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jBTool(evt);
+            }
+        });
 
         jBTXhm.setText("-");
         jBTXhm.setPreferredSize(new java.awt.Dimension(6, 23));
+        jBTXhm.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jBTool(evt);
+            }
+        });
 
         jLabel16.setText("1");
 
@@ -622,15 +727,35 @@ public final class MainForm extends javax.swing.JFrame implements ActionListener
 
         jBTYfp.setText("+");
         jBTYfp.setPreferredSize(new java.awt.Dimension(6, 23));
+        jBTYfp.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jBTool(evt);
+            }
+        });
 
         jBTYhp.setText("+");
         jBTYhp.setPreferredSize(new java.awt.Dimension(6, 23));
+        jBTYhp.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jBTool(evt);
+            }
+        });
 
         jBTYfm.setText("-");
         jBTYfm.setPreferredSize(new java.awt.Dimension(6, 23));
+        jBTYfm.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jBTool(evt);
+            }
+        });
 
         jBTYhm.setText("-");
         jBTYhm.setPreferredSize(new java.awt.Dimension(6, 23));
+        jBTYhm.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jBTool(evt);
+            }
+        });
 
         jLabel10.setText("1");
 
@@ -679,6 +804,11 @@ public final class MainForm extends javax.swing.JFrame implements ActionListener
 
         jBMove.setFont(new java.awt.Font("Tahoma", 1, 48)); // NOI18N
         jBMove.setText("Move");
+        jBMove.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jBMoveActionPerformed(evt);
+            }
+        });
 
         jBHoming.setText("Homeing");
         jBHoming.addActionListener(new java.awt.event.ActionListener() {
@@ -704,22 +834,38 @@ public final class MainForm extends javax.swing.JFrame implements ActionListener
         jPanel15.setBorder(javax.swing.BorderFactory.createTitledBorder(""));
 
         jCBarc.setText("ARC");
+        jCBarc.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jCBarcActionPerformed(evt);
+            }
+        });
 
         jLabel25.setText("I:");
 
-        jCBarcCC.setText("cc");
+        jCBarcCCW.setText("ccw");
+        jCBarcCCW.setEnabled(false);
 
         jLabel26.setText("J:");
 
         jLabel22.setText("Feedrate:");
 
         jCBFastMode.setText("Fast Moves");
+        jCBFastMode.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jCBFastModeActionPerformed(evt);
+            }
+        });
 
         jCBarcI.setEditable(true);
+        jCBarcI.setModel(new DefaultComboBoxModel<String>(new String[0]));
+        jCBarcI.setEnabled(false);
 
         jCBarcJ.setEditable(true);
+        jCBarcJ.setModel(new DefaultComboBoxModel<String>(new String[0]));
+        jCBarcJ.setEnabled(false);
 
         jCBfeedrate.setEditable(true);
+        jCBfeedrate.setModel(new DefaultComboBoxModel<String>(new String[0]));
 
         javax.swing.GroupLayout jPanel15Layout = new javax.swing.GroupLayout(jPanel15);
         jPanel15.setLayout(jPanel15Layout);
@@ -739,7 +885,7 @@ public final class MainForm extends javax.swing.JFrame implements ActionListener
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(jCBarcJ, 0, 1, Short.MAX_VALUE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                        .addComponent(jCBarcCC))
+                        .addComponent(jCBarcCCW))
                     .addGroup(jPanel15Layout.createSequentialGroup()
                         .addComponent(jLabel22)
                         .addGap(18, 18, 18)
@@ -755,7 +901,7 @@ public final class MainForm extends javax.swing.JFrame implements ActionListener
                     .addComponent(jCBarc)
                     .addComponent(jLabel25)
                     .addComponent(jLabel26)
-                    .addComponent(jCBarcCC)
+                    .addComponent(jCBarcCCW)
                     .addComponent(jCBarcI, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(jCBarcJ, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addGap(18, 18, 18)
@@ -769,18 +915,8 @@ public final class MainForm extends javax.swing.JFrame implements ActionListener
         jPanel16.setBorder(javax.swing.BorderFactory.createTitledBorder("Akt Position"));
 
         jTFXa.setEditable(false);
-        jTFXa.addFocusListener(new java.awt.event.FocusAdapter() {
-            public void focusLost(java.awt.event.FocusEvent evt) {
-                axesLostFocus(evt);
-            }
-        });
 
         jTFYa.setEditable(false);
-        jTFYa.addFocusListener(new java.awt.event.FocusAdapter() {
-            public void focusLost(java.awt.event.FocusEvent evt) {
-                axesLostFocus(evt);
-            }
-        });
 
         javax.swing.GroupLayout jPanel16Layout = new javax.swing.GroupLayout(jPanel16);
         jPanel16.setLayout(jPanel16Layout);
@@ -795,12 +931,13 @@ public final class MainForm extends javax.swing.JFrame implements ActionListener
                 .addComponent(jTFXa, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jTFYa, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addGap(0, 0, 0))
         );
 
         jPanel5.setBorder(javax.swing.BorderFactory.createTitledBorder("New Position"));
 
         jCBZn.setEditable(true);
+        jCBZn.setModel(new DefaultComboBoxModel<String>(new String[0]));
         jCBZn.setMinimumSize(new java.awt.Dimension(6, 20));
         jCBZn.setPreferredSize(new java.awt.Dimension(6, 20));
 
@@ -889,7 +1026,7 @@ public final class MainForm extends javax.swing.JFrame implements ActionListener
                         .addComponent(jBPowerON)
                         .addComponent(jBPowerOFF))
                     .addComponent(jLabel18))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 15, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 16, Short.MAX_VALUE)
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(jPanel1Layout.createSequentialGroup()
                         .addGap(3, 3, 3)
@@ -903,7 +1040,7 @@ public final class MainForm extends javax.swing.JFrame implements ActionListener
                             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
                                 .addGap(15, 15, 15)
                                 .addComponent(jPanel3, javax.swing.GroupLayout.PREFERRED_SIZE, 54, javax.swing.GroupLayout.PREFERRED_SIZE)))))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 15, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 16, Short.MAX_VALUE)
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(jLabel7)
                     .addGroup(jPanel1Layout.createSequentialGroup()
@@ -913,7 +1050,7 @@ public final class MainForm extends javax.swing.JFrame implements ActionListener
                         .addGap(7, 7, 7)
                         .addComponent(jBPosRem))
                     .addComponent(jScrollPane4, javax.swing.GroupLayout.PREFERRED_SIZE, 88, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 13, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 14, Short.MAX_VALUE)
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(jLabel11)
                     .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
@@ -921,20 +1058,20 @@ public final class MainForm extends javax.swing.JFrame implements ActionListener
                         .addComponent(jPanel8, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, 31, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addComponent(jPanel9, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                     .addComponent(jPanel5, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 7, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 10, Short.MAX_VALUE)
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                         .addComponent(jPanel12, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                         .addComponent(jPanel13, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                         .addComponent(jPanel14, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                     .addComponent(jLabel14))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 14, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 15, Short.MAX_VALUE)
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
                         .addComponent(jBMove, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                         .addComponent(jPanel15, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                     .addComponent(jLabel21))
-                .addContainerGap(16, Short.MAX_VALUE))
+                .addContainerGap(17, Short.MAX_VALUE))
         );
 
         jScrollPane2.setViewportView(jPanel1);
@@ -957,6 +1094,7 @@ public final class MainForm extends javax.swing.JFrame implements ActionListener
         jTabbedPane2.addTab("Control", jSplitPane1);
 
         jLCInOut.setModel(new javax.swing.DefaultComboBoxModel(new SendListElement[0]));
+        jLCInOut.setSelectionMode(javax.swing.ListSelectionModel.SINGLE_SELECTION);
         jLCInOut.addListSelectionListener(new javax.swing.event.ListSelectionListener() {
             public void valueChanged(javax.swing.event.ListSelectionEvent evt) {
                 jLCInOutValueChanged(evt);
@@ -1142,7 +1280,6 @@ public final class MainForm extends javax.swing.JFrame implements ActionListener
         System.exit(0);
     }//GEN-LAST:event_formWindowClosing
 
-    @Override
     public void actionSerialStatusChanged() {
         //Change Status 
         if(serial.isConnect())
@@ -1262,8 +1399,13 @@ public final class MainForm extends javax.swing.JFrame implements ActionListener
 
     private void jBHomingActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jBHomingActionPerformed
         send("G28 X Y Z");
+        jPPaint.setRepaintEnable(false);
         for(int i=0;i<3;i++)
+        {
             axes[i][0].set(0.0);
+            axes[i][0].dispatchEvent();
+        }
+        jPPaint.setRepaintEnable(true);
     }//GEN-LAST:event_jBHomingActionPerformed
 
     private void jBPowerONActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jBPowerONActionPerformed
@@ -1290,12 +1432,15 @@ public final class MainForm extends javax.swing.JFrame implements ActionListener
         if(values!= null)
         {
             String cmd= "G92";
+            jPPaint.setRepaintEnable(false);
             for(int i=0;i<3;i++)
             {
                 axes[i][0].set(values[i]);  
+                axes[i][0].dispatchEvent();
                 cmd+=" "+axesName[i]+Tools.dtostr(values[i]);
             }
             send(cmd);
+            jPPaint.setRepaintEnable(true);
         }
         
 
@@ -1305,13 +1450,13 @@ public final class MainForm extends javax.swing.JFrame implements ActionListener
         pharsnextserial=true;
         send("M114");
     }//GEN-LAST:event_jBGetPosActionPerformed
-
-    private void axesLostFocus(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_axesLostFocus
+   
+    private void axesEvent(AxesManipulator axis) {                               
         //Find Position
         int cat=-1,num=-1;
         for(int i=0;i<axes.length;i++)
             for(int j=0;j<axes[i].length;j++)
-                if(axes[i][j].isObject(evt.getSource()))
+                if(axes[i][j]==axis)
                 {
                     cat=i;
                     num=j;
@@ -1324,7 +1469,7 @@ public final class MainForm extends javax.swing.JFrame implements ActionListener
         try {
            value=axes[cat][num].getd();
         } catch (ParseException ex) {
-            JOptionPane.showMessageDialog(this, ex.toString());
+            Tools.popUpToolTip(axes[cat][num].getComponent(), ex.toString());
             axes[cat][num].setFocus();
             return;
         }
@@ -1368,13 +1513,13 @@ public final class MainForm extends javax.swing.JFrame implements ActionListener
         }
         if(axes[cat][num].getdsave()<min)
         {
-            JOptionPane.showMessageDialog(this, "Value have to be gater then "+Tools.dtostr(min));
+            Tools.popUpToolTip(axes[cat][num].getComponent(),"Value have to be gater then "+Tools.dtostr(min));
             axes[cat][num].set(min);
             axes[cat][num].setFocus();
         }
         if(axes[cat][num].getdsave()>max)
         {
-            JOptionPane.showMessageDialog(this, "Value have to be smaler then "+Tools.dtostr(max));
+            Tools.popUpToolTip(axes[cat][num].getComponent(),"Value have to be smaler then "+Tools.dtostr(max));
             axes[cat][num].set(max);
             axes[cat][num].setFocus();
         }
@@ -1391,12 +1536,221 @@ public final class MainForm extends javax.swing.JFrame implements ActionListener
                     axes[cat][1].set(axes[cat][2].getdsave()-axes[cat][0].getdsave());
                     break;
             }
-        
 
+        //Reprint
+        jPPaint.repaint();
         
-        
-    }//GEN-LAST:event_axesLostFocus
+    }                              
 
+    
+    private void jCBarcActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jCBarcActionPerformed
+        if(jCBarc.isSelected())
+        {
+            jCBarcI.setEnabled(true);
+            jCBarcJ.setEnabled(true);
+            jCBarcCCW.setEnabled(true);
+        }
+        else
+        {
+            jCBarcI.setEnabled(false);
+            jCBarcJ.setEnabled(false);
+            jCBarcCCW.setEnabled(false);            
+        }
+    }//GEN-LAST:event_jCBarcActionPerformed
+
+    private void jCBFastModeActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jCBFastModeActionPerformed
+        if(jCBFastMode.isSelected())
+        {
+            jCBfeedrate.setEnabled(false);
+        }
+        else
+        {
+            jCBfeedrate.setEnabled(true);
+        }
+    }//GEN-LAST:event_jCBFastModeActionPerformed
+
+    private void jBTool(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jBTool
+        JButton[][][] buttons= new JButton[][][]  
+                        {{ //X
+                            {jBTXfp, jBTXfm}, //1
+                            {jBTXhp, jBTXhm}  //1/2
+                        },{ //Y
+                            {jBTYfp, jBTYfm}, //1
+                            {jBTYhp, jBTYhm}}};  //1/2
+        int axis=-1,type=-1,sign=-1;
+        
+        for(int i=0;i<buttons.length;i++)
+            for(int j=0;j<buttons[i].length;j++)
+                for(int k=0;k<buttons[i][j].length;k++)
+                    if(buttons[i][j][k]==evt.getSource())
+                    {
+                        axis=i;
+                        type=j;
+                        sign=k;
+                    }
+                    
+        Double d=axes[4][0].getdsave();
+        
+        if(type==1)
+            d=d/2;
+        
+        if(sign==1)
+            d=0.0-d;
+        
+        axes[axis][1].set(axes[axis][1].getdsave()+d);
+        axes[axis][1].dispatchEvent();
+        
+        //Save Diameter
+        if(((DefaultComboBoxModel<String>)jCBdiameter.getModel()).getIndexOf(axes[4][0].get())==-1)
+            jCBdiameter.addItem(axes[4][0].get());
+        
+    }//GEN-LAST:event_jBTool
+
+    private void jBPosSaveActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jBPosSaveActionPerformed
+        String name = JOptionPane.showInputDialog("Name for the Position");
+        if(name==null)
+            return;
+        
+        PositionListElement element= new PositionListElement(name, axes[0][0].getdsave(), axes[1][0].getdsave());
+            
+        ((SortedComboBoxModel<PositionListElement>)jLSave.getModel()).addElement(element);
+        
+    }//GEN-LAST:event_jBPosSaveActionPerformed
+
+    private void jBPosRemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jBPosRemActionPerformed
+        if(jLSave.getSelectedIndex()!=-1)
+            ((SortedComboBoxModel<PositionListElement>)jLSave.getModel()).removeElementAt(jLSave.getSelectedIndex());
+    }//GEN-LAST:event_jBPosRemActionPerformed
+
+    private void loadformsavelist(int index)
+    {
+        if(((SortedComboBoxModel<PositionListElement>)jLSave.getModel()).getElementAt(index)!=null)
+        {
+            jPPaint.setRepaintEnable(false);
+            axes[0][2].set(((SortedComboBoxModel<PositionListElement>)jLSave.getModel()).getElementAt(index).getX());
+            axes[0][2].dispatchEvent();
+            axes[1][2].set(((SortedComboBoxModel<PositionListElement>)jLSave.getModel()).getElementAt(index).getY());
+            axes[1][2].dispatchEvent();
+            jPPaint.setRepaintEnable(true);
+        }
+    }
+    
+    private void jBPosLoadActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jBPosLoadActionPerformed
+        loadformsavelist(jLSave.getSelectedIndex());
+    }//GEN-LAST:event_jBPosLoadActionPerformed
+
+    private void jLSaveMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jLSaveMouseClicked
+        if(evt.getClickCount()==2)
+        {
+            loadformsavelist(jLSave.locationToIndex(evt.getPoint()));
+        }
+    }//GEN-LAST:event_jLSaveMouseClicked
+
+    private void jLSaveKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_jLSaveKeyPressed
+        if(evt.getKeyCode()==KeyEvent.VK_ENTER)
+        {
+            loadformsavelist(jLSave.getSelectedIndex());
+        }
+        if(evt.getKeyCode()==KeyEvent.VK_DELETE)
+        {
+            if(jLSave.getSelectedIndex()!=-1)
+            {
+                ((SortedComboBoxModel<PositionListElement>)jLSave.getModel()).removeElementAt(jLSave.getSelectedIndex());
+            }
+        }
+
+            
+    }//GEN-LAST:event_jLSaveKeyPressed
+
+    private void jBMoveActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jBMoveActionPerformed
+        jPPaint.setRepaintEnable(false);
+        
+        //Test Variables:
+        for(AxesManipulator[] aa:axes)
+            for(AxesManipulator a:aa)
+            {
+                String temp=a.get();
+                a.dispatchEvent();
+                if(!temp.equals(a.get()))
+                {
+                    JOptionPane.showMessageDialog(this, "Not all Parameters in range!");
+                    return;
+                }
+            }
+        
+        //Build Command
+        String cmd;
+        if(jCBarc.isSelected())
+        {
+            if(jCBarcCCW.isSelected())
+                cmd="G3"; //Counterclockwise
+            else
+                cmd="G2"; //Clockwise
+        }
+        else
+        {
+            cmd="G1";  //Linear Move
+        }
+        
+        //Load Axes
+        for(int i=0;i<3;i++)
+            cmd+=" "+axesName[i]+Tools.dtostr(axes[i][2].getdsave());
+        
+        if(jCBarc.isSelected())
+        {
+            cmd+=" I"+Tools.dtostr(axes[3][0].getdsave());
+            cmd+=" J"+Tools.dtostr(axes[3][1].getdsave());
+        }
+        
+        //Get feedrate
+        Double feedrate;
+        if(jCBFastMode.isSelected())
+            feedrate=Tools.strtodsave(Database.getDatabase().get("MAXFEEDRATE", Tools.dtostr(600.0))); 
+        else
+            feedrate=axes[5][0].getdsave();
+        cmd+=" F"+Tools.dtostr(feedrate);
+        
+        //Execute
+        send(cmd);
+        
+        //Save Move
+        printList.add(new PrintableElement());
+        
+        //Update Values
+        for(int i=0;i<3;i++)
+        {
+            axes[i][0].set(axes[i][2].getdsave());
+            axes[i][0].dispatchEvent();
+        }
+        
+        //Save Values
+        if(((DefaultComboBoxModel<String>)jCBZn.getModel()).getIndexOf(axes[2][0].get())==-1)
+            jCBZn.addItem(axes[2][0].get());
+        if(((DefaultComboBoxModel<String>)jCBarcI.getModel()).getIndexOf(axes[3][0].get())==-1)
+            jCBarcI.addItem(axes[3][0].get());
+        if(((DefaultComboBoxModel<String>)jCBarcJ.getModel()).getIndexOf(axes[3][1].get())==-1)
+            jCBarcJ.addItem(axes[3][1].get());
+        if(((DefaultComboBoxModel<String>)jCBfeedrate.getModel()).getIndexOf(axes[5][0].get())==-1)
+            jCBfeedrate.addItem(axes[5][0].get());
+        
+        jPPaint.setRepaintEnable(false);
+                                   
+    }//GEN-LAST:event_jBMoveActionPerformed
+
+    
+    private void paintAxesAria(Graphics g) {
+        //Calc window
+        double ariawidth= Tools.strtodsave(Database.getDatabase().get("WORKSPACE"+0, Tools.dtostr(200.0))); //x
+        double ariaheight= Tools.strtodsave(Database.getDatabase().get("WORKSPACE"+1, Tools.dtostr(200.0))); //y
+        Rectangle rect=Geometrics.placeRectangle(jPPaint.getWidth(), jPPaint.getHeight(), Geometrics.getRatio(ariawidth,ariaheight));
+        
+        g.setColor(Color.white);
+        g.fillRect(rect.x, rect.y, rect.width, rect.height);
+        
+    }
+
+    
+    
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton jBConnect;
     private javax.swing.JButton jBGetPos;
@@ -1425,7 +1779,7 @@ public final class MainForm extends javax.swing.JFrame implements ActionListener
     private javax.swing.JComboBox jCBSpeed;
     private javax.swing.JComboBox jCBZn;
     private javax.swing.JCheckBox jCBarc;
-    private javax.swing.JCheckBox jCBarcCC;
+    private javax.swing.JCheckBox jCBarcCCW;
     private javax.swing.JComboBox jCBarcI;
     private javax.swing.JComboBox jCBarcJ;
     private javax.swing.JComboBox jCBdiameter;

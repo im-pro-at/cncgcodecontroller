@@ -5,8 +5,6 @@
 package cnc.gcode.controller;
 
 import gnu.io.NRSerialPort;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.io.InputStream;
 import java.io.OutputStream;
 
@@ -15,12 +13,8 @@ import java.io.OutputStream;
  * @author patrick
  */
 public class SerialInterface {
-    public interface IEvent
-    {
-        public void actionSerialStatusChanged();
-    }
     
-    private IEvent changed;
+    private Tools.IEvent changed;
     private NRSerialPort sp=null;
     private String status="Not Connected!";
     private InputStream is;
@@ -64,7 +58,7 @@ public class SerialInterface {
 //
 //    }
     
-    public SerialInterface(IEvent changed)
+    public SerialInterface(Tools.IEvent changed)
     {
         this.changed=changed;
     }
@@ -80,7 +74,7 @@ public class SerialInterface {
     {
         if(!isConnect())
         {
-            changed.actionSerialStatusChanged();
+            changed.fired();
             return;
         }
         sp.disconnect();
@@ -91,7 +85,7 @@ public class SerialInterface {
     public void connect(String port, int speed) {
         if(isConnect())
         {
-            changed.actionSerialStatusChanged();
+            changed.fired();
             return;
         }
         try
@@ -121,7 +115,7 @@ public class SerialInterface {
                 status = ex.toString();
                 sp.disconnect();
                 sp=null;
-                changed.actionSerialStatusChanged();
+                changed.fired();
         }
     }
 
@@ -139,7 +133,7 @@ public class SerialInterface {
                 status = ex.toString();
                 sp.disconnect();
                 sp=null;
-                changed.actionSerialStatusChanged();
+                changed.fired();
                 return s;
             }
         }

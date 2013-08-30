@@ -4,10 +4,19 @@
  */
 package cnc.gcode.controller;
 
+import java.awt.Point;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
 import java.text.ParseException;
+import javax.swing.JComponent;
 import javax.swing.JOptionPane;
+import javax.swing.JToolTip;
+import javax.swing.Popup;
+import javax.swing.PopupFactory;
+import javax.swing.SwingUtilities;
+import javax.swing.Timer;
 
 /**
  *
@@ -16,12 +25,46 @@ import javax.swing.JOptionPane;
 public class Tools {
     private static DecimalFormat df;
 
+    // Creates and show a tooltip over the component passed as parameter
+    public static void popUpToolTip(JComponent comp, String text) {
+        // build ToolTip from JComponent
+        JToolTip toolTip = comp.createToolTip();
+        // with the good text
+        toolTip.setTipText(text);
+        // get JComponent position
+        Point point = comp.getLocationOnScreen();
+        final Popup popup = PopupFactory.getSharedInstance().getPopup(comp, toolTip, point.x , point.y + comp.getHeight());
+        // show it
+        popup.show();
+        // and start a thread to remove it 
+        new Timer(5000, new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    SwingUtilities.invokeLater(new Runnable() {
+                        @Override
+                        public void run() {
+                            popup.hide();
+                        }
+                    });
+                }
+            }).start();
+    }
+
+
+    
+        
+    public interface IEvent
+    {
+        public void fired();
+    }
+            
+    
     static {
         DecimalFormatSymbols s = new DecimalFormatSymbols();
         s.setDecimalSeparator('.');
         s.setMonetaryDecimalSeparator('.');
         s.setMinusSign('-');
-        df = new DecimalFormat("0.0000",s);
+        df = new DecimalFormat("0.00",s);
     }
        
     public static Double strtod(String s) throws ParseException

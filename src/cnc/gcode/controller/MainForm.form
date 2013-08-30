@@ -171,7 +171,7 @@
                                   </Group>
                                   <Component id="jLabel18" alignment="0" min="-2" max="-2" attributes="0"/>
                               </Group>
-                              <EmptySpace pref="15" max="32767" attributes="0"/>
+                              <EmptySpace pref="16" max="32767" attributes="0"/>
                               <Group type="103" groupAlignment="0" attributes="0">
                                   <Group type="102" attributes="0">
                                       <EmptySpace min="3" pref="3" max="-2" attributes="0"/>
@@ -191,7 +191,7 @@
                                       </Group>
                                   </Group>
                               </Group>
-                              <EmptySpace pref="15" max="32767" attributes="0"/>
+                              <EmptySpace pref="16" max="32767" attributes="0"/>
                               <Group type="103" groupAlignment="0" attributes="0">
                                   <Component id="jLabel7" min="-2" max="-2" attributes="0"/>
                                   <Group type="102" alignment="0" attributes="0">
@@ -203,7 +203,7 @@
                                   </Group>
                                   <Component id="jScrollPane4" min="-2" pref="88" max="-2" attributes="0"/>
                               </Group>
-                              <EmptySpace pref="13" max="32767" attributes="0"/>
+                              <EmptySpace pref="14" max="32767" attributes="0"/>
                               <Group type="103" groupAlignment="0" attributes="0">
                                   <Component id="jLabel11" min="-2" max="-2" attributes="0"/>
                                   <Group type="103" groupAlignment="0" max="-2" attributes="0">
@@ -213,7 +213,7 @@
                                   </Group>
                                   <Component id="jPanel5" alignment="1" min="-2" max="-2" attributes="0"/>
                               </Group>
-                              <EmptySpace pref="7" max="32767" attributes="0"/>
+                              <EmptySpace pref="10" max="32767" attributes="0"/>
                               <Group type="103" groupAlignment="0" attributes="0">
                                   <Group type="103" groupAlignment="0" max="-2" attributes="0">
                                       <Component id="jPanel12" max="32767" attributes="0"/>
@@ -222,7 +222,7 @@
                                   </Group>
                                   <Component id="jLabel14" min="-2" max="-2" attributes="0"/>
                               </Group>
-                              <EmptySpace pref="14" max="32767" attributes="0"/>
+                              <EmptySpace pref="15" max="32767" attributes="0"/>
                               <Group type="103" groupAlignment="0" attributes="0">
                                   <Group type="103" groupAlignment="1" max="-2" attributes="0">
                                       <Component id="jBMove" max="32767" attributes="0"/>
@@ -230,7 +230,7 @@
                                   </Group>
                                   <Component id="jLabel21" min="-2" max="-2" attributes="0"/>
                               </Group>
-                              <EmptySpace pref="16" max="32767" attributes="0"/>
+                              <EmptySpace pref="17" max="32767" attributes="0"/>
                           </Group>
                       </Group>
                     </DimensionLayout>
@@ -367,10 +367,15 @@
                       <SubComponents>
                         <Component class="javax.swing.JList" name="jLSave">
                           <Properties>
-                            <Property name="model" type="javax.swing.ListModel" editor="org.netbeans.modules.form.editors2.ListModelEditor">
-                              <StringArray count="0"/>
+                            <Property name="model" type="javax.swing.ListModel" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
+                              <Connection code="new SortedComboBoxModel(new PositionListElement[0])" type="code"/>
                             </Property>
+                            <Property name="selectionMode" type="int" value="0"/>
                           </Properties>
+                          <Events>
+                            <EventHandler event="mouseClicked" listener="java.awt.event.MouseListener" parameters="java.awt.event.MouseEvent" handler="jLSaveMouseClicked"/>
+                            <EventHandler event="keyPressed" listener="java.awt.event.KeyListener" parameters="java.awt.event.KeyEvent" handler="jLSaveKeyPressed"/>
+                          </Events>
                         </Component>
                       </SubComponents>
                     </Container>
@@ -386,16 +391,25 @@
                       <Properties>
                         <Property name="text" type="java.lang.String" value="Save Akt Position"/>
                       </Properties>
+                      <Events>
+                        <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="jBPosSaveActionPerformed"/>
+                      </Events>
                     </Component>
                     <Component class="javax.swing.JButton" name="jBPosLoad">
                       <Properties>
                         <Property name="text" type="java.lang.String" value="Load Position"/>
                       </Properties>
+                      <Events>
+                        <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="jBPosLoadActionPerformed"/>
+                      </Events>
                     </Component>
                     <Component class="javax.swing.JButton" name="jBPosRem">
                       <Properties>
                         <Property name="text" type="java.lang.String" value="Remove Position"/>
                       </Properties>
+                      <Events>
+                        <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="jBPosRemActionPerformed"/>
+                      </Events>
                     </Component>
                     <Component class="javax.swing.JLabel" name="jLabel11">
                       <Properties>
@@ -469,9 +483,6 @@
                           <Properties>
                             <Property name="enabled" type="boolean" value="false"/>
                           </Properties>
-                          <Events>
-                            <EventHandler event="focusLost" listener="java.awt.event.FocusListener" parameters="java.awt.event.FocusEvent" handler="axesLostFocus"/>
-                          </Events>
                         </Component>
                       </SubComponents>
                     </Container>
@@ -628,6 +639,9 @@
                               <Dimension value="[6, 23]"/>
                             </Property>
                           </Properties>
+                          <Events>
+                            <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="jBTool"/>
+                          </Events>
                         </Component>
                         <Component class="javax.swing.JButton" name="jBTXhp">
                           <Properties>
@@ -636,6 +650,9 @@
                               <Dimension value="[6, 23]"/>
                             </Property>
                           </Properties>
+                          <Events>
+                            <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="jBTool"/>
+                          </Events>
                         </Component>
                         <Component class="javax.swing.JButton" name="jBTXfm">
                           <Properties>
@@ -644,6 +661,9 @@
                               <Dimension value="[6, 23]"/>
                             </Property>
                           </Properties>
+                          <Events>
+                            <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="jBTool"/>
+                          </Events>
                         </Component>
                         <Component class="javax.swing.JButton" name="jBTXhm">
                           <Properties>
@@ -652,6 +672,9 @@
                               <Dimension value="[6, 23]"/>
                             </Property>
                           </Properties>
+                          <Events>
+                            <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="jBTool"/>
+                          </Events>
                         </Component>
                         <Component class="javax.swing.JLabel" name="jLabel16">
                           <Properties>
@@ -728,6 +751,9 @@
                               <Dimension value="[6, 23]"/>
                             </Property>
                           </Properties>
+                          <Events>
+                            <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="jBTool"/>
+                          </Events>
                         </Component>
                         <Component class="javax.swing.JButton" name="jBTYhp">
                           <Properties>
@@ -736,6 +762,9 @@
                               <Dimension value="[6, 23]"/>
                             </Property>
                           </Properties>
+                          <Events>
+                            <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="jBTool"/>
+                          </Events>
                         </Component>
                         <Component class="javax.swing.JButton" name="jBTYfm">
                           <Properties>
@@ -744,6 +773,9 @@
                               <Dimension value="[6, 23]"/>
                             </Property>
                           </Properties>
+                          <Events>
+                            <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="jBTool"/>
+                          </Events>
                         </Component>
                         <Component class="javax.swing.JButton" name="jBTYhm">
                           <Properties>
@@ -752,6 +784,9 @@
                               <Dimension value="[6, 23]"/>
                             </Property>
                           </Properties>
+                          <Events>
+                            <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="jBTool"/>
+                          </Events>
                         </Component>
                         <Component class="javax.swing.JLabel" name="jLabel10">
                           <Properties>
@@ -788,6 +823,9 @@
                         </Property>
                         <Property name="text" type="java.lang.String" value="Move"/>
                       </Properties>
+                      <Events>
+                        <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="jBMoveActionPerformed"/>
+                      </Events>
                     </Component>
                     <Component class="javax.swing.JButton" name="jBHoming">
                       <Properties>
@@ -839,7 +877,7 @@
                                           <EmptySpace min="-2" max="-2" attributes="0"/>
                                           <Component id="jCBarcJ" pref="0" max="32767" attributes="0"/>
                                           <EmptySpace type="unrelated" max="-2" attributes="0"/>
-                                          <Component id="jCBarcCC" min="-2" max="-2" attributes="0"/>
+                                          <Component id="jCBarcCCW" min="-2" max="-2" attributes="0"/>
                                       </Group>
                                       <Group type="102" alignment="0" attributes="0">
                                           <Component id="jLabel22" min="-2" max="-2" attributes="0"/>
@@ -860,7 +898,7 @@
                                       <Component id="jCBarc" alignment="3" min="-2" max="-2" attributes="0"/>
                                       <Component id="jLabel25" alignment="3" min="-2" max="-2" attributes="0"/>
                                       <Component id="jLabel26" alignment="3" min="-2" max="-2" attributes="0"/>
-                                      <Component id="jCBarcCC" alignment="3" min="-2" max="-2" attributes="0"/>
+                                      <Component id="jCBarcCCW" alignment="3" min="-2" max="-2" attributes="0"/>
                                       <Component id="jCBarcI" alignment="3" min="-2" max="-2" attributes="0"/>
                                       <Component id="jCBarcJ" alignment="3" min="-2" max="-2" attributes="0"/>
                                   </Group>
@@ -880,15 +918,19 @@
                           <Properties>
                             <Property name="text" type="java.lang.String" value="ARC"/>
                           </Properties>
+                          <Events>
+                            <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="jCBarcActionPerformed"/>
+                          </Events>
                         </Component>
                         <Component class="javax.swing.JLabel" name="jLabel25">
                           <Properties>
                             <Property name="text" type="java.lang.String" value="I:"/>
                           </Properties>
                         </Component>
-                        <Component class="javax.swing.JCheckBox" name="jCBarcCC">
+                        <Component class="javax.swing.JCheckBox" name="jCBarcCCW">
                           <Properties>
-                            <Property name="text" type="java.lang.String" value="cc"/>
+                            <Property name="text" type="java.lang.String" value="ccw"/>
+                            <Property name="enabled" type="boolean" value="false"/>
                           </Properties>
                         </Component>
                         <Component class="javax.swing.JLabel" name="jLabel26">
@@ -905,28 +947,33 @@
                           <Properties>
                             <Property name="text" type="java.lang.String" value="Fast Moves"/>
                           </Properties>
+                          <Events>
+                            <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="jCBFastModeActionPerformed"/>
+                          </Events>
                         </Component>
                         <Component class="javax.swing.JComboBox" name="jCBarcI">
                           <Properties>
                             <Property name="editable" type="boolean" value="true"/>
-                            <Property name="model" type="javax.swing.ComboBoxModel" editor="org.netbeans.modules.form.editors2.ComboBoxModelEditor">
-                              <StringArray count="0"/>
+                            <Property name="model" type="javax.swing.ComboBoxModel" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
+                              <Connection code="new DefaultComboBoxModel&lt;String&gt;(new String[0])" type="code"/>
                             </Property>
+                            <Property name="enabled" type="boolean" value="false"/>
                           </Properties>
                         </Component>
                         <Component class="javax.swing.JComboBox" name="jCBarcJ">
                           <Properties>
                             <Property name="editable" type="boolean" value="true"/>
-                            <Property name="model" type="javax.swing.ComboBoxModel" editor="org.netbeans.modules.form.editors2.ComboBoxModelEditor">
-                              <StringArray count="0"/>
+                            <Property name="model" type="javax.swing.ComboBoxModel" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
+                              <Connection code="new DefaultComboBoxModel&lt;String&gt;(new String[0])" type="code"/>
                             </Property>
+                            <Property name="enabled" type="boolean" value="false"/>
                           </Properties>
                         </Component>
                         <Component class="javax.swing.JComboBox" name="jCBfeedrate">
                           <Properties>
                             <Property name="editable" type="boolean" value="true"/>
-                            <Property name="model" type="javax.swing.ComboBoxModel" editor="org.netbeans.modules.form.editors2.ComboBoxModelEditor">
-                              <StringArray count="0"/>
+                            <Property name="model" type="javax.swing.ComboBoxModel" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
+                              <Connection code="new DefaultComboBoxModel&lt;String&gt;(new String[0])" type="code"/>
                             </Property>
                           </Properties>
                         </Component>
@@ -954,7 +1001,7 @@
                                   <Component id="jTFXa" min="-2" max="-2" attributes="0"/>
                                   <EmptySpace max="-2" attributes="0"/>
                                   <Component id="jTFYa" min="-2" max="-2" attributes="0"/>
-                                  <EmptySpace max="32767" attributes="0"/>
+                                  <EmptySpace min="0" pref="0" max="-2" attributes="0"/>
                               </Group>
                           </Group>
                         </DimensionLayout>
@@ -964,17 +1011,11 @@
                           <Properties>
                             <Property name="editable" type="boolean" value="false"/>
                           </Properties>
-                          <Events>
-                            <EventHandler event="focusLost" listener="java.awt.event.FocusListener" parameters="java.awt.event.FocusEvent" handler="axesLostFocus"/>
-                          </Events>
                         </Component>
                         <Component class="javax.swing.JTextField" name="jTFYa">
                           <Properties>
                             <Property name="editable" type="boolean" value="false"/>
                           </Properties>
-                          <Events>
-                            <EventHandler event="focusLost" listener="java.awt.event.FocusListener" parameters="java.awt.event.FocusEvent" handler="axesLostFocus"/>
-                          </Events>
                         </Component>
                       </SubComponents>
                     </Container>
@@ -1006,8 +1047,8 @@
                         <Component class="javax.swing.JComboBox" name="jCBZn">
                           <Properties>
                             <Property name="editable" type="boolean" value="true"/>
-                            <Property name="model" type="javax.swing.ComboBoxModel" editor="org.netbeans.modules.form.editors2.ComboBoxModelEditor">
-                              <StringArray count="0"/>
+                            <Property name="model" type="javax.swing.ComboBoxModel" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
+                              <Connection code="new DefaultComboBoxModel&lt;String&gt;(new String[0])" type="code"/>
                             </Property>
                             <Property name="minimumSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
                               <Dimension value="[6, 20]"/>
@@ -1091,6 +1132,7 @@
                     <Property name="model" type="javax.swing.ListModel" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
                       <Connection code="new javax.swing.DefaultComboBoxModel(new SendListElement[0])" type="code"/>
                     </Property>
+                    <Property name="selectionMode" type="int" value="0"/>
                   </Properties>
                   <Events>
                     <EventHandler event="valueChanged" listener="javax.swing.event.ListSelectionListener" parameters="javax.swing.event.ListSelectionEvent" handler="jLCInOutValueChanged"/>
