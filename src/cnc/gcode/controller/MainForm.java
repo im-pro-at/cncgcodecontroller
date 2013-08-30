@@ -7,12 +7,11 @@ package cnc.gcode.controller;
 import gnu.io.NRSerialPort;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.FocusAdapter;
 import java.awt.event.KeyEvent;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Set;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.JComboBox;
 import javax.swing.JOptionPane;
@@ -29,6 +28,7 @@ public final class MainForm extends javax.swing.JFrame implements ActionListener
     private class AxesManipulator
     {
         Object element;
+        Object event;
         
         public AxesManipulator(Object element)
         {
@@ -45,6 +45,16 @@ public final class MainForm extends javax.swing.JFrame implements ActionListener
                 throw new UnsupportedOperationException("Not yet implemented");
         }
 
+        public void addFocusLost(FocusAdapter fa)
+        {
+            if(element instanceof JTextField)
+                ((JTextField)element).addFocusListener(fa);
+            else if(element instanceof JComboBox)
+                ((JComboBox)element).getEditor().getEditorComponent().addFocusListener(fa);
+            else
+                throw new UnsupportedOperationException("Not yet implemented");
+        }
+        
         public void set(String text)
         {
             if(element instanceof JTextField)
@@ -91,6 +101,8 @@ public final class MainForm extends javax.swing.JFrame implements ActionListener
         
         public boolean isObject(Object element)
         {
+            if(this.element instanceof JComboBox && (((JComboBox)this.element).getEditor().getEditorComponent()==element))
+                return true;
             return this.element==element;
         }
         
@@ -124,8 +136,15 @@ public final class MainForm extends javax.swing.JFrame implements ActionListener
                                         };
         for(AxesManipulator[] axe:axes)
             for(AxesManipulator field:axe)
+            {
                 field.set(0.0);
-        
+                field.addFocusLost(new java.awt.event.FocusAdapter() {
+                    @Override
+                    public void focusLost(java.awt.event.FocusEvent evt) {
+                        axesLostFocus(evt);
+                    }
+                });            
+            }
         
                 
         //Load Database
@@ -402,18 +421,6 @@ public final class MainForm extends javax.swing.JFrame implements ActionListener
         jPanel7.setToolTipText("");
         jPanel7.setName(""); // NOI18N
 
-        jTFXd.addFocusListener(new java.awt.event.FocusAdapter() {
-            public void focusLost(java.awt.event.FocusEvent evt) {
-                axesLostFocus(evt);
-            }
-        });
-
-        jTFYd.addFocusListener(new java.awt.event.FocusAdapter() {
-            public void focusLost(java.awt.event.FocusEvent evt) {
-                axesLostFocus(evt);
-            }
-        });
-
         javax.swing.GroupLayout jPanel7Layout = new javax.swing.GroupLayout(jPanel7);
         jPanel7.setLayout(jPanel7Layout);
         jPanel7Layout.setHorizontalGroup(
@@ -432,18 +439,6 @@ public final class MainForm extends javax.swing.JFrame implements ActionListener
         jPanel6.setBorder(javax.swing.BorderFactory.createTitledBorder("New Position"));
         jPanel6.setToolTipText("");
         jPanel6.setName(""); // NOI18N
-
-        jTFXn.addFocusListener(new java.awt.event.FocusAdapter() {
-            public void focusLost(java.awt.event.FocusEvent evt) {
-                axesLostFocus(evt);
-            }
-        });
-
-        jTFYn.addFocusListener(new java.awt.event.FocusAdapter() {
-            public void focusLost(java.awt.event.FocusEvent evt) {
-                axesLostFocus(evt);
-            }
-        });
 
         javax.swing.GroupLayout jPanel6Layout = new javax.swing.GroupLayout(jPanel6);
         jPanel6.setLayout(jPanel6Layout);
@@ -522,12 +517,6 @@ public final class MainForm extends javax.swing.JFrame implements ActionListener
         jPanel10.setToolTipText("");
         jPanel10.setName(""); // NOI18N
 
-        jTFZd.addFocusListener(new java.awt.event.FocusAdapter() {
-            public void focusLost(java.awt.event.FocusEvent evt) {
-                axesLostFocus(evt);
-            }
-        });
-
         javax.swing.GroupLayout jPanel10Layout = new javax.swing.GroupLayout(jPanel10);
         jPanel10.setLayout(jPanel10Layout);
         jPanel10Layout.setHorizontalGroup(
@@ -557,11 +546,6 @@ public final class MainForm extends javax.swing.JFrame implements ActionListener
         jPanel13.setName(""); // NOI18N
 
         jCBdiameter.setEditable(true);
-        jCBdiameter.addFocusListener(new java.awt.event.FocusAdapter() {
-            public void focusLost(java.awt.event.FocusEvent evt) {
-                axesLostFocus(evt);
-            }
-        });
 
         javax.swing.GroupLayout jPanel13Layout = new javax.swing.GroupLayout(jPanel13);
         jPanel13.setLayout(jPanel13Layout);
@@ -732,25 +716,10 @@ public final class MainForm extends javax.swing.JFrame implements ActionListener
         jCBFastMode.setText("Fast Moves");
 
         jCBarcI.setEditable(true);
-        jCBarcI.addFocusListener(new java.awt.event.FocusAdapter() {
-            public void focusLost(java.awt.event.FocusEvent evt) {
-                axesLostFocus(evt);
-            }
-        });
 
         jCBarcJ.setEditable(true);
-        jCBarcJ.addFocusListener(new java.awt.event.FocusAdapter() {
-            public void focusLost(java.awt.event.FocusEvent evt) {
-                axesLostFocus(evt);
-            }
-        });
 
         jCBfeedrate.setEditable(true);
-        jCBfeedrate.addFocusListener(new java.awt.event.FocusAdapter() {
-            public void focusLost(java.awt.event.FocusEvent evt) {
-                axesLostFocus(evt);
-            }
-        });
 
         javax.swing.GroupLayout jPanel15Layout = new javax.swing.GroupLayout(jPanel15);
         jPanel15.setLayout(jPanel15Layout);
@@ -770,8 +739,7 @@ public final class MainForm extends javax.swing.JFrame implements ActionListener
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(jCBarcJ, 0, 1, Short.MAX_VALUE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                        .addComponent(jCBarcCC)
-                        .addGap(0, 0, 0))
+                        .addComponent(jCBarcCC))
                     .addGroup(jPanel15Layout.createSequentialGroup()
                         .addComponent(jLabel22)
                         .addGap(18, 18, 18)
@@ -835,11 +803,6 @@ public final class MainForm extends javax.swing.JFrame implements ActionListener
         jCBZn.setEditable(true);
         jCBZn.setMinimumSize(new java.awt.Dimension(6, 20));
         jCBZn.setPreferredSize(new java.awt.Dimension(6, 20));
-        jCBZn.addFocusListener(new java.awt.event.FocusAdapter() {
-            public void focusLost(java.awt.event.FocusEvent evt) {
-                axesLostFocus(evt);
-            }
-        });
 
         javax.swing.GroupLayout jPanel5Layout = new javax.swing.GroupLayout(jPanel5);
         jPanel5.setLayout(jPanel5Layout);
@@ -1369,33 +1332,67 @@ public final class MainForm extends javax.swing.JFrame implements ActionListener
         //Write back Value
         axes[cat][num].set(value);
         
+        //Test Range
+        Double min= Double.MIN_VALUE;
+        Double max= Double.MAX_VALUE;
+        switch(cat)
+        {
+            case 0: //X
+            case 1: //Y
+            case 2: //Z
+                if(num!=2)
+                {
+                    //Manipulating a,d
+                    num=1; //only d is manipulatable!
+                    min=0.0-axes[cat][0].getdsave();
+                    max=Tools.strtodsave(Database.getDatabase().get("WORKSPACE"+cat, Tools.dtostr(200.0)))-axes[cat][0].getdsave();
+                }
+                else
+                {
+                    //Manipulating n
+                    min=0.0;
+                    max=Tools.strtodsave(Database.getDatabase().get("WORKSPACE"+cat, Tools.dtostr(200.0)));
+                }
+                break;
+            case 3: //I,J
+                max=Tools.strtodsave(Database.getDatabase().get("WORKSPACE"+num, Tools.dtostr(200.0)));
+                min=0.0-max;
+                break;
+            case 4: //Diameter
+                min=0.0;
+                break;
+            case 5: //Feedrate
+                min=0.0;
+                max=Tools.strtodsave(Database.getDatabase().get("MAXFEEDRATE", Tools.dtostr(600.0)));
+                break;
+        }
+        if(axes[cat][num].getdsave()<min)
+        {
+            JOptionPane.showMessageDialog(this, "Value have to be gater then "+Tools.dtostr(min));
+            axes[cat][num].set(min);
+            axes[cat][num].setFocus();
+        }
+        if(axes[cat][num].getdsave()>max)
+        {
+            JOptionPane.showMessageDialog(this, "Value have to be smaler then "+Tools.dtostr(max));
+            axes[cat][num].set(max);
+            axes[cat][num].setFocus();
+        }
+
         //Calc other Fields
         if(cat<=2)
             switch(num)
             {
                 case 0: //a
                 case 1: //d
+                    axes[cat][2].set(axes[cat][0].getdsave()+axes[cat][1].getdsave());
                     break;
                 case 2: //n
+                    axes[cat][1].set(axes[cat][2].getdsave()-axes[cat][0].getdsave());
                     break;
             }
         
 
-        //Test Range
-        switch(cat)
-        {
-            case 0: //X
-            case 1: //Y
-            case 2: //Z
-                break;
-            case 3: //I,J
-                break;
-            case 4: //Diameter
-                break;
-            case 5: //Feedrate
-                break;
-        }
-        
         
         
     }//GEN-LAST:event_axesLostFocus

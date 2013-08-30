@@ -318,14 +318,8 @@
                       </Layout>
                       <SubComponents>
                         <Component class="javax.swing.JTextField" name="jTFXd">
-                          <Events>
-                            <EventHandler event="focusLost" listener="java.awt.event.FocusListener" parameters="java.awt.event.FocusEvent" handler="axesLostFocus"/>
-                          </Events>
                         </Component>
                         <Component class="javax.swing.JTextField" name="jTFYd">
-                          <Events>
-                            <EventHandler event="focusLost" listener="java.awt.event.FocusListener" parameters="java.awt.event.FocusEvent" handler="axesLostFocus"/>
-                          </Events>
                         </Component>
                       </SubComponents>
                     </Container>
@@ -359,14 +353,8 @@
                       </Layout>
                       <SubComponents>
                         <Component class="javax.swing.JTextField" name="jTFXn">
-                          <Events>
-                            <EventHandler event="focusLost" listener="java.awt.event.FocusListener" parameters="java.awt.event.FocusEvent" handler="axesLostFocus"/>
-                          </Events>
                         </Component>
                         <Component class="javax.swing.JTextField" name="jTFYn">
-                          <Events>
-                            <EventHandler event="focusLost" listener="java.awt.event.FocusListener" parameters="java.awt.event.FocusEvent" handler="axesLostFocus"/>
-                          </Events>
                         </Component>
                       </SubComponents>
                     </Container>
@@ -512,9 +500,6 @@
                       </Layout>
                       <SubComponents>
                         <Component class="javax.swing.JTextField" name="jTFZd">
-                          <Events>
-                            <EventHandler event="focusLost" listener="java.awt.event.FocusListener" parameters="java.awt.event.FocusEvent" handler="axesLostFocus"/>
-                          </Events>
                         </Component>
                       </SubComponents>
                     </Container>
@@ -577,9 +562,6 @@
                               <StringArray count="0"/>
                             </Property>
                           </Properties>
-                          <Events>
-                            <EventHandler event="focusLost" listener="java.awt.event.FocusListener" parameters="java.awt.event.FocusEvent" handler="axesLostFocus"/>
-                          </Events>
                         </Component>
                       </SubComponents>
                     </Container>
@@ -858,7 +840,6 @@
                                           <Component id="jCBarcJ" pref="0" max="32767" attributes="0"/>
                                           <EmptySpace type="unrelated" max="-2" attributes="0"/>
                                           <Component id="jCBarcCC" min="-2" max="-2" attributes="0"/>
-                                          <EmptySpace min="0" pref="0" max="-2" attributes="0"/>
                                       </Group>
                                       <Group type="102" alignment="0" attributes="0">
                                           <Component id="jLabel22" min="-2" max="-2" attributes="0"/>
@@ -932,9 +913,6 @@
                               <StringArray count="0"/>
                             </Property>
                           </Properties>
-                          <Events>
-                            <EventHandler event="focusLost" listener="java.awt.event.FocusListener" parameters="java.awt.event.FocusEvent" handler="axesLostFocus"/>
-                          </Events>
                         </Component>
                         <Component class="javax.swing.JComboBox" name="jCBarcJ">
                           <Properties>
@@ -943,9 +921,6 @@
                               <StringArray count="0"/>
                             </Property>
                           </Properties>
-                          <Events>
-                            <EventHandler event="focusLost" listener="java.awt.event.FocusListener" parameters="java.awt.event.FocusEvent" handler="axesLostFocus"/>
-                          </Events>
                         </Component>
                         <Component class="javax.swing.JComboBox" name="jCBfeedrate">
                           <Properties>
@@ -954,9 +929,6 @@
                               <StringArray count="0"/>
                             </Property>
                           </Properties>
-                          <Events>
-                            <EventHandler event="focusLost" listener="java.awt.event.FocusListener" parameters="java.awt.event.FocusEvent" handler="axesLostFocus"/>
-                          </Events>
                         </Component>
                       </SubComponents>
                     </Container>
@@ -1044,9 +1016,6 @@
                               <Dimension value="[6, 20]"/>
                             </Property>
                           </Properties>
-                          <Events>
-                            <EventHandler event="focusLost" listener="java.awt.event.FocusListener" parameters="java.awt.event.FocusEvent" handler="axesLostFocus"/>
-                          </Events>
                         </Component>
                       </SubComponents>
                     </Container>
