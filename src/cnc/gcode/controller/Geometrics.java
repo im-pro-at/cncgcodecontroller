@@ -12,7 +12,6 @@ import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Point;
 import java.awt.Rectangle;
-import java.util.ArrayList;
 
 /**
  *
@@ -166,13 +165,18 @@ public final class Geometrics {
     /**
      * Calces the scale for (w2,h2) to fit into (w1,h1) 
      */
-    public static double getScale(int w1, int h1, int w2, int h2){
+    public static double getScale(double w1, double h1, double w2, double h2){
         if(getRatio(w1,h1) < getRatio(w2,h2))
             return (double)w1/w2;            
         else
             return (double)h1/h2;            
     }
-        
+
+    public static double getScale(int w1, int h1, int w2, int h2){
+        return getScale((double)w1,(double)h1,(double)w2,(double)h2);
+    }
+
+    
     /**
      * Manipulate rectangle (old) (defined in Operation) with delta. Allowed area is (0,max.x;0,max.y)
      * returns new rectangle
@@ -392,6 +396,28 @@ public final class Geometrics {
         return new Rectangle((int)(r.x*scale)+center.x, (int)((r.y)*scale)+center.y,(int)(r.width*scale), (int)(r.height*scale));
     }
     
+    
+    public static boolean doubleequals(double a, double b, double epsilon)
+    {
+        double f= a-b;
+        if(f <= ( 0 - epsilon ) )
+            return false;
+        if(f >= ( 0 + epsilon ) )
+            return false;
+        return true;
+    }
+    
+    public static boolean doubleequals(double a, double b)
+    {
+        double epsilon = 0.0000001;
+        return doubleequals(a, b, epsilon);
+    }
+    
+    public static double getdistance(double x1, double y1, double x2, double y2)
+    {
+        return Math.hypot(x1-x2, y1-y2);
+    }
+
     private Geometrics(){
         throw new AssertionError();
     }
