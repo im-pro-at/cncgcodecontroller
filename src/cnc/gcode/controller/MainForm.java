@@ -191,7 +191,7 @@ public final class MainForm extends javax.swing.JFrame {
                     g.drawLine(point.x + (int)(xc*scale), point.y +(int)(yc*scale), point.x +(int)(axes[0][0]*scale), point.y +(int)(axes[1][0]*scale));
                     g.drawLine(point.x + (int)(xc*scale), point.y +(int)(yc*scale), point.x +(int)(axes[0][1]*scale), point.y +(int)(axes[1][1]*scale));
                     g.setColor(Color.red);
-                    g.fillArc(point.x + (int)(xc*scale)-3, point.y +(int)(yc*scale)-3, 6, 6, 0, 360);
+                    g.fillArc(point.x + (int)(xc*scale)-4, point.y +(int)(yc*scale)-4, 8, 8, 0, 360);
                     g.setColor(Color.black);
                     g.fillArc(point.x + (int)(axes[0][0]*scale)-2, point.y +(int)(axes[1][0]*scale)-2, 4, 4, 0, 360);
                     g.fillArc(point.x + (int)(axes[0][1]*scale)-2, point.y +(int)(axes[1][1]*scale)-2, 4, 4, 0, 360);
@@ -1786,14 +1786,19 @@ public final class MainForm extends javax.swing.JFrame {
                     return;
                 }
             }
+        //Z or XY move allowed but not both
+        boolean mxy= !Geometrics.doubleequals(axes[0][0].getdsave(), axes[0][2].getdsave(),0.001) || !Geometrics.doubleequals(axes[1][0].getdsave(), axes[1][2].getdsave(),0.001);
+        boolean mz=!Geometrics.doubleequals(axes[2][0].getdsave(), axes[2][2].getdsave(),0.001);
+        if(mxy && mz)
+        {
+            JOptionPane.showMessageDialog(this, "Only XY move or Z move allowed .. but not both!");
+            return;
+        }
+        
+        
+        
         if(jCBarc.isSelected())
         {
-            //Z move not allowed!
-            if(!Geometrics.doubleequals(axes[2][0].getdsave(), axes[2][2].getdsave(),0.001))
-            {
-                JOptionPane.showMessageDialog(this, "Z move in ARC Mode not supported!");
-                return;
-            }
             
             //Check equi-distant
             double cx=axes[0][0].getdsave()+axes[3][0].getdsave();
