@@ -49,14 +49,6 @@ public class Tools {
                 }
             }).start();
     }
-
-
-    
-        
-    public interface IEvent
-    {
-        public void fired();
-    }
             
     
     static {

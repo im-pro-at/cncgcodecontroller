@@ -12,41 +12,54 @@ import java.io.ObjectInput;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutput;
 import java.io.ObjectOutputStream;
-import java.util.HashMap;
+import java.util.EnumMap;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  *
  * @author patrick
  */
-public class Database {
-    private static Database self= new Database();
-    public static Database getDatabase()
-    {
-        return self;
-    }
-
-    HashMap<String, String> data = new HashMap<>();
+public enum Database {
     
-    //private Constractor
-    private Database()
+    //Port Settings
+    PORT(""),
+    SPEED("9"),
+    
+    //Control
+    HOMEING("0"), //Homing Point 0= upper left; 1= upper right; 2= lower left; 3= lower right;
+    MAXFEEDRATE(Tools.dtostr(600.0)), 
+    WORKSPACE0(Tools.dtostr(200.0)),
+    WORKSPACE1(Tools.dtostr(200.0)),
+    WORKSPACE2(Tools.dtostr(200.0)),
+    
+    //CNC
+    FILEDIRECTORY(System.getProperty("user.home")),
+    
+    ;
+
+    private final String defaultValue;
+
+    private Database(String defaultvalue)
     {
-        //nothing to do! (just make it private => Sigilton)
+        this.defaultValue=defaultvalue;
     }
-
-
+   
+    private static EnumMap<Database, String> data = new EnumMap<>(Database.class);
+    
     /**
      * Loads the Data from a File 
      * @return 
      * true => no errors 
      */
-    public boolean load(){
+    public static boolean load(){
         try {
             File file = new File("Settings.ois");
             ObjectInput in = new ObjectInputStream(new FileInputStream(file));
-            data= (HashMap<String, String>)in.readObject();
+            data= (EnumMap<Database, String>)in.readObject();
             return true;
-        } catch (ClassNotFoundException | IOException ex) {
-            System.out.print(ex.toString());
+        } catch (Exception ex) {
+            Logger.getLogger(Database.class.getName()).log(Level.SEVERE, null, ex); 
             return false;
         }
     }
@@ -56,7 +69,7 @@ public class Database {
      * @return 
      * true => no errors
      */
-    public boolean save(){
+    public static boolean save(){
         try {
             File file = new File("Settings.ois");
             if(!file.exists())
@@ -65,17 +78,17 @@ public class Database {
             out.writeObject(data);
             return true;
         } catch (IOException ex) {
-            System.out.print(ex.toString());
+            Logger.getLogger(Database.class.getName()).log(Level.SEVERE, null, ex); 
             return false;
         }
     }
 
-    public void set(String name, String value)
+    public static void set(Database name, String value)
     {
        data.put(name, value);        
     }
     
-    public String get(String name, String dvalue)
+    public static String get(Database name)
     {
         if(data.containsKey(name))
         {
@@ -83,8 +96,18 @@ public class Database {
         }
         else
         {
-            data.put(name, dvalue);        
-            return dvalue;
+            return name.defaultValue;
         }
     }
+    
+    public void set(String value)
+    {
+        Database.set(this, value);
+    }
+    
+    public String get()
+    {
+        return Database.get(this);
+    }
+    
 }
