@@ -12,6 +12,8 @@ import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Point;
 import java.awt.Rectangle;
+import java.awt.geom.Point2D;
+import java.awt.geom.Rectangle2D;
 
 /**
  *
@@ -123,6 +125,18 @@ public final class Geometrics {
         int r_y=rectangle.y;
         int r_w=rectangle.width;
         int r_h=rectangle.height;
+        if((x+margin)>=r_x && (y+margin) >= r_y && (x-margin)<=(r_x+r_w) && (y-margin)<=(r_y+r_h))
+            return true;
+        return false;
+    }
+
+    public static boolean pointInRectangle(Point2D point, Rectangle2D rectangle, double margin){
+        double x= point.getX();
+        double y= point.getY();
+        double r_x=rectangle.getX();
+        double r_y=rectangle.getY();
+        double r_w=rectangle.getWidth();
+        double r_h=rectangle.getHeight();
         if((x+margin)>=r_x && (y+margin) >= r_y && (x-margin)<=(r_x+r_w) && (y-margin)<=(r_y+r_h))
             return true;
         return false;

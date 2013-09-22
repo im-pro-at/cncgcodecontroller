@@ -35,6 +35,11 @@ public enum Database {
     
     //CNC
     FILEDIRECTORY(System.getProperty("user.home")),
+    TOOLCHANGE("M6 T?"),
+    SPINDLEON("M?"),
+    SPINDLEOFF("M5"),
+    GOFEEDRATE(Tools.dtostr(100.0)),
+    TOOLSIZE(Tools.dtostr(5.0)),
     
     ;
 
@@ -83,12 +88,12 @@ public enum Database {
         }
     }
 
-    public static void set(Database name, String value)
+    public synchronized static void set(Database name, String value)
     {
        data.put(name, value);        
     }
     
-    public static String get(Database name)
+    public synchronized static String get(Database name)
     {
         if(data.containsKey(name))
         {
@@ -109,5 +114,11 @@ public enum Database {
     {
         return Database.get(this);
     }
+
+    @Override
+    public String toString() {
+        return Database.get(this);
+    }
+    
     
 }

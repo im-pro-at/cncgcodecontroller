@@ -4,8 +4,10 @@
  */
 package cnc.gcode.controller;
 
-import java.awt.event.ActionEvent;
+import java.awt.Dimension;
 import javax.swing.JOptionPane;
+import javax.swing.JScrollPane;
+import javax.swing.JTextArea;
 
 /**
  *
@@ -39,6 +41,11 @@ public class JPanelSettings extends javax.swing.JPanel implements IGUIEvent{
         jLSWorkSpace.setText("");
         for(int i=0; i<3;i++ )
             jLSWorkSpace.setText(jLSWorkSpace.getText() +CommandParsing.axesName[i]+" = "+ Database.values()[Database.WORKSPACE0.ordinal()+i].get()+"   ");        
+        jLSCNCToolChange.setText(Tools.convertToMultiline(Database.TOOLCHANGE.get()));
+        jLSCNCSpindleON.setText(Tools.convertToMultiline(Database.SPINDLEON.get()));
+        jLSCNCSpindleOFF.setText(Tools.convertToMultiline(Database.SPINDLEOFF.get()));
+        jLSCNCG0Feedrate.setText(Database.GOFEEDRATE.get());
+        jLSCNCToolSize.setText(Database.TOOLSIZE.get());
     }
     
     private void fireupdateGUI()
@@ -60,21 +67,27 @@ public class JPanelSettings extends javax.swing.JPanel implements IGUIEvent{
         jLabel2 = new javax.swing.JLabel();
         jBSHomeing = new javax.swing.JButton();
         jLSHomeing = new javax.swing.JLabel();
-        jLSFastFeedrate = new javax.swing.JLabel();
-        jBSFastFeedrate = new javax.swing.JButton();
         jLabel19 = new javax.swing.JLabel();
+        jBSFastFeedrate = new javax.swing.JButton();
+        jLSFastFeedrate = new javax.swing.JLabel();
         jLabel20 = new javax.swing.JLabel();
         jBSWorkSpace = new javax.swing.JButton();
         jLSWorkSpace = new javax.swing.JLabel();
-        jLSCNCToolChange = new javax.swing.JLabel();
-        jBSCNCToolChange = new javax.swing.JButton();
         jLabel32 = new javax.swing.JLabel();
+        jBSCNCToolChange = new javax.swing.JButton();
+        jLSCNCToolChange = new javax.swing.JLabel();
+        jLabel35 = new javax.swing.JLabel();
+        jBSCNCSpindleON = new javax.swing.JButton();
+        jLSCNCSpindleON = new javax.swing.JLabel();
+        jLabel36 = new javax.swing.JLabel();
+        jBSCNCSpindleOFF = new javax.swing.JButton();
+        jLSCNCSpindleOFF = new javax.swing.JLabel();
         jLabel33 = new javax.swing.JLabel();
         jBSCNCG0Feedrate = new javax.swing.JButton();
         jLSCNCG0Feedrate = new javax.swing.JLabel();
-        jLSCNCToolSize = new javax.swing.JLabel();
-        jBSCNCToolSize = new javax.swing.JButton();
         jLabel34 = new javax.swing.JLabel();
+        jBSCNCToolSize = new javax.swing.JButton();
+        jLSCNCToolSize = new javax.swing.JLabel();
 
         jLabel2.setText("Homeing:");
 
@@ -87,7 +100,7 @@ public class JPanelSettings extends javax.swing.JPanel implements IGUIEvent{
 
         jLSHomeing.setText("Settings Text");
 
-        jLSFastFeedrate.setText("Settings Text");
+        jLabel19.setText("Fast Move Feedrate:");
 
         jBSFastFeedrate.setText("Change");
         jBSFastFeedrate.addActionListener(new java.awt.event.ActionListener() {
@@ -96,7 +109,7 @@ public class JPanelSettings extends javax.swing.JPanel implements IGUIEvent{
             }
         });
 
-        jLabel19.setText("Fast Move Feedrate:");
+        jLSFastFeedrate.setText("Settings Text");
 
         jLabel20.setText("Size of Workingspace:");
 
@@ -109,7 +122,7 @@ public class JPanelSettings extends javax.swing.JPanel implements IGUIEvent{
 
         jLSWorkSpace.setText("Settings Text");
 
-        jLSCNCToolChange.setText("Settings Text");
+        jLabel32.setText("CNC/Tool Change:");
 
         jBSCNCToolChange.setText("Change");
         jBSCNCToolChange.addActionListener(new java.awt.event.ActionListener() {
@@ -118,7 +131,29 @@ public class JPanelSettings extends javax.swing.JPanel implements IGUIEvent{
             }
         });
 
-        jLabel32.setText("CNC/Tool Change:");
+        jLSCNCToolChange.setText("Settings Text");
+
+        jLabel35.setText("CNC/Spindle ON:");
+
+        jBSCNCSpindleON.setText("Change");
+        jBSCNCSpindleON.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jBSettingsActionPerformed(evt);
+            }
+        });
+
+        jLSCNCSpindleON.setText("Settings Text");
+
+        jLabel36.setText("CNC/Spindle OFF:");
+
+        jBSCNCSpindleOFF.setText("Change");
+        jBSCNCSpindleOFF.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jBSettingsActionPerformed(evt);
+            }
+        });
+
+        jLSCNCSpindleOFF.setText("Settings Text");
 
         jLabel33.setText("CNC/G0 Feedrate");
 
@@ -131,7 +166,7 @@ public class JPanelSettings extends javax.swing.JPanel implements IGUIEvent{
 
         jLSCNCG0Feedrate.setText("Settings Text");
 
-        jLSCNCToolSize.setText("Settings Text");
+        jLabel34.setText("CNC/Paint Tool Size");
 
         jBSCNCToolSize.setText("Change");
         jBSCNCToolSize.addActionListener(new java.awt.event.ActionListener() {
@@ -140,7 +175,7 @@ public class JPanelSettings extends javax.swing.JPanel implements IGUIEvent{
             }
         });
 
-        jLabel34.setText("CNC/Paint Tool Size");
+        jLSCNCToolSize.setText("Settings Text");
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
@@ -153,24 +188,30 @@ public class JPanelSettings extends javax.swing.JPanel implements IGUIEvent{
                     .addComponent(jLabel19)
                     .addComponent(jLabel20)
                     .addComponent(jLabel32)
+                    .addComponent(jLabel35)
+                    .addComponent(jLabel36)
                     .addComponent(jLabel33)
                     .addComponent(jLabel34))
                 .addGap(50, 50, 50)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jBSHomeing)
-                    .addComponent(jBSFastFeedrate)
-                    .addComponent(jBSWorkSpace)
-                    .addComponent(jBSCNCToolChange)
+                    .addComponent(jBSCNCToolSize)
                     .addComponent(jBSCNCG0Feedrate)
-                    .addComponent(jBSCNCToolSize))
+                    .addComponent(jBSCNCSpindleOFF)
+                    .addComponent(jBSCNCSpindleON)
+                    .addComponent(jBSCNCToolChange)
+                    .addComponent(jBSWorkSpace)
+                    .addComponent(jBSFastFeedrate)
+                    .addComponent(jBSHomeing))
                 .addGap(50, 50, 50)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jLSCNCToolSize)
-                    .addComponent(jLSCNCG0Feedrate)
-                    .addComponent(jLSCNCToolChange)
-                    .addComponent(jLSWorkSpace)
+                    .addComponent(jLSHomeing)
                     .addComponent(jLSFastFeedrate)
-                    .addComponent(jLSHomeing))
+                    .addComponent(jLSWorkSpace)
+                    .addComponent(jLSCNCToolChange)
+                    .addComponent(jLSCNCSpindleON)
+                    .addComponent(jLSCNCSpindleOFF)
+                    .addComponent(jLSCNCG0Feedrate)
+                    .addComponent(jLSCNCToolSize))
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
@@ -196,6 +237,16 @@ public class JPanelSettings extends javax.swing.JPanel implements IGUIEvent{
                     .addComponent(jLabel32)
                     .addComponent(jBSCNCToolChange)
                     .addComponent(jLSCNCToolChange))
+                .addGap(18, 18, 18)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jLabel35)
+                    .addComponent(jBSCNCSpindleON)
+                    .addComponent(jLSCNCSpindleON))
+                .addGap(18, 18, 18)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jLabel36)
+                    .addComponent(jBSCNCSpindleOFF)
+                    .addComponent(jLSCNCSpindleOFF))
                 .addGap(18, 18, 18)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel33)
@@ -224,8 +275,7 @@ public class JPanelSettings extends javax.swing.JPanel implements IGUIEvent{
         if(evt.getSource()==jBSFastFeedrate)
         {
             Double[] d=Tools.getValues(new String[]{"Set the Feetrate for the fast move:"}, new Double[]{Tools.strtodsave(Database.MAXFEEDRATE.get())}, new Double[]{Double.MAX_VALUE}, new Double[]{0.0});
-            if(d!= null)
-            Database.MAXFEEDRATE.set(Tools.dtostr(d[0]));
+            if(d!= null) Database.MAXFEEDRATE.set(Tools.dtostr(d[0]));
         }
 
         //WORKINGSPACE
@@ -245,18 +295,91 @@ public class JPanelSettings extends javax.swing.JPanel implements IGUIEvent{
             for(int i=0; i<3;i++ )
             Database.values()[Database.WORKSPACE0.ordinal()+i].set(Tools.dtostr(values[i]));
         }
+        
+        //Toolchange
+        if(evt.getSource()==jBSCNCToolChange)
+        {
+            JTextArea textArea = new JTextArea(Database.TOOLCHANGE.get()); 
+            JScrollPane scrollArea = new JScrollPane(textArea); 
+            scrollArea.setPreferredSize(new Dimension(100, 100));
 
+            if(JOptionPane.showConfirmDialog
+                    (
+                    this,
+                    new Object[]{"Enter the commands to chnage the Tool:", scrollArea,"Hint: '?' will be replaced with the Tool Number"},
+                    "Tool change:",
+                    JOptionPane.OK_CANCEL_OPTION
+                    )
+                    ==JOptionPane.OK_OPTION)
+                Database.TOOLCHANGE.set(textArea.getText().trim());
+        }
+        
+        //Spindle ON
+        if(evt.getSource()==jBSCNCSpindleON)
+        {
+            JTextArea textArea = new JTextArea(Database.SPINDLEON.get()); 
+            JScrollPane scrollArea = new JScrollPane(textArea); 
+            scrollArea.setPreferredSize(new Dimension(100, 100));
+
+            if(JOptionPane.showConfirmDialog
+                    (
+                    this,
+                    new Object[]{"Enter the commands to turn the spindle on:", scrollArea,"Hint: '?' will be replaced with the Origenal Command Number!"},
+                    "Spindle ON:",
+                    JOptionPane.OK_CANCEL_OPTION
+                    )
+                    ==JOptionPane.OK_OPTION)
+                Database.SPINDLEON.set(textArea.getText().trim());
+        }
+
+        //Spindle OFF
+        if(evt.getSource()==jBSCNCSpindleOFF)
+        {
+            JTextArea textArea = new JTextArea(Database.SPINDLEOFF.get()); 
+            JScrollPane scrollArea = new JScrollPane(textArea); 
+            scrollArea.setPreferredSize(new Dimension(100, 100));
+
+            if(JOptionPane.showConfirmDialog
+                    (
+                    this,
+                    new Object[]{"Enter the commands to turn the spindle off:", scrollArea},
+                    "Spindle OFF:",
+                    JOptionPane.OK_CANCEL_OPTION
+                    )
+                    ==JOptionPane.OK_OPTION)
+                Database.SPINDLEOFF.set(textArea.getText().trim());
+        }
+        
+        
+        //G0Feedrate
+        if(evt.getSource()==jBSCNCG0Feedrate)
+        {
+            Double[] d=Tools.getValues(new String[]{"Set the Feetrate for the G0 move:"}, new Double[]{Tools.strtodsave(Database.GOFEEDRATE.get())}, new Double[]{Tools.strtodsave(Database.MAXFEEDRATE.get())}, new Double[]{0.0});
+            if(d!= null) Database.GOFEEDRATE.set(Tools.dtostr(d[0]));
+        }
+        
+        //Tooldiameter
+        if(evt.getSource()==jBSCNCToolSize)
+        {
+            Double[] d=Tools.getValues(new String[]{"Set the Toolsize for CNC Milling Simulation:"}, new Double[]{Tools.strtodsave(Database.TOOLSIZE.get())}, new Double[]{Double.MAX_VALUE}, new Double[]{0.0});
+            if(d!= null) Database.TOOLSIZE.set(Tools.dtostr(d[0]));
+        }
+        
         fireupdateGUI();
     }//GEN-LAST:event_jBSettingsActionPerformed
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton jBSCNCG0Feedrate;
+    private javax.swing.JButton jBSCNCSpindleOFF;
+    private javax.swing.JButton jBSCNCSpindleON;
     private javax.swing.JButton jBSCNCToolChange;
     private javax.swing.JButton jBSCNCToolSize;
     private javax.swing.JButton jBSFastFeedrate;
     private javax.swing.JButton jBSHomeing;
     private javax.swing.JButton jBSWorkSpace;
     private javax.swing.JLabel jLSCNCG0Feedrate;
+    private javax.swing.JLabel jLSCNCSpindleOFF;
+    private javax.swing.JLabel jLSCNCSpindleON;
     private javax.swing.JLabel jLSCNCToolChange;
     private javax.swing.JLabel jLSCNCToolSize;
     private javax.swing.JLabel jLSFastFeedrate;
@@ -268,5 +391,7 @@ public class JPanelSettings extends javax.swing.JPanel implements IGUIEvent{
     private javax.swing.JLabel jLabel32;
     private javax.swing.JLabel jLabel33;
     private javax.swing.JLabel jLabel34;
+    private javax.swing.JLabel jLabel35;
+    private javax.swing.JLabel jLabel36;
     // End of variables declaration//GEN-END:variables
 }

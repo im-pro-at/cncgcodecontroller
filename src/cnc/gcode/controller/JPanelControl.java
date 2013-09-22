@@ -10,20 +10,14 @@ import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Point;
 import java.awt.Rectangle;
-import java.awt.event.FocusAdapter;
-import java.awt.event.FocusEvent;
-import java.awt.event.KeyAdapter;
+import java.awt.RenderingHints;
 import java.awt.event.KeyEvent;
-import java.awt.event.KeyListener;
 import java.awt.geom.GeneralPath;
 import java.text.ParseException;
 import java.util.ArrayList;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.JButton;
-import javax.swing.JComboBox;
-import javax.swing.JComponent;
 import javax.swing.JOptionPane;
-import javax.swing.JTextField;
 
 /**
  *
@@ -33,121 +27,6 @@ public class JPanelControl extends javax.swing.JPanel implements IGUIEvent{
 
     private IEvent GUIEvent=null;
 
-    private interface IAxesEvent
-    {
-        void fired(AxesManipulator axis);
-    }
-    
-    private class AxesManipulator
-    {
-        private final JComponent element;
-        private final IAxesEvent event;
-
-        public AxesManipulator(JComponent element,IAxesEvent event)
-        {
-            this.element=element;
-            this.event=event;
-            
-            FocusAdapter f=new FocusAdapter() {
-                        @Override
-                        public void focusLost(FocusEvent e) {
-                                AxesManipulator.this.event.fired(AxesManipulator.this);
-                        }
-
-                        @Override
-                        public void focusGained(FocusEvent e) {
-                            if(e.getSource() instanceof JComboBox)
-                            {
-                                ((JComboBox)e.getSource()).getEditor().selectAll();
-                            }
-                            if(e.getSource() instanceof JTextField)
-                            {
-                                ((JTextField)e.getSource()).selectAll();
-                            }                            
-                        }
-                        
-                    };
-            KeyListener k= new KeyAdapter() {
-                    @Override
-                    public void keyReleased(KeyEvent e) {
-                        if(e.getKeyCode()== KeyEvent.VK_ENTER)
-                                AxesManipulator.this.event.fired(AxesManipulator.this);
-                    }
-                };
-
-            if(element instanceof JComboBox)
-            {
-                ((JComboBox)element).getEditor().getEditorComponent().addFocusListener(f);
-                ((JComboBox)element).getEditor().getEditorComponent().addKeyListener(k);
-            }
-            else
-            {
-                element.addFocusListener(f);
-                element.addKeyListener(k);
-            }
-        }
-        
-        public void setFocus()
-        {
-            element.requestFocusInWindow();
-        }
-
-        public void dispatchEvent()
-        {
-            event.fired(this);
-        }
-        
-        public void set(String text)
-        {
-            if(element instanceof JTextField)
-            {
-                ((JTextField)element).setText(text);
-            }
-            else if(element instanceof JComboBox)
-                ((JComboBox)element).setSelectedItem(text);
-            else
-                throw new UnsupportedOperationException("Not yet implemented");
-
-        }
- 
-        public String get()
-        {
-            if(element instanceof JTextField)
-                return ((JTextField)element).getText();
-            else if(element instanceof JComboBox)
-                return ((JComboBox)element).getSelectedItem().toString();
-            else
-                throw new UnsupportedOperationException("Not yet implemented");
-        }
-
-        public void set(Double d)
-        {
-            set(Tools.dtostr(d));
-        }
-
-        
-        public Double getd() throws ParseException
-        {
-            return Tools.strtod(get());
-        }
-
-        /**
-         * Return 0.0 if its not a Number!
-         */
-        public Double getdsave()
-        {
-            try {
-                return Tools.strtod(get());
-            } catch (ParseException ex) {
-                return 0.0;
-            }
-        }
-
-        private JComponent getComponent() {
-            return this.element;
-        }
-    }
-    
     private class PrintableElement {
         boolean arc,ccw;
         double diameter;
@@ -247,7 +126,7 @@ public class JPanelControl extends javax.swing.JPanel implements IGUIEvent{
         
     }
     
-    AxesManipulator[][] axes;
+    NumberFildManipulator[][] axes;
     ArrayList<PrintableElement> printList= new ArrayList<>();
 
     boolean pharsnextserial=false;
@@ -260,23 +139,23 @@ public class JPanelControl extends javax.swing.JPanel implements IGUIEvent{
         initComponents();
 
         //Init Fileds:
-        IAxesEvent event= new IAxesEvent() {
+        NumberFildManipulator.IAxesEvent event= new NumberFildManipulator.IAxesEvent() {
             @Override
-            public void fired(AxesManipulator axis) {
+            public void fired(NumberFildManipulator axis) {
                 axesEvent(axis);
             }
         };
 
-        axes= new AxesManipulator[][]   {
-                                        /*0*/    {new AxesManipulator(jTFXa,event),new AxesManipulator(jTFXd,event),new AxesManipulator(jTFXn,event)},
-                                        /*1*/    {new AxesManipulator(jTFYa,event),new AxesManipulator(jTFYd,event),new AxesManipulator(jTFYn,event)},
-                                        /*2*/    {new AxesManipulator(jTFZa,event),new AxesManipulator(jTFZd,event),new AxesManipulator(jCBZn,event)},
-                                        /*3*/    {new AxesManipulator(jCBarcI,event),new AxesManipulator(jCBarcJ,event)}, // I,J
-                                        /*4*/    {new AxesManipulator(jCBdiameter,event)}, //Diameter
-                                        /*5*/    {new AxesManipulator(jCBfeedrate,event)} //Feedrate
+        axes= new NumberFildManipulator[][]   {
+                                        /*0*/    {new NumberFildManipulator(jTFXa,event),new NumberFildManipulator(jTFXd,event),new NumberFildManipulator(jTFXn,event)},
+                                        /*1*/    {new NumberFildManipulator(jTFYa,event),new NumberFildManipulator(jTFYd,event),new NumberFildManipulator(jTFYn,event)},
+                                        /*2*/    {new NumberFildManipulator(jTFZa,event),new NumberFildManipulator(jTFZd,event),new NumberFildManipulator(jCBZn,event)},
+                                        /*3*/    {new NumberFildManipulator(jCBarcI,event),new NumberFildManipulator(jCBarcJ,event)}, // I,J
+                                        /*4*/    {new NumberFildManipulator(jCBdiameter,event)}, //Diameter
+                                        /*5*/    {new NumberFildManipulator(jCBfeedrate,event)} //Feedrate
                                         };
-        for(AxesManipulator[] axe:axes)
-            for(AxesManipulator field:axe)
+        for(NumberFildManipulator[] axe:axes)
+            for(NumberFildManipulator field:axe)
                 field.set(0.0);
         
         axes[5][0].set(Tools.strtodsave(Database.MAXFEEDRATE.get())/10);
@@ -361,7 +240,7 @@ public class JPanelControl extends javax.swing.JPanel implements IGUIEvent{
     }
    
     
-    private void axesEvent(AxesManipulator axis) {                               
+    private void axesEvent(NumberFildManipulator axis) {                               
         //Find Position
         int cat=-1,num=-1;
         for(int i=0;i<axes.length;i++)
@@ -379,7 +258,7 @@ public class JPanelControl extends javax.swing.JPanel implements IGUIEvent{
         try {
            value=axes[cat][num].getd();
         } catch (ParseException ex) {
-            Tools.popUpToolTip(axes[cat][num].getComponent(), ex.toString());
+            axes[cat][num].popUpToolTip(ex.toString());
             axes[cat][num].setFocus();
             return;
         }
@@ -423,13 +302,13 @@ public class JPanelControl extends javax.swing.JPanel implements IGUIEvent{
         }
         if(axes[cat][num].getdsave()<min)
         {
-            Tools.popUpToolTip(axes[cat][num].getComponent(),"Value have to be gater then "+Tools.dtostr(min));
+            axes[cat][num].popUpToolTip("Value have to be gater then "+Tools.dtostr(min));
             axes[cat][num].set(min);
             axes[cat][num].setFocus();
         }
         if(axes[cat][num].getdsave()>max)
         {
-            Tools.popUpToolTip(axes[cat][num].getComponent(),"Value have to be smaler then "+Tools.dtostr(max));
+            axes[cat][num].popUpToolTip("Value have to be smaler then "+Tools.dtostr(max));
             axes[cat][num].set(max);
             axes[cat][num].setFocus();
         }
@@ -453,7 +332,7 @@ public class JPanelControl extends javax.swing.JPanel implements IGUIEvent{
     }                              
 
     
-       private void paintAxesAria(Graphics g) {
+    private void paintAxesAria(Graphics g) {
         //Calc window
         double ariawidth= Tools.strtodsave(Database.WORKSPACE0.get()); //x
         double ariaheight= Tools.strtodsave(Database.WORKSPACE1.get()); //y
@@ -462,6 +341,8 @@ public class JPanelControl extends javax.swing.JPanel implements IGUIEvent{
         if(g instanceof Graphics2D == false)
             throw new UnsupportedOperationException("Graphics is not 2D!");
         Graphics2D g2d=(Graphics2D)g;
+        
+        g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 
         //Scale for homeing position
         g2d.translate(jPPaint.getWidth()/2, jPPaint.getHeight()/2);
@@ -586,7 +467,8 @@ public class JPanelControl extends javax.swing.JPanel implements IGUIEvent{
         jBMove = new javax.swing.JButton();
         jPPaint = new cnc.gcode.controller.JPPaintable();
 
-        jSplitPane1.setDividerLocation(300);
+        jSplitPane1.setDividerLocation(400);
+        jSplitPane1.setResizeWeight(0.5);
 
         jBHoming.setText("Homeing");
         jBHoming.addActionListener(new java.awt.event.ActionListener() {
@@ -1135,15 +1017,15 @@ public class JPanelControl extends javax.swing.JPanel implements IGUIEvent{
                             .addComponent(jBPosLoad, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                             .addComponent(jBPosSave, javax.swing.GroupLayout.PREFERRED_SIZE, 128, javax.swing.GroupLayout.PREFERRED_SIZE)))
                     .addGroup(jPanel1Layout.createSequentialGroup()
-                        .addComponent(jBHoming, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addComponent(jBHoming, javax.swing.GroupLayout.DEFAULT_SIZE, 89, Short.MAX_VALUE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(jBPowerON, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addComponent(jBPowerON, javax.swing.GroupLayout.DEFAULT_SIZE, 96, Short.MAX_VALUE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(jBPowerOFF, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addComponent(jBPowerOFF, javax.swing.GroupLayout.DEFAULT_SIZE, 100, Short.MAX_VALUE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(jBSetPos, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addComponent(jBSetPos, javax.swing.GroupLayout.DEFAULT_SIZE, 104, Short.MAX_VALUE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(jBGetPos, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                        .addComponent(jBGetPos, javax.swing.GroupLayout.DEFAULT_SIZE, 104, Short.MAX_VALUE))
                     .addGroup(jPanel1Layout.createSequentialGroup()
                         .addComponent(jPXYname, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addGap(18, 18, 18)
@@ -1172,7 +1054,7 @@ public class JPanelControl extends javax.swing.JPanel implements IGUIEvent{
                         .addComponent(jBPowerON)
                         .addComponent(jBPowerOFF))
                     .addComponent(jLabel18))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 22, Short.MAX_VALUE)
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(jPanel1Layout.createSequentialGroup()
                         .addGap(3, 3, 3)
@@ -1186,7 +1068,7 @@ public class JPanelControl extends javax.swing.JPanel implements IGUIEvent{
                             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
                                 .addGap(15, 15, 15)
                                 .addComponent(jPXYname, javax.swing.GroupLayout.PREFERRED_SIZE, 54, javax.swing.GroupLayout.PREFERRED_SIZE)))))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 22, Short.MAX_VALUE)
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(jLabel7)
                     .addGroup(jPanel1Layout.createSequentialGroup()
@@ -1196,7 +1078,7 @@ public class JPanelControl extends javax.swing.JPanel implements IGUIEvent{
                         .addGap(7, 7, 7)
                         .addComponent(jBPosRem))
                     .addComponent(jScrollPane4, javax.swing.GroupLayout.PREFERRED_SIZE, 88, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 22, Short.MAX_VALUE)
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(jLabel11)
                     .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
@@ -1204,20 +1086,20 @@ public class JPanelControl extends javax.swing.JPanel implements IGUIEvent{
                         .addComponent(jPZname, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, 31, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addComponent(jPZakt, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                     .addComponent(jPZnew, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 22, Short.MAX_VALUE)
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                         .addComponent(jPYdiameter, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                         .addComponent(jPdiameter, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                         .addComponent(jPXdiameter, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                     .addComponent(jLabel14))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 24, Short.MAX_VALUE)
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
                         .addComponent(jBMove, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                         .addComponent(jPoptions, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                     .addComponent(jLabel21))
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addContainerGap(27, Short.MAX_VALUE))
         );
 
         jScrollPane2.setViewportView(jPanel1);
@@ -1234,11 +1116,11 @@ public class JPanelControl extends javax.swing.JPanel implements IGUIEvent{
         jPPaint.setLayout(jPPaintLayout);
         jPPaintLayout.setHorizontalGroup(
             jPPaintLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 299, Short.MAX_VALUE)
+            .addGap(0, 399, Short.MAX_VALUE)
         );
         jPPaintLayout.setVerticalGroup(
             jPPaintLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 451, Short.MAX_VALUE)
+            .addGap(0, 549, Short.MAX_VALUE)
         );
 
         jSplitPane1.setLeftComponent(jPPaint);
@@ -1247,15 +1129,15 @@ public class JPanelControl extends javax.swing.JPanel implements IGUIEvent{
         this.setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 944, Short.MAX_VALUE)
+            .addGap(0, 1050, Short.MAX_VALUE)
             .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                .addComponent(jSplitPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 944, Short.MAX_VALUE))
+                .addComponent(jSplitPane1))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGap(0, 551, Short.MAX_VALUE)
             .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                .addComponent(jSplitPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 551, Short.MAX_VALUE))
+                .addComponent(jSplitPane1))
         );
     }// </editor-fold>//GEN-END:initComponents
 
@@ -1457,8 +1339,8 @@ public class JPanelControl extends javax.swing.JPanel implements IGUIEvent{
         jPPaint.setRepaintEnable(false);
 
         //Test Variables:
-        for(AxesManipulator[] aa:axes)
-        for(AxesManipulator a:aa)
+        for(NumberFildManipulator[] aa:axes)
+        for(NumberFildManipulator a:aa)
         {
             String temp=a.get();
             a.dispatchEvent();

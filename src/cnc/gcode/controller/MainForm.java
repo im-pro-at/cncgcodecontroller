@@ -88,6 +88,7 @@ public final class MainForm extends javax.swing.JFrame implements IGUIEvent{
         //Controll      
         jCBPort.setEnabled(!serial);
         jCBSpeed.setEnabled(!serial);
+        jBConnect.setEnabled(!isworking);
         jBConnect.setText(serial?"Disconnect":"Connect");
     }
     
@@ -131,7 +132,7 @@ public final class MainForm extends javax.swing.JFrame implements IGUIEvent{
         });
 
         jTabbedPane2.addTab("Control", jPanelControl);
-        jTabbedPane2.addTab("CNC Milling (beta)", jPanelCNCMilling);
+        jTabbedPane2.addTab("CNC Milling", jPanelCNCMilling);
         jTabbedPane2.addTab("Communication", jPanelCommunication);
 
         jScrollPane.setViewportView(jPanelSettings);
@@ -165,12 +166,12 @@ public final class MainForm extends javax.swing.JFrame implements IGUIEvent{
                 .addComponent(jBConnect)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jLStatus, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-            .addComponent(jTabbedPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 971, Short.MAX_VALUE)
+            .addComponent(jTabbedPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 1029, Short.MAX_VALUE)
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
-                .addComponent(jTabbedPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 536, Short.MAX_VALUE)
+                .addComponent(jTabbedPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 559, Short.MAX_VALUE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jBConnect)

@@ -173,6 +173,8 @@ public class Communication {
         sp=null;
         status="Disconneded!";
         doUpdate();
+        
+        notifyAll();
     }
 
     public synchronized void connect(String port, int speed) {
@@ -213,12 +215,26 @@ public class Communication {
     }
     
     public synchronized void send(final String command) {
+        if(!isConnect())
+            return;
+        
+        while(sendlinecount>linecount)
+        {
+            try {
+                wait();
+            } catch (InterruptedException ex) { 
+                return;
+            }
+        }
+
+        if(!isConnect())
+            return;
+
+        sendlinecount=linecount+1; //Block till answer!
+        
+        
         
         try {
-            while(sendlinecount>linecount)
-                wait();
-            sendlinecount=linecount+1; //Block till answer!
-        
             os.write((command+"\n").getBytes());
             
             for(final ISend e:send)

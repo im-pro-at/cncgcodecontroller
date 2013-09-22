@@ -4,64 +4,32 @@
  */
 package cnc.gcode.controller;
 
-import java.awt.Point;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
 import java.text.ParseException;
-import javax.swing.JComponent;
 import javax.swing.JOptionPane;
-import javax.swing.JToolTip;
-import javax.swing.Popup;
-import javax.swing.PopupFactory;
-import javax.swing.SwingUtilities;
-import javax.swing.Timer;
 
 /**
  *
  * @author patrick
  */
 public class Tools {
-    private static DecimalFormat df;
+    private static final ThreadLocal<DecimalFormat> df= new ThreadLocal<DecimalFormat>(){
 
-    // Creates and show a tooltip over the component passed as parameter
-    public static void popUpToolTip(JComponent comp, String text) {
-        // build ToolTip from JComponent
-        JToolTip toolTip = comp.createToolTip();
-        // with the good text
-        toolTip.setTipText(text);
-        // get JComponent position
-        Point point = comp.getLocationOnScreen();
-        final Popup popup = PopupFactory.getSharedInstance().getPopup(comp, toolTip, point.x , point.y + comp.getHeight());
-        // show it
-        popup.show();
-        // and start a thread to remove it 
-        new Timer(5000, new ActionListener() {
-                @Override
-                public void actionPerformed(ActionEvent e) {
-                    SwingUtilities.invokeLater(new Runnable() {
-                        @Override
-                        public void run() {
-                            popup.hide();
-                        }
-                    });
-                }
-            }).start();
-    }
-            
-    
-    static {
-        DecimalFormatSymbols s = new DecimalFormatSymbols();
-        s.setDecimalSeparator('.');
-        s.setMonetaryDecimalSeparator('.');
-        s.setMinusSign('-');
-        df = new DecimalFormat("0.00",s);
-    }
-       
+        @Override
+        protected DecimalFormat initialValue() {
+            DecimalFormatSymbols s = new DecimalFormatSymbols();
+            s.setDecimalSeparator('.');
+            s.setMonetaryDecimalSeparator('.');
+            s.setMinusSign('-');
+            return new DecimalFormat("0.0000",s); 
+        }
+        
+    };
+        
     public static Double strtod(String s) throws ParseException
     {
-        return df.parse(s).doubleValue();
+        return df.get().parse(s).doubleValue();
     }
 
     /**
@@ -79,10 +47,20 @@ public class Tools {
         }
     }
     
-    public static String dtostr(Double d)
+    public static String dtostr(double d)
     {
-        return df.format(d);
+        return df.get().format(d);
     }
+    
+    public static String formatDuration(long secounds)
+    {
+        return String.format("%d:%02d:%02d", secounds/3600,(secounds%3600)/60,(secounds%60));
+    }
+    
+    public static String convertToMultiline(String orig)
+    {
+        return "<html>" + orig.replaceAll("\n", "<br>");
+    }    
     
     public static Double[] getValues(String[] messages,Double[] defaults, Double[] max, Double[] min)
     {

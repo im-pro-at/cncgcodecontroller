@@ -17,10 +17,17 @@ public class CommandParsing {
     {
         public final char letter;
         public final double value;
+        public final boolean isint;
 
-        private Parameter(char letter, double value) {
+        private Parameter(char letter, double value, boolean isint) {
             this.letter = letter;
             this.value = value;
+            this.isint= isint;
+        }
+        
+        private Parameter(char letter)
+        {
+            this(letter,0.0,false);
         }
 
         @Override
@@ -63,10 +70,10 @@ public class CommandParsing {
                     double number=0.0;
                     try {
                         number=Tools.strtod(save);
-                    } catch (ParseException ex) {
+                    } catch (Exception ex) {
                         error = true;
                     }
-                    Parameter p= new Parameter(letter, number);
+                    Parameter p= new Parameter(letter, number, !save.contains("."));
                     
                     if (parameters.contains(p)) {
                         error = true;
@@ -124,7 +131,11 @@ public class CommandParsing {
     public String toString() {
         String s = "";
         for (int i = 0; i < parameters.size(); i++) {
-            s += "" + parameters.get(i).letter + parameters.get(i).value + " ";
+            s += "" + parameters.get(i).letter;
+            if(parameters.get(i).isint)
+                 s+=""+(int)(parameters.get(i).value) + " ";
+            else
+                 s+=""+Tools.dtostr(parameters.get(i).value) + " ";
         }
         return s;
     }
@@ -140,7 +151,7 @@ public class CommandParsing {
     
     public boolean contains(char letter)
     {
-        return parameters.contains(new Parameter(letter, 0.0));
+        return parameters.contains(new Parameter(letter));
     }
     
     public Parameter get(int index)
@@ -150,7 +161,7 @@ public class CommandParsing {
     
     public Parameter get(char letter)
     {
-        return parameters.get(parameters.indexOf(new Parameter(letter, 0.0)));
+        return parameters.get(parameters.indexOf(new Parameter(letter)));
     }
 
     public boolean iserror()

@@ -16,33 +16,39 @@
   <Layout>
     <DimensionLayout dim="0">
       <Group type="103" groupAlignment="0" attributes="0">
-          <Group type="102" alignment="0" attributes="0">
+          <Group type="102" attributes="0">
               <EmptySpace max="-2" attributes="0"/>
               <Group type="103" groupAlignment="0" attributes="0">
                   <Component id="jLabel2" alignment="0" min="-2" max="-2" attributes="0"/>
                   <Component id="jLabel19" alignment="0" min="-2" max="-2" attributes="0"/>
                   <Component id="jLabel20" alignment="0" min="-2" max="-2" attributes="0"/>
                   <Component id="jLabel32" alignment="0" min="-2" max="-2" attributes="0"/>
+                  <Component id="jLabel35" alignment="0" min="-2" max="-2" attributes="0"/>
+                  <Component id="jLabel36" alignment="0" min="-2" max="-2" attributes="0"/>
                   <Component id="jLabel33" alignment="0" min="-2" max="-2" attributes="0"/>
                   <Component id="jLabel34" alignment="0" min="-2" max="-2" attributes="0"/>
               </Group>
               <EmptySpace min="-2" pref="50" max="-2" attributes="0"/>
               <Group type="103" groupAlignment="0" attributes="0">
-                  <Component id="jBSHomeing" alignment="0" min="-2" max="-2" attributes="0"/>
-                  <Component id="jBSFastFeedrate" alignment="0" min="-2" max="-2" attributes="0"/>
-                  <Component id="jBSWorkSpace" alignment="0" min="-2" max="-2" attributes="0"/>
-                  <Component id="jBSCNCToolChange" alignment="0" min="-2" max="-2" attributes="0"/>
-                  <Component id="jBSCNCG0Feedrate" alignment="0" min="-2" max="-2" attributes="0"/>
                   <Component id="jBSCNCToolSize" alignment="0" min="-2" max="-2" attributes="0"/>
+                  <Component id="jBSCNCG0Feedrate" alignment="0" min="-2" max="-2" attributes="0"/>
+                  <Component id="jBSCNCSpindleOFF" alignment="0" min="-2" max="-2" attributes="0"/>
+                  <Component id="jBSCNCSpindleON" alignment="0" min="-2" max="-2" attributes="0"/>
+                  <Component id="jBSCNCToolChange" alignment="0" min="-2" max="-2" attributes="0"/>
+                  <Component id="jBSWorkSpace" alignment="0" min="-2" max="-2" attributes="0"/>
+                  <Component id="jBSFastFeedrate" alignment="0" min="-2" max="-2" attributes="0"/>
+                  <Component id="jBSHomeing" alignment="0" min="-2" max="-2" attributes="0"/>
               </Group>
               <EmptySpace min="-2" pref="50" max="-2" attributes="0"/>
               <Group type="103" groupAlignment="0" attributes="0">
-                  <Component id="jLSCNCToolSize" alignment="0" min="-2" max="-2" attributes="0"/>
-                  <Component id="jLSCNCG0Feedrate" alignment="0" min="-2" max="-2" attributes="0"/>
-                  <Component id="jLSCNCToolChange" alignment="0" min="-2" max="-2" attributes="0"/>
-                  <Component id="jLSWorkSpace" alignment="0" min="-2" max="-2" attributes="0"/>
-                  <Component id="jLSFastFeedrate" alignment="0" min="-2" max="-2" attributes="0"/>
                   <Component id="jLSHomeing" alignment="0" min="-2" max="-2" attributes="0"/>
+                  <Component id="jLSFastFeedrate" alignment="0" min="-2" max="-2" attributes="0"/>
+                  <Component id="jLSWorkSpace" alignment="0" min="-2" max="-2" attributes="0"/>
+                  <Component id="jLSCNCToolChange" alignment="0" min="-2" max="-2" attributes="0"/>
+                  <Component id="jLSCNCSpindleON" alignment="0" min="-2" max="-2" attributes="0"/>
+                  <Component id="jLSCNCSpindleOFF" alignment="0" min="-2" max="-2" attributes="0"/>
+                  <Component id="jLSCNCG0Feedrate" min="-2" max="-2" attributes="0"/>
+                  <Component id="jLSCNCToolSize" min="-2" max="-2" attributes="0"/>
               </Group>
               <EmptySpace max="32767" attributes="0"/>
           </Group>
@@ -74,6 +80,18 @@
                   <Component id="jLabel32" alignment="3" min="-2" max="-2" attributes="0"/>
                   <Component id="jBSCNCToolChange" alignment="3" min="-2" max="-2" attributes="0"/>
                   <Component id="jLSCNCToolChange" alignment="3" min="-2" max="-2" attributes="0"/>
+              </Group>
+              <EmptySpace type="separate" max="-2" attributes="0"/>
+              <Group type="103" groupAlignment="3" attributes="0">
+                  <Component id="jLabel35" alignment="3" min="-2" max="-2" attributes="0"/>
+                  <Component id="jBSCNCSpindleON" alignment="3" min="-2" max="-2" attributes="0"/>
+                  <Component id="jLSCNCSpindleON" alignment="3" min="-2" max="-2" attributes="0"/>
+              </Group>
+              <EmptySpace type="separate" max="-2" attributes="0"/>
+              <Group type="103" groupAlignment="3" attributes="0">
+                  <Component id="jLabel36" alignment="3" min="-2" max="-2" attributes="0"/>
+                  <Component id="jBSCNCSpindleOFF" alignment="3" min="-2" max="-2" attributes="0"/>
+                  <Component id="jLSCNCSpindleOFF" alignment="3" min="-2" max="-2" attributes="0"/>
               </Group>
               <EmptySpace type="separate" max="-2" attributes="0"/>
               <Group type="103" groupAlignment="3" attributes="0">
@@ -111,9 +129,9 @@
         <Property name="text" type="java.lang.String" value="Settings Text"/>
       </Properties>
     </Component>
-    <Component class="javax.swing.JLabel" name="jLSFastFeedrate">
+    <Component class="javax.swing.JLabel" name="jLabel19">
       <Properties>
-        <Property name="text" type="java.lang.String" value="Settings Text"/>
+        <Property name="text" type="java.lang.String" value="Fast Move Feedrate:"/>
       </Properties>
     </Component>
     <Component class="javax.swing.JButton" name="jBSFastFeedrate">
@@ -124,9 +142,9 @@
         <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="jBSettingsActionPerformed"/>
       </Events>
     </Component>
-    <Component class="javax.swing.JLabel" name="jLabel19">
+    <Component class="javax.swing.JLabel" name="jLSFastFeedrate">
       <Properties>
-        <Property name="text" type="java.lang.String" value="Fast Move Feedrate:"/>
+        <Property name="text" type="java.lang.String" value="Settings Text"/>
       </Properties>
     </Component>
     <Component class="javax.swing.JLabel" name="jLabel20">
@@ -147,9 +165,9 @@
         <Property name="text" type="java.lang.String" value="Settings Text"/>
       </Properties>
     </Component>
-    <Component class="javax.swing.JLabel" name="jLSCNCToolChange">
+    <Component class="javax.swing.JLabel" name="jLabel32">
       <Properties>
-        <Property name="text" type="java.lang.String" value="Settings Text"/>
+        <Property name="text" type="java.lang.String" value="CNC/Tool Change:"/>
       </Properties>
     </Component>
     <Component class="javax.swing.JButton" name="jBSCNCToolChange">
@@ -160,9 +178,45 @@
         <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="jBSettingsActionPerformed"/>
       </Events>
     </Component>
-    <Component class="javax.swing.JLabel" name="jLabel32">
+    <Component class="javax.swing.JLabel" name="jLSCNCToolChange">
       <Properties>
-        <Property name="text" type="java.lang.String" value="CNC/Tool Change:"/>
+        <Property name="text" type="java.lang.String" value="Settings Text"/>
+      </Properties>
+    </Component>
+    <Component class="javax.swing.JLabel" name="jLabel35">
+      <Properties>
+        <Property name="text" type="java.lang.String" value="CNC/Spindle ON:"/>
+      </Properties>
+    </Component>
+    <Component class="javax.swing.JButton" name="jBSCNCSpindleON">
+      <Properties>
+        <Property name="text" type="java.lang.String" value="Change"/>
+      </Properties>
+      <Events>
+        <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="jBSettingsActionPerformed"/>
+      </Events>
+    </Component>
+    <Component class="javax.swing.JLabel" name="jLSCNCSpindleON">
+      <Properties>
+        <Property name="text" type="java.lang.String" value="Settings Text"/>
+      </Properties>
+    </Component>
+    <Component class="javax.swing.JLabel" name="jLabel36">
+      <Properties>
+        <Property name="text" type="java.lang.String" value="CNC/Spindle OFF:"/>
+      </Properties>
+    </Component>
+    <Component class="javax.swing.JButton" name="jBSCNCSpindleOFF">
+      <Properties>
+        <Property name="text" type="java.lang.String" value="Change"/>
+      </Properties>
+      <Events>
+        <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="jBSettingsActionPerformed"/>
+      </Events>
+    </Component>
+    <Component class="javax.swing.JLabel" name="jLSCNCSpindleOFF">
+      <Properties>
+        <Property name="text" type="java.lang.String" value="Settings Text"/>
       </Properties>
     </Component>
     <Component class="javax.swing.JLabel" name="jLabel33">
@@ -183,9 +237,9 @@
         <Property name="text" type="java.lang.String" value="Settings Text"/>
       </Properties>
     </Component>
-    <Component class="javax.swing.JLabel" name="jLSCNCToolSize">
+    <Component class="javax.swing.JLabel" name="jLabel34">
       <Properties>
-        <Property name="text" type="java.lang.String" value="Settings Text"/>
+        <Property name="text" type="java.lang.String" value="CNC/Paint Tool Size"/>
       </Properties>
     </Component>
     <Component class="javax.swing.JButton" name="jBSCNCToolSize">
@@ -196,9 +250,9 @@
         <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="jBSettingsActionPerformed"/>
       </Events>
     </Component>
-    <Component class="javax.swing.JLabel" name="jLabel34">
+    <Component class="javax.swing.JLabel" name="jLSCNCToolSize">
       <Properties>
-        <Property name="text" type="java.lang.String" value="CNC/Paint Tool Size"/>
+        <Property name="text" type="java.lang.String" value="Settings Text"/>
       </Properties>
     </Component>
   </SubComponents>
