@@ -141,6 +141,10 @@ public class JPanelCNCMilling extends javax.swing.JPanel implements IGUIEvent{
                 g2.setColor(Color.white);
                 g2.fill(new Rectangle2D.Double(0, 0, ariawidth, ariaheight));
                 
+                //Positioning
+                g2.translate(data.movex, data.movey);
+                g2.scale(data.mirrorx?-1:1, data.mirrory?-1:1);
+                
                 try {
                     AffineTransform t=g2.getTransform();
                     t.invert();
@@ -148,10 +152,6 @@ public class JPanelCNCMilling extends javax.swing.JPanel implements IGUIEvent{
                 } catch (NoninvertibleTransformException ex) {
                     trans=new AffineTransform();
                 }
-                //Positioning
-                g2.translate(data.movex, data.movey);
-                g2.scale(data.mirrorx?-1:1, data.mirrory?-1:1);
-                
                 
                 layers.paint(g2, data.index); 
                 
