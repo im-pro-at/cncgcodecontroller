@@ -238,7 +238,7 @@ public class CNCCommand {
                             type=Type.ARC;
                             if(state== State.NORMAL)
                                 state=State.WARNING;
-                            message+="Not Implemented May cause problems! ";
+                            message+="Not Implemented jet may cause problems! ";
                             break;
                         case 28:
                             type=Type.HOMEING;
@@ -294,6 +294,12 @@ public class CNCCommand {
                             type= Type.ENDPORGRAM;
                             break;
                             
+                        case 110:
+                            type= Type.EMPTY;
+                            state= State.ERROR;
+                            message+="NEVER USE M110! IT CAUSES COMMUNICATION POBLEMS!!! ";
+                            break;
+                            
                     }
                     break;
             }
@@ -337,7 +343,7 @@ public class CNCCommand {
                 }
                 if(state== State.NORMAL)
                     state=State.WARNING;
-                message+="Homing will not be Positioniged! ";
+                message+="Homing will not be Repositioniged! ";
                 break;
                 
             case SETPOS:
@@ -346,7 +352,7 @@ public class CNCCommand {
                         c.axes[i]=p.get(CommandParsing.axesName[i]).value;
                 if(state== State.NORMAL)
                     state=State.WARNING;
-                message+="Setpos will not be Positioniged! ";
+                message+="Setpos will not be Repositioniged! ";
                 break;
             
             case TOOLCHANGE:
@@ -483,13 +489,13 @@ public class CNCCommand {
                 cmds.addAll(Arrays.asList(Database.SPINDLEOFF.get().split("\n")));
                 break;
 
+            //Send directly:
             case CORDINATEMODE:
             case HOMEING:
             case SETPOS:
             case GXX:
             case MXX: 
-                //Send directly:
-                cmds.add(command);
+                cmds.add(command.split(";")[0]);
                 break;
         }
         

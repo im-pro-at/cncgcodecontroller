@@ -204,11 +204,18 @@ public final class MainForm extends javax.swing.JFrame implements IGUIEvent{
         else
         {
             Communication.getInstance().connect((String)jCBPort.getModel().getSelectedItem(), Integer.parseInt((String)jCBSpeed.getSelectedItem()));
-            //Save config
-            Database.PORT.set((String)jCBPort.getModel().getSelectedItem());
-            Database.SPEED.set(((Integer)jCBSpeed.getSelectedIndex()).toString());
-            
-            Communication.getInstance().send("G90");
+            if(Communication.getInstance().isConnect())
+            {
+                //Save config
+                Database.PORT.set((String)jCBPort.getModel().getSelectedItem());
+                Database.SPEED.set(((Integer)jCBSpeed.getSelectedIndex()).toString());
+
+                Communication.getInstance().send("G90");
+            }
+            else
+            {
+                jLStatus.setText(Communication.getInstance().getStatus());
+            }
         }
     }//GEN-LAST:event_jBConnectActionPerformed
    

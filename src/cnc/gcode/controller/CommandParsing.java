@@ -58,9 +58,11 @@ public class CommandParsing {
     
     private boolean error = false;
     private ArrayList<Parameter> parameters = new ArrayList<>();
+    private String cmdwithoutcomments;
 
     public CommandParsing(String command) {
         String save = "";
+        cmdwithoutcomments="";
         char letter = 0;
         int comment = 0;
         for (char c : (command + " ").toCharArray()) {

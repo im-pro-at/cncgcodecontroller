@@ -9,8 +9,12 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.ArrayList;
+import java.util.LinkedList;
+import java.util.Random;
 import java.util.Timer;
 import java.util.TimerTask;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.swing.SwingUtilities;
 
 /**
@@ -26,7 +30,7 @@ public class Communication {
     public static Communication getInstance(){
         return singelton;
     }
-    
+
     public interface IResivedLines
     {
         void resived(String[] lines);
@@ -41,8 +45,8 @@ public class Communication {
      */
     private Timer resivetimer;
     String lastserialstring="";
-    long linecount=0;
-    long sendlinecount=0;
+    LinkedList<String> cmdhistroy= new LinkedList<>();
+    long resivecount=0;
     private ArrayList<IEvent> changed=new ArrayList<>();
     private ArrayList<IResivedLines> resived=new ArrayList<>();
     private ArrayList<ISend> send=new ArrayList<>();
@@ -59,7 +63,17 @@ public class Communication {
         resivetimer.schedule(new TimerTask(){
             @Override
             public void run() {
-                recive();
+                try {
+                    recive();
+                } catch (Exception ex) {
+                    status = ex.toString();
+                    if(sp!=null)    
+                        sp.disconnect();
+                    sp=null;
+                    status="Communication Error! ("+ex+"9";
+                    ex.printStackTrace();
+                    doUpdate();
+                }
             }
         }, 10, 10 );
     }
@@ -75,20 +89,9 @@ public class Communication {
             });
     }
 
-    private synchronized void recive() {
+    private synchronized void recive() throws Exception {
         if(isConnect())
         {
-            try {
-                if(is.available()==0)
-                    return;
-            } catch (IOException ex) {
-                    status = ex.toString();
-                    sp.disconnect();
-                    sp=null;
-                    doUpdate();
-                    return;
-            }
-            
             String input = "";
             while (true) {
                 try {
@@ -100,7 +103,8 @@ public class Communication {
                     }
                 } catch (Exception ex) {
                     status = ex.toString();
-                    sp.disconnect();
+                    if(sp!=null)    
+                        sp.disconnect();
                     sp=null;
                     doUpdate();
                     return;
@@ -122,9 +126,26 @@ public class Communication {
             
             if(inputs.size()>1)
             {
-                linecount+=inputs.size()-1;
-                notify();
-                
+                int rs=0;
+                for(String temp:inputs)
+                {
+                    //is it OK?
+                    if(temp.length()>=2 && temp.substring(0, 2).equals("ok"))
+                    {
+                        resivecount++;
+                    }
+                    //resend?
+                    if(temp.length()>=2 && temp.substring(0, 2).equals("rs"))
+                    {
+                        rs=Integer.parseInt(temp.substring(3));
+                    }
+                    if(temp.length()>=7 && temp.substring(0, 7).equals("Resend:"))
+                    {
+                        resivecount--; //Marlin ok will be comming anyway :-(
+                        rs=Integer.parseInt(temp.substring(7));
+                    }
+                }
+
                 final String[] lines= new String[inputs.size()-1];
                 for(int i=0; i < inputs.size()-1;i++)
                     lines[i]=inputs.get(i);
@@ -136,9 +157,20 @@ public class Communication {
                             e.resived(lines);
                         }
                     });
+
+                if(rs>0)
+                {
+                    resend(rs);
+                }
+                else
+                {
+                    //Notify waiting Threads:
+                    notify();
+                }
             }
             
         }
+        wait(0,1);
     }
     
     
@@ -185,8 +217,8 @@ public class Communication {
         }
 
         lastserialstring="";
-        linecount=0;
-        sendlinecount=0;
+        cmdhistroy= new LinkedList<>();
+        resivecount=0;
 
         try
         {
@@ -198,12 +230,24 @@ public class Communication {
             }
             is = sp.getInputStream();
             os = sp.getOutputStream();
+            
+            //Send M110 to reset checksum
+            send("M110");
+
+            //1 secound Timout for answere
+            wait(1000);
+            if(isbussy())
+                //Printer not answered!
+                throw new Exception("Printer did not respons!"); 
+            
         }
         catch(Exception e)
         {
-            sp.disconnect();
+            if(sp!=null)    
+                sp.disconnect();
             sp=null;
             status=e.toString();
+            return;
         }
         status="Connected!";
         doUpdate();
@@ -211,14 +255,16 @@ public class Communication {
 
     public synchronized boolean isbussy()
     {
-        return sendlinecount>linecount;
+        return !isConnect() || cmdhistroy.size()>resivecount;
     }
     
-    public synchronized void send(final String command) {
+    public synchronized void send(String command) {
         if(!isConnect())
             return;
         
-        while(sendlinecount>linecount)
+        command=command.replace('*', ' ');
+        
+        while(cmdhistroy.size()>resivecount)
         {
             try {
                 wait();
@@ -230,28 +276,47 @@ public class Communication {
         if(!isConnect())
             return;
 
-        sendlinecount=linecount+1; //Block till answer!
+        cmdhistroy.add(command);        
         
-        
-        
+            resend(cmdhistroy.size());
+
+    }
+    
+    private void resend(int rs)
+    {
         try {
+           //Cecksum:
+            if(rs>cmdhistroy.size())
+                rs=cmdhistroy.size();
+            String command=cmdhistroy.get(rs-1);
+            command="N"+cmdhistroy.size()+" "+command+" *";
+            byte cs = 0;
+            byte[] b=command.getBytes();
+            for(int i = 0;  b[i]!= '*' && i<b.length; i++)
+               cs = (byte)(cs ^ b[i]);
+            command+=""+cs;
+
             os.write((command+"\n").getBytes());
-            
+
+            final String ccommand=cmdhistroy.get(rs-1);
             for(final ISend e:send)
                 SwingUtilities.invokeLater(new Runnable() {
                     @Override
                     public void run() {
-                        e.send(command);
+                        e.send(ccommand);
                     }
-                });
-            
+                });        
+
         } catch (Exception ex) {
-                status = ex.toString();
+            status = ex.toString();
+            if(sp!=null)    
                 sp.disconnect();
-                sp=null;
-                doUpdate();
+            sp=null;
+            doUpdate();
         }
     }
+    
+    
 
     public synchronized String getStatus() {
         return status;
