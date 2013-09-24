@@ -48,6 +48,8 @@ public enum Database {
     ALZERO(Tools.dtostr(0.0)),
     ALMAXPROPDEPTH(Tools.dtostr(-1.0)), 
     ALSAVEHEIGHT(Tools.dtostr(10.0)),
+    ALCLEARENCE(Tools.dtostr(10.0)),
+    ALFEEDRATE(Tools.dtostr(10.0)),
     ALDISTANACE(Tools.dtostr(10.0)),
     ALSTARTCODE("G28"), 
     
@@ -158,10 +160,27 @@ public enum Database {
         return Database.get(this);
     }
 
+    public double getsaved()
+    {
+        return Tools.strtodsave(get());
+    }
+    
     @Override
     public String toString() {
         return Database.get(this);
     }
-    
-    
+
+    public static Database getWorkspace(int i)
+    {
+        switch(i)
+        {
+            case 0:
+            default:
+                return WORKSPACE0;
+            case 1:
+                return WORKSPACE1;
+            case 2:
+                return WORKSPACE2;
+        }
+    }
 }

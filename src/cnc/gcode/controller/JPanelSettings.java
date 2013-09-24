@@ -44,7 +44,7 @@ public class JPanelSettings extends javax.swing.JPanel implements IGUIEvent{
         jLSFastFeedrate.setText(Database.MAXFEEDRATE.get());
         jLSWorkSpace.setText("");
         for(int i=0; i<3;i++ )
-            jLSWorkSpace.setText(jLSWorkSpace.getText() +CommandParsing.axesName[i]+" = "+ Database.values()[Database.WORKSPACE0.ordinal()+i].get()+"   ");        
+            jLSWorkSpace.setText(jLSWorkSpace.getText() +CommandParsing.axesName[i]+" = "+ Database.getWorkspace(i).get()+"   ");        
         jLSCNCStart.setText(Tools.convertToMultiline(Database.STARTCODE.get()));
         jLSCNCToolChange.setText(Tools.convertToMultiline(Database.TOOLCHANGE.get()));
         jLSCNCSpindleON.setText(Tools.convertToMultiline(Database.SPINDLEON.get()));
@@ -52,8 +52,10 @@ public class JPanelSettings extends javax.swing.JPanel implements IGUIEvent{
         jLSCNCG0Feedrate.setText(Database.GOFEEDRATE.get());
         jLSCNCToolSize.setText(Database.TOOLSIZE.get());
         jLSALOptions.setText(Tools.convertToMultiline("Zero height: "+Database.ALZERO+
-                "\nMax Proping depth: "+Database.ALMAXPROPDEPTH+
+                "\nMax depth: "+Database.ALMAXPROPDEPTH+
                 "\nSafe height: "+Database.ALSAVEHEIGHT+
+                "\nClearence: "+Database.ALCLEARENCE+
+                "\nFeedrate: "+Database.ALFEEDRATE+
                 "\nDistance: "+Database.ALDISTANACE));
         jLSALStart.setText(Tools.convertToMultiline(Database.ALSTARTCODE.get()));
     }
@@ -376,7 +378,7 @@ public class JPanelSettings extends javax.swing.JPanel implements IGUIEvent{
         //MAXFEEDRATE
         if(evt.getSource()==jBSFastFeedrate)
         {
-            Double[] d=Tools.getValues(new String[]{"Set the Feetrate for the fast move:"}, new Double[]{Tools.strtodsave(Database.MAXFEEDRATE.get())}, new Double[]{Double.MAX_VALUE}, new Double[]{0.0});
+            Double[] d=Tools.getValues(new String[]{"Set the Feetrate for the fast move:"}, new Double[]{Database.MAXFEEDRATE.getsaved()}, new Double[]{Double.MAX_VALUE}, new Double[]{0.0});
             if(d!= null) Database.MAXFEEDRATE.set(Tools.dtostr(d[0]));
         }
 
@@ -388,14 +390,14 @@ public class JPanelSettings extends javax.swing.JPanel implements IGUIEvent{
 
             for(int i=0; i<3;i++ )
             {
-                values[i] = Tools.strtodsave(Database.values()[Database.WORKSPACE0.ordinal()+i].get());
+                values[i] = Database.getWorkspace(i).getsaved();
                 messages[i] = "Set Size for the "+CommandParsing.axesName[i]+" axis";
             }
             values= Tools.getValues(messages, values, new Double[]{Double.MAX_VALUE, Double.MAX_VALUE, Double.MAX_VALUE}, new Double[]{0.0,0.0,0.0});
 
             if(values!= null)
             for(int i=0; i<3;i++ )
-            Database.values()[Database.WORKSPACE0.ordinal()+i].set(Tools.dtostr(values[i]));
+                Database.getWorkspace(i).set(Tools.dtostr(values[i]));
         }
         
         //StartCode
@@ -474,17 +476,64 @@ public class JPanelSettings extends javax.swing.JPanel implements IGUIEvent{
         //G0Feedrate
         if(evt.getSource()==jBSCNCG0Feedrate)
         {
-            Double[] d=Tools.getValues(new String[]{"Set the Feetrate for the G0 move:"}, new Double[]{Tools.strtodsave(Database.GOFEEDRATE.get())}, new Double[]{Tools.strtodsave(Database.MAXFEEDRATE.get())}, new Double[]{0.0});
+            Double[] d=Tools.getValues(new String[]{"Set the Feetrate for the G0 move:"}, new Double[]{Database.GOFEEDRATE.getsaved()}, new Double[]{Database.MAXFEEDRATE.getsaved()}, new Double[]{0.0});
             if(d!= null) Database.GOFEEDRATE.set(Tools.dtostr(d[0]));
         }
         
         //Tooldiameter
         if(evt.getSource()==jBSCNCToolSize)
         {
-            Double[] d=Tools.getValues(new String[]{"Set the Toolsize for CNC Milling Simulation:"}, new Double[]{Tools.strtodsave(Database.TOOLSIZE.get())}, new Double[]{Double.MAX_VALUE}, new Double[]{0.0});
+            Double[] d=Tools.getValues(new String[]{"Set the Toolsize for CNC Milling Simulation:"}, new Double[]{Database.TOOLSIZE.getsaved()}, new Double[]{Double.MAX_VALUE}, new Double[]{0.0});
             if(d!= null) Database.TOOLSIZE.set(Tools.dtostr(d[0]));
         }
         
+        //AL Options
+        if(evt.getSource()==jBSALOptions)
+        {
+            Double[] values= Tools.getValues(
+                new String[]{ //message
+                    /*ALZERO*/          "The absolut position where the Autoleveling is correcting to. \nSo after level correction this Z value will habe the proped value. (Normally its 0)",
+                    /*ALMAXPROPDEPTH*/  "How deep the system try to prope. (You should home you system before Autoleveling.) \nIn absolute position it is \"Zero height\" - this value.",
+                    /*ALSAVEHEIGHT*/    "Absulute hight where the CNC can move safely without problems. \nThe first Proping will also start from this position!",
+                    /*ALCLEARENCE*/     "The clearence to the object between tow propings.",
+                    /*ALFEEDRATE*/      "The feedrate used for the proping",
+                    /*ALDISTANACE*/     "The maximum distance between two props",
+                },
+                new Double[]{ //value
+                    Database.ALZERO.getsaved(),
+                    Database.ALMAXPROPDEPTH.getsaved(),
+                    Database.ALSAVEHEIGHT.getsaved(),
+                    Database.ALCLEARENCE.getsaved(),
+                    Database.ALFEEDRATE.getsaved(),
+                    Database.ALDISTANACE.getsaved(),
+                },
+                new Double[]{ //max
+                    /*ALZERO*/          Double.MAX_VALUE,
+                    /*ALMAXPROPDEPTH*/  Database.WORKSPACE2.getsaved(),
+                    /*ALSAVEHEIGHT*/    Database.WORKSPACE2.getsaved(),
+                    /*ALCLEARENCE*/     Database.WORKSPACE2.getsaved(),    
+                    /*ALFEEDRATE*/      Double.MAX_VALUE,
+                    /*ALDISTANACE*/     Double.MAX_VALUE,
+                },
+                new Double[]{ //min
+                    /*ALZERO*/          -Double.MAX_VALUE,
+                    /*ALMAXPROPDEPTH*/  0.0,
+                    /*ALSAVEHEIGHT*/    0.0-Database.WORKSPACE2.getsaved(),                    
+                    /*ALCLEARENCE*/     0.0,
+                    /*ALFEEDRATE*/      0.0,
+                    /*ALDISTANACE*/     Double.MIN_VALUE, //Not 0 
+                });
+
+            if(values!= null)
+            {
+                Database.ALZERO.set(Tools.dtostr(values[0]));
+                Database.ALMAXPROPDEPTH.set(Tools.dtostr(values[1]));
+                Database.ALSAVEHEIGHT.set(Tools.dtostr(values[2]));
+                Database.ALCLEARENCE.set(Tools.dtostr(values[3]));
+                Database.ALFEEDRATE.set(Tools.dtostr(values[4]));
+                Database.ALDISTANACE.set(Tools.dtostr(values[5]));
+            }
+        }
         fireupdateGUI();
     }//GEN-LAST:event_jBSettingsActionPerformed
 

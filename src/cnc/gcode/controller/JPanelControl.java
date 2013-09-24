@@ -158,7 +158,7 @@ public class JPanelControl extends javax.swing.JPanel implements IGUIEvent{
             for(NumberFildManipulator field:axe)
                 field.set(0.0);
         
-        axes[5][0].set(Tools.strtodsave(Database.MAXFEEDRATE.get())/10);
+        axes[5][0].set(Database.MAXFEEDRATE.getsaved()/10);
 
         
        Communication.getInstance().addResiveEvent(new Communication.IResivedLines() {
@@ -267,7 +267,7 @@ public class JPanelControl extends javax.swing.JPanel implements IGUIEvent{
         axes[cat][num].set(value);
         
         //Test Range
-        Double min= Double.MIN_VALUE;
+        Double min= -Double.MAX_VALUE;
         Double max= Double.MAX_VALUE;
         switch(cat)
         {
@@ -278,26 +278,26 @@ public class JPanelControl extends javax.swing.JPanel implements IGUIEvent{
                 {
                     //Manipulating a,d
                     num=1; //only d is manipulatable!
-                    min=0.0-axes[cat][0].getdsave();
-                    max=Tools.strtodsave(Database.values()[Database.WORKSPACE0.ordinal()+cat].get())-axes[cat][0].getdsave();
+                    min=-axes[cat][0].getdsave();
+                    max=Database.getWorkspace(cat).getsaved()-axes[cat][0].getdsave();
                 }
                 else
                 {
                     //Manipulating n
                     min=0.0;
-                    max=Tools.strtodsave(Database.values()[Database.WORKSPACE0.ordinal()+cat].get());
+                    max=Database.getWorkspace(cat).getsaved();
                 }
                 break;
             case 3: //I,J
-                max=Tools.strtodsave(Database.values()[Database.WORKSPACE0.ordinal()+num].get());
-                min=0.0-max;
+                max=Database.getWorkspace(num).getsaved();
+                min=-max;
                 break;
             case 4: //Diameter
                 min=0.0;
                 break;
             case 5: //Feedrate
                 min=0.0;
-                max=Tools.strtodsave(Database.MAXFEEDRATE.get());
+                max=Database.MAXFEEDRATE.getsaved();
                 break;
         }
         if(axes[cat][num].getdsave()<min)
@@ -334,8 +334,8 @@ public class JPanelControl extends javax.swing.JPanel implements IGUIEvent{
     
     private void paintAxesAria(Graphics g) {
         //Calc window
-        double ariawidth= Tools.strtodsave(Database.WORKSPACE0.get()); //x
-        double ariaheight= Tools.strtodsave(Database.WORKSPACE1.get()); //y
+        double ariawidth= Database.WORKSPACE0.getsaved(); //x
+        double ariaheight=Database.WORKSPACE1.getsaved(); //y
         Rectangle rect=Geometrics.placeRectangle(jPPaint.getWidth(), jPPaint.getHeight(), Geometrics.getRatio(ariawidth,ariaheight));
         
         if(g instanceof Graphics2D == false)
@@ -1188,7 +1188,7 @@ public class JPanelControl extends javax.swing.JPanel implements IGUIEvent{
         {
             messages[i]="Set the Value for the "+CommandParsing.axesName[i]+" Axis";
             values[i]= axes[i][0].getdsave();
-            max[i]= Tools.strtodsave(Database.values()[Database.WORKSPACE0.ordinal()+i].get());
+            max[i]= Database.getWorkspace(i).getsaved();
         }
 
         values = Tools.getValues(messages, values, max, new Double[]{0.0,0.0,0.0});
@@ -1403,9 +1403,9 @@ public class JPanelControl extends javax.swing.JPanel implements IGUIEvent{
         //Get feedrate
         Double feedrate;
         if(jCBFastMode.isSelected())
-        feedrate=Tools.strtodsave(Database.MAXFEEDRATE.get());
+            feedrate=Database.MAXFEEDRATE.getsaved();
         else
-        feedrate=axes[5][0].getdsave();
+            feedrate=axes[5][0].getdsave();
         cmd+=" F"+Tools.dtostr(feedrate);
 
         //Execute
@@ -1436,8 +1436,8 @@ public class JPanelControl extends javax.swing.JPanel implements IGUIEvent{
     }//GEN-LAST:event_jBMoveActionPerformed
 
     private void jPPaintMouseReleased(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jPPaintMouseReleased
-        double ariawidth= Tools.strtodsave(Database.WORKSPACE0.get()); //x
-        double ariaheight= Tools.strtodsave(Database.WORKSPACE1.get()); //y
+        double ariawidth= Database.WORKSPACE0.getsaved(); //x
+        double ariaheight=Database.WORKSPACE1.getsaved(); //y
         Rectangle rect=Geometrics.placeRectangle(jPPaint.getWidth(), jPPaint.getHeight(), Geometrics.getRatio(ariawidth,ariaheight));
 
         if(Geometrics.pointInRectangle(new Point(evt.getX(),evt.getY()), rect, 0))

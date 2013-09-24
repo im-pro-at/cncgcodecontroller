@@ -51,7 +51,7 @@ public class JPanelCNCMilling extends javax.swing.JPanel implements IGUIEvent{
     
     
     private NumberFildManipulator[] positioningmove;
-    private PMySwingWorker cncworker=null;
+    private PMySwingWorker worker=null;
     private boolean cncloadedfile=false;
     private PrintableLayers layers= new PrintableLayers();
     private AffineTransform trans=new AffineTransform();
@@ -128,8 +128,8 @@ public class JPanelCNCMilling extends javax.swing.JPanel implements IGUIEvent{
                 g2.translate(-data.jpw/2, -data.jph/2);
                 
                 //Display Position
-                double ariawidth= Tools.strtodsave(Database.WORKSPACE0.get()); //x
-                double ariaheight= Tools.strtodsave(Database.WORKSPACE1.get()); //y
+                double ariawidth= Database.WORKSPACE0.getsaved(); //x
+                double ariaheight= Database.WORKSPACE1.getsaved(); //y
                 Rectangle rect=Geometrics.placeRectangle(data.jpw, data.jph, Geometrics.getRatio(ariawidth,ariaheight));
                 double scalex=rect.width/ariawidth;
                 double scaley=rect.height/ariaheight;
@@ -240,11 +240,11 @@ public class JPanelCNCMilling extends javax.swing.JPanel implements IGUIEvent{
         jCBPerview.setEnabled(cncloadedfile);
         jLoadFile.setEnabled(!isworking);
         jBMilling.setEnabled(!isworking && cncloadedfile && serial);
-        jBAbrote.setEnabled(isworking);
-        if(!isworking) jPBar.setValue(0);
+        jBAbrote.setEnabled(isRunning());
+        if(!isRunning()) jPBar.setValue(0);
         if(!cncloadedfile) jPBar.setString(" ");
-        jBPause.setEnabled(isworking);
-        jBPause.setText((isworking && cncworker.isPuased())?"Resume":"Pause");
+        jBPause.setEnabled(isRunning());
+        jBPause.setText((isRunning() && worker.isPuased())?"Resume":"Pause");
 
         painter.trigger();
 
@@ -260,7 +260,7 @@ public class JPanelCNCMilling extends javax.swing.JPanel implements IGUIEvent{
     
     public boolean isRunning()
     {
-        return cncworker!=null && !cncworker.isDone();
+        return worker!=null && !worker.isDone();
     }
     
     /**
@@ -616,8 +616,8 @@ public class JPanelCNCMilling extends javax.swing.JPanel implements IGUIEvent{
 
     private void jBAbroteActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jBAbroteActionPerformed
 
-        if(cncworker!=null)
-            cncworker.cancel();
+        if(worker!=null)
+            worker.cancel();
 
         fireupdateGUI();
     }//GEN-LAST:event_jBAbroteActionPerformed
@@ -641,8 +641,8 @@ public class JPanelCNCMilling extends javax.swing.JPanel implements IGUIEvent{
     }//GEN-LAST:event_jLCNCCommandsMouseClicked
 
     private void jBPauseActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jBPauseActionPerformed
-        if(cncworker!=null)
-            cncworker.pause(!cncworker.isPuased());
+        if(worker!=null)
+            worker.pause(!worker.isPuased());
 
         fireupdateGUI();
     }//GEN-LAST:event_jBPauseActionPerformed
@@ -677,7 +677,7 @@ public class JPanelCNCMilling extends javax.swing.JPanel implements IGUIEvent{
         final CNCCommand[] cmds= new CNCCommand[jLCNCCommands.getModel().getSize()];
         ((DefaultListModel<CNCCommand>)jLCNCCommands.getModel()).copyInto(cmds);
 
-        cncworker= new PMySwingWorker<Object,CNCCommand>() {
+        worker= new PMySwingWorker<Object,CNCCommand>() {
             CNCCommand.Transform t= new CNCCommand.Transform(positioningmove[0].getdsave(), positioningmove[1].getdsave(), jCBmirroX.isSelected(), jCBmirroY.isSelected());
             
             class Helper
@@ -775,7 +775,7 @@ public class JPanelCNCMilling extends javax.swing.JPanel implements IGUIEvent{
 
         };
 
-        cncworker.execute();
+        worker.execute();
 
         fireupdateGUI();
     }//GEN-LAST:event_jBMillingActionPerformed
@@ -801,7 +801,7 @@ public class JPanelCNCMilling extends javax.swing.JPanel implements IGUIEvent{
         jLCNCCommands.setModel(new DefaultComboBoxModel()); //Clear Listbox
         jCBPerview.setModel(new DefaultComboBoxModel()); //Clear Layers
 
-        cncworker = new PMySwingWorker<String, CNCCommand>() {
+        worker = new PMySwingWorker<String, CNCCommand>() {
 
             DefaultListModel<CNCCommand> model=new DefaultListModel<>();
             long secounds=0;
@@ -887,7 +887,7 @@ public class JPanelCNCMilling extends javax.swing.JPanel implements IGUIEvent{
 
         };
 
-        cncworker.execute();
+        worker.execute();
 
         fireupdateGUI();
     }//GEN-LAST:event_jLoadFileActionPerformed

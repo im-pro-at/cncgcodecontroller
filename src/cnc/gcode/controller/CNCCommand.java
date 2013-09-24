@@ -167,7 +167,7 @@ public class CNCCommand {
         }
 
         void setupGraphicsOptions(Graphics2D g, boolean selected) {
-            g.setStroke(new BasicStroke((float)(double)Tools.strtodsave(Database.TOOLSIZE.get()), BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND));
+            g.setStroke(new BasicStroke((float)Database.TOOLSIZE.getsaved(), BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND));
             if(!selected)
             {
                 g.setColor(new Color(color.getRed(), color.getGreen(), color.getBlue(), 200));
@@ -398,7 +398,7 @@ public class CNCCommand {
                 //get feedrate
                 double f=c.axes[3];
                 if(type==Type.G0)
-                    f=Tools.strtodsave(Database.GOFEEDRATE.get());
+                    f=Database.GOFEEDRATE.getsaved();
                 c.secounds+=d/f *60;
 
                 //If not a Number:
