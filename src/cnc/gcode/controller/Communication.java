@@ -260,6 +260,13 @@ public class Communication {
     
     public synchronized void send(String command) {
         if(!isConnect())
+        {
+            doUpdate();
+            return;
+        }
+        
+        //No command
+        if(command.trim().equals(""))
             return;
         
         command=command.replace('*', ' ');
@@ -278,7 +285,7 @@ public class Communication {
 
         cmdhistroy.add(command);        
         
-            resend(cmdhistroy.size());
+        resend(cmdhistroy.size());
 
     }
     

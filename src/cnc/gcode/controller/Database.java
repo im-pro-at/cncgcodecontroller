@@ -4,6 +4,8 @@
  */
 package cnc.gcode.controller;
 
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -15,15 +17,15 @@ import java.io.ObjectOutputStream;
 import java.util.EnumMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.swing.JFileChooser;
 
 /**
  *
  * @author patrick
  */
 public enum Database {
-    
     //Port Settings
-    PORT(""),
+    PORT,
     SPEED("9"),
     
     //Control
@@ -35,34 +37,71 @@ public enum Database {
     
     //CNC
     FILEDIRECTORY(System.getProperty("user.home")),
+    STARTCODE,
     TOOLCHANGE("M6 T?"),
     SPINDLEON("M?"),
     SPINDLEOFF("M5"),
     GOFEEDRATE(Tools.dtostr(100.0)),
     TOOLSIZE(Tools.dtostr(5.0)),
     
+    //Autoleveling
+    ALZERO(Tools.dtostr(0.0)),
+    ALMAXPROPDEPTH(Tools.dtostr(-1.0)), 
+    ALSAVEHEIGHT(Tools.dtostr(10.0)),
+    ALDISTANACE(Tools.dtostr(10.0)),
+    ALSTARTCODE("G28"), 
+    
     ;
 
     private final String defaultValue;
+    private final static String SETTINGSFILE=System.getProperty("user.home")+File.separator+".cnccgcodecontroller"+File.separator+"Settings.ois";
 
     private Database(String defaultvalue)
     {
         this.defaultValue=defaultvalue;
     }
+    private Database()
+    {
+        this.defaultValue="";
+    }
    
     private static EnumMap<Database, String> data = new EnumMap<>(Database.class);
+    
+    public static JFileChooser getFileChooser()
+    {
+        final JFileChooser fc = new JFileChooser();
+        //set currantdiroctary
+        try {
+            fc.setCurrentDirectory(new File(Database.FILEDIRECTORY.get()));
+        }
+        catch(Exception ex){
+            //Its ok ;-)
+        }
+        fc.addPropertyChangeListener(new PropertyChangeListener() {
+            @Override
+            public void propertyChange(PropertyChangeEvent evt) {
+                if(JFileChooser.DIRECTORY_CHANGED_PROPERTY.equals(evt.getPropertyName()))
+                {
+                    Database.FILEDIRECTORY.set(fc.getCurrentDirectory().getPath());
+                }
+            }
+        });
+        return fc;
+    }
     
     /**
      * Loads the Data from a File 
      * @return 
      * true => no errors 
      */
-    public static boolean load(){
+    public static boolean load(File file){
         try {
-            File file = new File("Settings.ois");
-            ObjectInput in = new ObjectInputStream(new FileInputStream(file));
-            data= (EnumMap<Database, String>)in.readObject();
-            return true;
+            if(file==null)
+                file = new File(SETTINGSFILE);
+            try (ObjectInput in = new ObjectInputStream(new FileInputStream(file))) {
+                data= (EnumMap<Database, String>)in.readObject();
+                return true;
+            }
         } catch (Exception ex) {
             Logger.getLogger(Database.class.getName()).log(Level.SEVERE, null, ex); 
             return false;
@@ -74,13 +113,17 @@ public enum Database {
      * @return 
      * true => no errors
      */
-    public static boolean save(){
+    public static boolean save(File file){
         try {
-            File file = new File("Settings.ois");
+            if(file==null)
+                file = new File(SETTINGSFILE);
+            if(!file.getParentFile().exists())
+                file.getParentFile().mkdirs();
             if(!file.exists())
                 file.createNewFile();
-            ObjectOutput out = new ObjectOutputStream(new FileOutputStream(file));
-            out.writeObject(data);
+            try (ObjectOutput out = new ObjectOutputStream(new FileOutputStream(file))) {
+                out.writeObject(data);
+            }
             return true;
         } catch (IOException ex) {
             Logger.getLogger(Database.class.getName()).log(Level.SEVERE, null, ex); 

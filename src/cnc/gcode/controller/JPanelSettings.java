@@ -5,9 +5,12 @@
 package cnc.gcode.controller;
 
 import java.awt.Dimension;
+import java.io.File;
+import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
+import javax.swing.filechooser.FileFilter;
 
 /**
  *
@@ -33,19 +36,26 @@ public class JPanelSettings extends javax.swing.JPanel implements IGUIEvent{
     }
 
     @Override
-    public void updateGUI(boolean serial, boolean isworking)
+    public void updateGUI(boolean serial, boolean isworking, boolean isleveled)
     {
+        jBImport.setEnabled(!isworking);
         //Akt Text
         jLSHomeing.setText(homeing[Integer.parseInt(Database.HOMEING.get())]); //Homeing
         jLSFastFeedrate.setText(Database.MAXFEEDRATE.get());
         jLSWorkSpace.setText("");
         for(int i=0; i<3;i++ )
             jLSWorkSpace.setText(jLSWorkSpace.getText() +CommandParsing.axesName[i]+" = "+ Database.values()[Database.WORKSPACE0.ordinal()+i].get()+"   ");        
+        jLSCNCStart.setText(Tools.convertToMultiline(Database.STARTCODE.get()));
         jLSCNCToolChange.setText(Tools.convertToMultiline(Database.TOOLCHANGE.get()));
         jLSCNCSpindleON.setText(Tools.convertToMultiline(Database.SPINDLEON.get()));
         jLSCNCSpindleOFF.setText(Tools.convertToMultiline(Database.SPINDLEOFF.get()));
         jLSCNCG0Feedrate.setText(Database.GOFEEDRATE.get());
         jLSCNCToolSize.setText(Database.TOOLSIZE.get());
+        jLSALOptions.setText(Tools.convertToMultiline("Zero height: "+Database.ALZERO+
+                "\nMax Proping depth: "+Database.ALMAXPROPDEPTH+
+                "\nSafe height: "+Database.ALSAVEHEIGHT+
+                "\nDistance: "+Database.ALDISTANACE));
+        jLSALStart.setText(Tools.convertToMultiline(Database.ALSTARTCODE.get()));
     }
     
     private void fireupdateGUI()
@@ -73,6 +83,9 @@ public class JPanelSettings extends javax.swing.JPanel implements IGUIEvent{
         jLabel20 = new javax.swing.JLabel();
         jBSWorkSpace = new javax.swing.JButton();
         jLSWorkSpace = new javax.swing.JLabel();
+        jLabel21 = new javax.swing.JLabel();
+        jBSCNCStart = new javax.swing.JButton();
+        jLSCNCStart = new javax.swing.JLabel();
         jLabel32 = new javax.swing.JLabel();
         jBSCNCToolChange = new javax.swing.JButton();
         jLSCNCToolChange = new javax.swing.JLabel();
@@ -88,6 +101,14 @@ public class JPanelSettings extends javax.swing.JPanel implements IGUIEvent{
         jLabel34 = new javax.swing.JLabel();
         jBSCNCToolSize = new javax.swing.JButton();
         jLSCNCToolSize = new javax.swing.JLabel();
+        jLabel37 = new javax.swing.JLabel();
+        jBSALOptions = new javax.swing.JButton();
+        jLSALOptions = new javax.swing.JLabel();
+        jLabel38 = new javax.swing.JLabel();
+        jBSALStart = new javax.swing.JButton();
+        jLSALStart = new javax.swing.JLabel();
+        jBexport = new javax.swing.JButton();
+        jBImport = new javax.swing.JButton();
 
         jLabel2.setText("Homeing:");
 
@@ -122,6 +143,17 @@ public class JPanelSettings extends javax.swing.JPanel implements IGUIEvent{
 
         jLSWorkSpace.setText("Settings Text");
 
+        jLabel21.setText("CNC/StartGCode");
+
+        jBSCNCStart.setText("Change");
+        jBSCNCStart.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jBSettingsActionPerformed(evt);
+            }
+        });
+
+        jLSCNCStart.setText("Settings Text");
+
         jLabel32.setText("CNC/Tool Change:");
 
         jBSCNCToolChange.setText("Change");
@@ -155,7 +187,7 @@ public class JPanelSettings extends javax.swing.JPanel implements IGUIEvent{
 
         jLSCNCSpindleOFF.setText("Settings Text");
 
-        jLabel33.setText("CNC/G0 Feedrate");
+        jLabel33.setText("CNC/G0 Feedrate:");
 
         jBSCNCG0Feedrate.setText("Change");
         jBSCNCG0Feedrate.addActionListener(new java.awt.event.ActionListener() {
@@ -166,7 +198,7 @@ public class JPanelSettings extends javax.swing.JPanel implements IGUIEvent{
 
         jLSCNCG0Feedrate.setText("Settings Text");
 
-        jLabel34.setText("CNC/Paint Tool Size");
+        jLabel34.setText("CNC/Paint Tool Size:");
 
         jBSCNCToolSize.setText("Change");
         jBSCNCToolSize.addActionListener(new java.awt.event.ActionListener() {
@@ -177,6 +209,42 @@ public class JPanelSettings extends javax.swing.JPanel implements IGUIEvent{
 
         jLSCNCToolSize.setText("Settings Text");
 
+        jLabel37.setText("Autolevel/Options:");
+
+        jBSALOptions.setText("Change");
+        jBSALOptions.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jBSettingsActionPerformed(evt);
+            }
+        });
+
+        jLSALOptions.setText("Settings Text");
+
+        jLabel38.setText("Autolevel/Start GCode:");
+
+        jBSALStart.setText("Change");
+        jBSALStart.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jBSettingsActionPerformed(evt);
+            }
+        });
+
+        jLSALStart.setText("Settings Text");
+
+        jBexport.setText("Export");
+        jBexport.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jBexportActionPerformed(evt);
+            }
+        });
+
+        jBImport.setText("Import");
+        jBImport.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jBImportActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
         layout.setHorizontalGroup(
@@ -184,34 +252,49 @@ public class JPanelSettings extends javax.swing.JPanel implements IGUIEvent{
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jLabel2)
-                    .addComponent(jLabel19)
-                    .addComponent(jLabel20)
-                    .addComponent(jLabel32)
-                    .addComponent(jLabel35)
-                    .addComponent(jLabel36)
-                    .addComponent(jLabel33)
-                    .addComponent(jLabel34))
-                .addGap(50, 50, 50)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jBSCNCToolSize)
-                    .addComponent(jBSCNCG0Feedrate)
-                    .addComponent(jBSCNCSpindleOFF)
-                    .addComponent(jBSCNCSpindleON)
-                    .addComponent(jBSCNCToolChange)
-                    .addComponent(jBSWorkSpace)
-                    .addComponent(jBSFastFeedrate)
-                    .addComponent(jBSHomeing))
-                .addGap(50, 50, 50)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jLSHomeing)
-                    .addComponent(jLSFastFeedrate)
-                    .addComponent(jLSWorkSpace)
-                    .addComponent(jLSCNCToolChange)
-                    .addComponent(jLSCNCSpindleON)
-                    .addComponent(jLSCNCSpindleOFF)
-                    .addComponent(jLSCNCG0Feedrate)
-                    .addComponent(jLSCNCToolSize))
+                    .addGroup(layout.createSequentialGroup()
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(jLabel2)
+                            .addComponent(jLabel19)
+                            .addComponent(jLabel20)
+                            .addComponent(jLabel32)
+                            .addComponent(jLabel35)
+                            .addComponent(jLabel36)
+                            .addComponent(jLabel33)
+                            .addComponent(jLabel34)
+                            .addComponent(jLabel37)
+                            .addComponent(jLabel38)
+                            .addComponent(jLabel21))
+                        .addGap(50, 50, 50)
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(jBSALOptions)
+                            .addComponent(jBSCNCToolSize)
+                            .addComponent(jBSCNCG0Feedrate)
+                            .addComponent(jBSCNCSpindleOFF)
+                            .addComponent(jBSCNCSpindleON)
+                            .addComponent(jBSCNCToolChange)
+                            .addComponent(jBSWorkSpace)
+                            .addComponent(jBSFastFeedrate)
+                            .addComponent(jBSHomeing)
+                            .addComponent(jBSALStart)
+                            .addComponent(jBSCNCStart))
+                        .addGap(50, 50, 50)
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(jLSCNCStart)
+                            .addComponent(jLSALStart)
+                            .addComponent(jLSALOptions)
+                            .addComponent(jLSCNCToolSize)
+                            .addComponent(jLSCNCG0Feedrate)
+                            .addComponent(jLSCNCSpindleOFF)
+                            .addComponent(jLSCNCSpindleON)
+                            .addComponent(jLSCNCToolChange)
+                            .addComponent(jLSWorkSpace)
+                            .addComponent(jLSFastFeedrate)
+                            .addComponent(jLSHomeing)))
+                    .addGroup(layout.createSequentialGroup()
+                        .addComponent(jBexport)
+                        .addGap(18, 18, 18)
+                        .addComponent(jBImport)))
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
@@ -232,6 +315,11 @@ public class JPanelSettings extends javax.swing.JPanel implements IGUIEvent{
                     .addComponent(jLabel20)
                     .addComponent(jBSWorkSpace)
                     .addComponent(jLSWorkSpace))
+                .addGap(18, 18, 18)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jLabel21)
+                    .addComponent(jBSCNCStart)
+                    .addComponent(jLSCNCStart))
                 .addGap(18, 18, 18)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel32)
@@ -257,7 +345,21 @@ public class JPanelSettings extends javax.swing.JPanel implements IGUIEvent{
                     .addComponent(jLabel34)
                     .addComponent(jBSCNCToolSize)
                     .addComponent(jLSCNCToolSize))
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addGap(18, 18, 18)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jLabel37)
+                    .addComponent(jBSALOptions)
+                    .addComponent(jLSALOptions))
+                .addGap(18, 18, 18)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jLabel38)
+                    .addComponent(jBSALStart)
+                    .addComponent(jLSALStart))
+                .addGap(18, 18, 18)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jBexport)
+                    .addComponent(jBImport))
+                .addContainerGap(13, Short.MAX_VALUE))
         );
     }// </editor-fold>//GEN-END:initComponents
 
@@ -296,6 +398,24 @@ public class JPanelSettings extends javax.swing.JPanel implements IGUIEvent{
             Database.values()[Database.WORKSPACE0.ordinal()+i].set(Tools.dtostr(values[i]));
         }
         
+        //StartCode
+        if(evt.getSource()==jBSCNCStart)
+        {
+            JTextArea textArea = new JTextArea(Database.STARTCODE.get()); 
+            JScrollPane scrollArea = new JScrollPane(textArea); 
+            scrollArea.setPreferredSize(new Dimension(100, 100));
+
+            if(JOptionPane.showConfirmDialog
+                    (
+                    this,
+                    new Object[]{"Enter the commands which will be executed when milling is started:", scrollArea},
+                    "Tool change:",
+                    JOptionPane.OK_CANCEL_OPTION
+                    )
+                    ==JOptionPane.OK_OPTION)
+                Database.STARTCODE.set(textArea.getText().trim());
+        }
+
         //Toolchange
         if(evt.getSource()==jBSCNCToolChange)
         {
@@ -368,18 +488,79 @@ public class JPanelSettings extends javax.swing.JPanel implements IGUIEvent{
         fireupdateGUI();
     }//GEN-LAST:event_jBSettingsActionPerformed
 
+    private void jBexportActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jBexportActionPerformed
+        JFileChooser fc= Database.getFileChooser();
+        fc.setFileFilter(new FileFilter() {
+            @Override
+            public boolean accept(File f) {
+                return f.getName().toLowerCase().endsWith(".ois")||f.isDirectory();
+            }
+
+            @Override
+            public String getDescription() {
+                return "Settings files (*.ois)";
+            }
+        });
+        fc.setFileSelectionMode(JFileChooser.FILES_ONLY);
+        fc.setMultiSelectionEnabled(false);
+
+        if(fc.showSaveDialog(this)!=JFileChooser.APPROVE_OPTION)
+            return;
+        
+        File f=fc.getSelectedFile();
+        if(f.getName().lastIndexOf('.')==-1)
+            f=new File(f.getPath()+".ois");
+
+        if(!Database.save(f))
+            JOptionPane.showMessageDialog(this, "Cannot export Settings!");
+    }//GEN-LAST:event_jBexportActionPerformed
+
+    private void jBImportActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jBImportActionPerformed
+        JFileChooser fc= Database.getFileChooser();
+        fc.setFileFilter(new FileFilter() {
+            @Override
+            public boolean accept(File f) {
+                return f.getName().toLowerCase().endsWith(".ois")||f.isDirectory();
+            }
+
+            @Override
+            public String getDescription() {
+                return "Settings files (*.ois)";
+            }
+        });
+        fc.setFileSelectionMode(JFileChooser.FILES_ONLY);
+        fc.setMultiSelectionEnabled(false);
+
+        if(fc.showOpenDialog(this)!=JFileChooser.APPROVE_OPTION)
+            return;
+        
+        if(!Database.load(fc.getSelectedFile()))
+            JOptionPane.showMessageDialog(this, "Cannot import Settings!");
+        
+        fireupdateGUI();
+        
+    }//GEN-LAST:event_jBImportActionPerformed
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JButton jBImport;
+    private javax.swing.JButton jBSALOptions;
+    private javax.swing.JButton jBSALStart;
     private javax.swing.JButton jBSCNCG0Feedrate;
     private javax.swing.JButton jBSCNCSpindleOFF;
     private javax.swing.JButton jBSCNCSpindleON;
+    private javax.swing.JButton jBSCNCStart;
     private javax.swing.JButton jBSCNCToolChange;
     private javax.swing.JButton jBSCNCToolSize;
     private javax.swing.JButton jBSFastFeedrate;
     private javax.swing.JButton jBSHomeing;
     private javax.swing.JButton jBSWorkSpace;
+    private javax.swing.JButton jBexport;
+    private javax.swing.JLabel jLSALOptions;
+    private javax.swing.JLabel jLSALStart;
     private javax.swing.JLabel jLSCNCG0Feedrate;
     private javax.swing.JLabel jLSCNCSpindleOFF;
     private javax.swing.JLabel jLSCNCSpindleON;
+    private javax.swing.JLabel jLSCNCStart;
     private javax.swing.JLabel jLSCNCToolChange;
     private javax.swing.JLabel jLSCNCToolSize;
     private javax.swing.JLabel jLSFastFeedrate;
@@ -388,10 +569,13 @@ public class JPanelSettings extends javax.swing.JPanel implements IGUIEvent{
     private javax.swing.JLabel jLabel19;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel20;
+    private javax.swing.JLabel jLabel21;
     private javax.swing.JLabel jLabel32;
     private javax.swing.JLabel jLabel33;
     private javax.swing.JLabel jLabel34;
     private javax.swing.JLabel jLabel35;
     private javax.swing.JLabel jLabel36;
+    private javax.swing.JLabel jLabel37;
+    private javax.swing.JLabel jLabel38;
     // End of variables declaration//GEN-END:variables
 }

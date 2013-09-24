@@ -143,6 +143,7 @@ public class CNCCommand {
         SETPOS(Color.orange),
         
         //Settings
+        STARTCOMMAND(Color.blue),  
         TOOLCHANGE(Color.blue), 
         SPINDELON(Color.blue),
         SPINDELOFF(Color.blue),
@@ -180,7 +181,7 @@ public class CNCCommand {
     }    
     
     
-    private State state;
+    private State state=State.UNKNOWN;
     private Type type= Type.UNKNOWN;
     private String command;
     private Calchelper cin;
@@ -190,11 +191,24 @@ public class CNCCommand {
 
     public CNCCommand(String command) {
         this.command = command;  
-        this.state= State.UNKNOWN;
+    }
+    
+    public static CNCCommand getStartCommand()
+    {
+        CNCCommand c=new CNCCommand("Start Command");
+        c.state= State.NORMAL;
+        c.type= Type.STARTCOMMAND;
+        c.cin=new Calchelper();
+        c.cout= new Calchelper();
+        c.p= new CommandParsing("");
+        return c;
     }
     
     public State calcCommand(Calchelper c)
     {
+        if(type==Type.STARTCOMMAND)
+            return State.NORMAL;
+        
         state= State.NORMAL;
         this.cin= c.clone();
         this.cout= c;
@@ -476,6 +490,9 @@ public class CNCCommand {
                 break;
 
             //Settings
+            case STARTCOMMAND:
+                cmds.addAll(Arrays.asList(Database.STARTCODE.get().split("\n")));
+                break;
             case TOOLCHANGE:
                 cmd=Database.TOOLCHANGE.get();
                 if(p.contains('T'))
@@ -529,8 +546,8 @@ public class CNCCommand {
         String s= command +"\n"+
                 "  Message: "+message+"\n"+
                 "  Type:    "+type+"\n"+
-                "  Parser:  "+p.toString()+"\n"+
-                "  Contex:  "+cin.toString()+"\n"+
+                "  Parser:  "+p+"\n"+
+                "  Contex:  "+cin+"\n"+
                 "  Execute: ";
         for(String cmd:execute(t))
             s+="\n            --> "+cmd;

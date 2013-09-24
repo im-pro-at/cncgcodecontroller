@@ -12,6 +12,6 @@ public interface IGUIEvent {
 
     public void setGUIEvent(IEvent event);
 
-    public void updateGUI(boolean serial, boolean isworking);
+    public void updateGUI(boolean serial, boolean isworking, boolean isleveled);
     
 }

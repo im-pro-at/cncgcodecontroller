@@ -50,7 +50,6 @@ public class JPanelCNCMilling extends javax.swing.JPanel implements IGUIEvent{
     }
     
     
-    private final JFileChooser fc = new JFileChooser();
     private NumberFildManipulator[] positioningmove;
     private PMySwingWorker cncworker=null;
     private boolean cncloadedfile=false;
@@ -198,14 +197,6 @@ public class JPanelCNCMilling extends javax.swing.JPanel implements IGUIEvent{
         for(NumberFildManipulator fild:positioningmove)
             fild.set(0.0);
         
-        //set currantdiroctary
-        try {
-            fc.setCurrentDirectory(new File(Database.FILEDIRECTORY.get()));
-        }
-        catch(Exception ex){
-            //Its ok ;-)
-        }
-
         //CNC Milling
         jLCNCCommands.setCellRenderer(new BasicComboBoxRenderer(){
 
@@ -244,7 +235,7 @@ public class JPanelCNCMilling extends javax.swing.JPanel implements IGUIEvent{
     }
 
     @Override
-    public void updateGUI(boolean serial, boolean isworking)
+    public void updateGUI(boolean serial, boolean isworking, boolean isleveled)
     {
         jCBPerview.setEnabled(cncloadedfile);
         jLoadFile.setEnabled(!isworking);
@@ -790,11 +781,13 @@ public class JPanelCNCMilling extends javax.swing.JPanel implements IGUIEvent{
     }//GEN-LAST:event_jBMillingActionPerformed
 
     private void jLoadFileActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jLoadFileActionPerformed
+        JFileChooser fc= Database.getFileChooser();
         fc.setFileSelectionMode(JFileChooser.FILES_ONLY);
         fc.setMultiSelectionEnabled(false);
+        
         if(fc.showOpenDialog(this)!=JFileChooser.APPROVE_OPTION)
-        return;
-        Database.FILEDIRECTORY.set(fc.getCurrentDirectory().getPath());
+            return;
+
         final File f= fc.getSelectedFile();
 
         if(!f.canRead())
@@ -825,7 +818,9 @@ public class JPanelCNCMilling extends javax.swing.JPanel implements IGUIEvent{
                 long length= f.length();
 
                 if (length==0) length=1;
-
+                
+                model.addElement(CNCCommand.getStartCommand());
+                
                 try (BufferedReader br = new BufferedReader(new FileReader(f))) {
 
                     while((line = br.readLine() )!=null && !this.isCancelled())

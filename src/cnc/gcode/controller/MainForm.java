@@ -23,18 +23,18 @@ public final class MainForm extends javax.swing.JFrame implements IGUIEvent{
     public MainForm() {
         
         //Load Database
-        if(!Database.load())
+        if(!Database.load(null))
             JOptionPane.showMessageDialog(null,"Could not load Settings!");
         
         initComponents();
         
         //GuiUpdateHandler
-        final IGUIEvent[] panels= new IGUIEvent[]{this,jPanelControl,jPanelCNCMilling,jPanelCommunication,jPanelSettings};
+        final IGUIEvent[] panels= new IGUIEvent[]{this,jPanelControl,jPanelAutoLevel,jPanelCNCMilling,jPanelCommunication,jPanelSettings};
         IEvent updateGUI= new IEvent() {
             @Override
             public void fired() {
                 for(IGUIEvent panel:panels)
-                    panel.updateGUI(Communication.getInstance().isConnect(), jPanelCNCMilling.isRunning());
+                    panel.updateGUI(Communication.getInstance().isConnect(), jPanelCNCMilling.isRunning() || jPanelAutoLevel.isWorking(), jPanelAutoLevel.isLeveled());
             }
         };
         for(IGUIEvent panel:panels)
@@ -84,7 +84,7 @@ public final class MainForm extends javax.swing.JFrame implements IGUIEvent{
     }
 
     @Override
-    public void updateGUI(boolean serial, boolean isworking) {
+    public void updateGUI(boolean serial, boolean isworking, boolean  isleveld) {
         //Controll      
         jCBPort.setEnabled(!serial);
         jCBSpeed.setEnabled(!serial);
@@ -112,6 +112,7 @@ public final class MainForm extends javax.swing.JFrame implements IGUIEvent{
 
         jTabbedPane2 = new javax.swing.JTabbedPane();
         jPanelControl = new cnc.gcode.controller.JPanelControl();
+        jPanelAutoLevel = new cnc.gcode.controller.JPanelAutoLevel();
         jPanelCNCMilling = new cnc.gcode.controller.JPanelCNCMilling();
         jPanelCommunication = new cnc.gcode.controller.JPanelCommunication();
         jScrollPane = new javax.swing.JScrollPane();
@@ -132,6 +133,7 @@ public final class MainForm extends javax.swing.JFrame implements IGUIEvent{
         });
 
         jTabbedPane2.addTab("Control", jPanelControl);
+        jTabbedPane2.addTab("Auto Leveler", jPanelAutoLevel);
         jTabbedPane2.addTab("CNC Milling", jPanelCNCMilling);
         jTabbedPane2.addTab("Communication", jPanelCommunication);
 
@@ -166,12 +168,12 @@ public final class MainForm extends javax.swing.JFrame implements IGUIEvent{
                 .addComponent(jBConnect)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jLStatus, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-            .addComponent(jTabbedPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 1029, Short.MAX_VALUE)
+            .addComponent(jTabbedPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 1054, Short.MAX_VALUE)
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
-                .addComponent(jTabbedPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 559, Short.MAX_VALUE)
+                .addComponent(jTabbedPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 576, Short.MAX_VALUE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jBConnect)
@@ -190,7 +192,7 @@ public final class MainForm extends javax.swing.JFrame implements IGUIEvent{
             Communication.getInstance().disconnect();
         
         //Save Database
-        if(!Database.save())
+        if(!Database.save(null))
             JOptionPane.showMessageDialog(this,"Could not Save Settings!");
         
         System.exit(0);
@@ -227,6 +229,7 @@ public final class MainForm extends javax.swing.JFrame implements IGUIEvent{
     private javax.swing.JComboBox jCBSpeed;
     private javax.swing.JLabel jLStatus;
     private javax.swing.JLabel jLabel6;
+    private cnc.gcode.controller.JPanelAutoLevel jPanelAutoLevel;
     private cnc.gcode.controller.JPanelCNCMilling jPanelCNCMilling;
     private cnc.gcode.controller.JPanelCommunication jPanelCommunication;
     private cnc.gcode.controller.JPanelControl jPanelControl;
