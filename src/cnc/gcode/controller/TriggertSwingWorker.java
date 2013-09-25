@@ -16,19 +16,22 @@ public abstract class TriggertSwingWorker<P> {
     protected void process(P chunk){}
     
     private boolean cancelled=false;
+    private boolean triggered=false;
     
     private Thread t= new Thread(new Runnable() {
         @Override
         public void run() {
             try {
                 P p;
-                synchronized(TriggertSwingWorker.this)
-                {
-                    //Wait for first trigger
-                    TriggertSwingWorker.this.wait();
-                }
                 while(true)
                 {
+                    synchronized(TriggertSwingWorker.this)
+                    {
+                        //Wait for trigger
+                        if(!triggered)
+                            TriggertSwingWorker.this.wait();
+                        triggered=false;
+                    }
                     try {
                         p=doJob();
                     } catch (InterruptedException ex) {
@@ -49,10 +52,6 @@ public abstract class TriggertSwingWorker<P> {
                                 process(cp);
                             }
                         });
-                        
-                        //Wait for trigger
-                        TriggertSwingWorker.this.wait();
-                        
                     }
                 }
             } catch (InterruptedException ex) {
@@ -62,6 +61,7 @@ public abstract class TriggertSwingWorker<P> {
     }){
         {
             //Start thread imediatly:
+            setName("TriggerWorker p="+Thread.currentThread().getName());
             start();
         }
     };    
@@ -83,6 +83,7 @@ public abstract class TriggertSwingWorker<P> {
     
     public final synchronized void trigger()
     {
+        triggered=true;
         notify();
     }
         

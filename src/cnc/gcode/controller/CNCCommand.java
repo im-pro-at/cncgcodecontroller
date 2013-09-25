@@ -144,6 +144,7 @@ public class CNCCommand {
         
         //Settings
         STARTCOMMAND(Color.blue),  
+        ALSTARTCOMMAND(Color.blue),  
         TOOLCHANGE(Color.blue), 
         SPINDELON(Color.blue),
         SPINDELOFF(Color.blue),
@@ -203,11 +204,17 @@ public class CNCCommand {
         c.p= new CommandParsing("");
         return c;
     }
+    public static CNCCommand getALStartCommand()
+    {
+        CNCCommand c=getStartCommand();
+        c.type= Type.ALSTARTCOMMAND;
+        return c;
+    }
     
     public State calcCommand(Calchelper c)
     {
-        if(type==Type.STARTCOMMAND)
-            return State.NORMAL;
+        if(state!=State.UNKNOWN)
+            return state; //cale done before!
         
         state= State.NORMAL;
         this.cin= c.clone();
@@ -424,6 +431,17 @@ public class CNCCommand {
                             state=State.WARNING;
                         message+="Command Without any Moving! ";
                     }
+                    
+                    if(move.s[2]!=move.e[2] && !Double.isNaN(move.e[2]))
+                    {
+                        //Z move
+                        if(Double.isNaN(move.s[0]) || Double.isNaN(move.s[1]))
+                        {
+                            if(state== State.NORMAL)
+                                state=State.WARNING;
+                            message+="Z movement without knowing X/Y! Autoleveling will not work! ";
+                        }
+                    }
                 }
         }
         
@@ -450,7 +468,7 @@ public class CNCCommand {
         return new Move[0];
     }
 
-    String[] execute(Transform t) {
+    String[] execute(Transform t, boolean autoleveling) {
         ArrayList<String> cmds= new ArrayList<>();
         String cmd;
         switch(type)
@@ -469,8 +487,15 @@ public class CNCCommand {
                     boolean domove=false;
                     //Cordinates
                     for(int i=0;i<3;i++)
-                        if(move.s[i]!=move.e[i] && !Double.isNaN(move.e[i]))
+                        if(autoleveling && i==2 && !Double.isNaN(move.e[0]) && !Double.isNaN(move.e[1]) && !Double.isNaN(move.e[2]) )
                         {
+                            //Autoleveld Z
+                            cmd+=" "+CommandParsing.axesName[i]+Tools.dtostr(AutoLevelSystem.correctz(t.t(0,move.e[0]), t.t(1,move.e[1]), move.e[2]));
+                            domove=true;
+                        }
+                        else if((move.s[i]!=move.e[i] || autoleveling )&& !Double.isNaN(move.e[i]))
+                        {
+                            //Normal Axis
                             cmd+=" "+CommandParsing.axesName[i]+Tools.dtostr(t.t(i,move.e[i]));
                             domove=true;
                         }
@@ -492,6 +517,9 @@ public class CNCCommand {
             //Settings
             case STARTCOMMAND:
                 cmds.addAll(Arrays.asList(Database.STARTCODE.get().split("\n")));
+                break;
+            case ALSTARTCOMMAND:
+                cmds.addAll(Arrays.asList(Database.ALSTARTCODE.get().split("\n")));
                 break;
             case TOOLCHANGE:
                 cmd=Database.TOOLCHANGE.get();
@@ -542,14 +570,14 @@ public class CNCCommand {
         return command;
     }
 
-    public String getInfos(Transform t) {
+    public String getInfos(Transform t,boolean autoleveling) {
         String s= command +"\n"+
                 "  Message: "+message+"\n"+
                 "  Type:    "+type+"\n"+
                 "  Parser:  "+p+"\n"+
                 "  Contex:  "+cin+"\n"+
                 "  Execute: ";
-        for(String cmd:execute(t))
+        for(String cmd:execute(t,autoleveling))
             s+="\n            --> "+cmd;
         
         return s;

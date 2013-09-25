@@ -36,7 +36,7 @@ public class JPanelSettings extends javax.swing.JPanel implements IGUIEvent{
     }
 
     @Override
-    public void updateGUI(boolean serial, boolean isworking, boolean isleveled)
+    public void updateGUI(boolean serial, boolean isworking)
     {
         jBImport.setEnabled(!isworking);
         //Akt Text
@@ -534,6 +534,26 @@ public class JPanelSettings extends javax.swing.JPanel implements IGUIEvent{
                 Database.ALDISTANACE.set(Tools.dtostr(values[5]));
             }
         }
+ 
+        //AutoLavel StartCode
+        if(evt.getSource()==jBSALStart)
+        {
+            JTextArea textArea = new JTextArea(Database.ALSTARTCODE.get()); 
+            JScrollPane scrollArea = new JScrollPane(textArea); 
+            scrollArea.setPreferredSize(new Dimension(100, 100));
+
+            if(JOptionPane.showConfirmDialog
+                    (
+                    this,
+                    new Object[]{"Enter the commands which will be executed when autoleveling is started:", scrollArea},
+                    "Tool change:",
+                    JOptionPane.OK_CANCEL_OPTION
+                    )
+                    ==JOptionPane.OK_OPTION)
+                Database.ALSTARTCODE.set(textArea.getText().trim());
+        }
+        
+        
         fireupdateGUI();
     }//GEN-LAST:event_jBSettingsActionPerformed
 

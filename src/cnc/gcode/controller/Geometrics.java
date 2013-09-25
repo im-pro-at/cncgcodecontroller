@@ -51,6 +51,26 @@ public final class Geometrics {
         }
         return rect;
     }
+    public static Rectangle2D pointToRectangel(Point2D p1, Point2D p2){
+        double x,y,width,height;
+        if(p1.getX()<p2.getX()){
+            x=p1.getX();
+            width=p2.getX()-p1.getX();
+        }
+        else{
+            x=p2.getX();
+            width=p1.getX()-p2.getX();            
+        }
+        if(p1.getY()<p2.getY()){
+            y=p1.getY();
+            height=p2.getY()-p1.getY();
+        }
+        else{
+            y=p2.getY();
+            height=p1.getY()-p2.getY();            
+        }
+        return new Rectangle2D.Double(x, y, width, height);
+    }
     
     
     

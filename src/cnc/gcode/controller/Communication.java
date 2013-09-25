@@ -70,7 +70,7 @@ public class Communication {
                     if(sp!=null)    
                         sp.disconnect();
                     sp=null;
-                    status="Communication Error! ("+ex+"9";
+                    status="Communication Error! ("+ex+")";
                     ex.printStackTrace();
                     doUpdate();
                 }
@@ -160,7 +160,10 @@ public class Communication {
 
                 if(rs>0)
                 {
-                    resend(rs);
+                    if(rs!=1)
+                        resend(rs);
+                    else
+                        throw new MyException("Resend 1! Controller reset?!");
                 }
                 else
                 {
@@ -238,7 +241,7 @@ public class Communication {
             wait(1000);
             if(isbussy())
                 //Printer not answered!
-                throw new Exception("Printer did not respons!"); 
+                throw new MyException("Printer did not respons!"); 
             
         }
         catch(Exception e)

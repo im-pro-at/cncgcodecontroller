@@ -17,7 +17,7 @@ public abstract class MySwingWorker<R,P> {
     protected abstract R doInBackground() throws Exception;
     protected abstract void done(R rvalue, Exception ex, boolean canceled);
     protected void process(List<P> chunks){}
-    protected void progress(int progress){}
+    protected void progress(int progress,String message){}
     
     private boolean cancelled=false;
     private boolean done=false;
@@ -25,6 +25,7 @@ public abstract class MySwingWorker<R,P> {
     final private Object syncprogress=new Object();
     boolean progressstate=false;
     private int progress=0;
+    private String mprogress="";
     final private Object syncprocess=new Object();
     boolean processstate=false;
     private LinkedList<P> chunkes= new LinkedList<>();
@@ -87,14 +88,16 @@ public abstract class MySwingWorker<R,P> {
             }
         }
     }
+
     
-    protected final void setProgress(int progress)
+    protected final void setProgress(int progress, String message)
     {
         if(!Thread.currentThread().equals(t))
             throw new UnsupportedOperationException("Must be called from worker Thread!");
         synchronized(syncprogress)
         {
             this.progress=progress;
+            this.mprogress=message;
             if(!progressstate)
             {
                 progressstate=true;
@@ -102,13 +105,15 @@ public abstract class MySwingWorker<R,P> {
                     @Override
                     public void run() {
                         int value;
+                        String message;
                         //Acess Value
                         synchronized(syncprogress)
                         {
                             MySwingWorker.this.progressstate=false;
                             value=MySwingWorker.this.progress;
+                            message=MySwingWorker.this.mprogress;
                         }
-                        progress(value);
+                        progress(value,message);
                     }
                 });
             }
@@ -120,6 +125,7 @@ public abstract class MySwingWorker<R,P> {
         if(!started)
         {
             started=true;
+            t.setName("MyWorker p="+Thread.currentThread().getName());
             t.start();
         }
     }
@@ -178,6 +184,16 @@ public abstract class MySwingWorker<R,P> {
             if(pause)
                 syncpause.wait();
         }        
+    }
+
+    public synchronized void trigger()
+    {
+        notify();
+    }
+    
+    protected synchronized void waitfortrigger(long timout) throws InterruptedException
+    {
+        wait(timout);
     }
     
 }

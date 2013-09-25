@@ -34,7 +34,7 @@ public final class MainForm extends javax.swing.JFrame implements IGUIEvent{
             @Override
             public void fired() {
                 for(IGUIEvent panel:panels)
-                    panel.updateGUI(Communication.getInstance().isConnect(), jPanelCNCMilling.isRunning() || jPanelAutoLevel.isWorking(), jPanelAutoLevel.isLeveled());
+                    panel.updateGUI(Communication.getInstance().isConnect(), jPanelCNCMilling.isRunning() || jPanelAutoLevel.isWorking());
             }
         };
         for(IGUIEvent panel:panels)
@@ -84,7 +84,7 @@ public final class MainForm extends javax.swing.JFrame implements IGUIEvent{
     }
 
     @Override
-    public void updateGUI(boolean serial, boolean isworking, boolean  isleveld) {
+    public void updateGUI(boolean serial, boolean isworking) {
         //Controll      
         jCBPort.setEnabled(!serial);
         jCBSpeed.setEnabled(!serial);

@@ -63,7 +63,7 @@ public class JPanelCommunication extends javax.swing.JPanel implements IGUIEvent
     }
 
     @Override
-    public void updateGUI(boolean serial, boolean isworking, boolean isleveled)
+    public void updateGUI(boolean serial, boolean isworking)
     {
         jBSend.setEnabled(!isworking && serial);
     }
