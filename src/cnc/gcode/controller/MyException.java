@@ -10,8 +10,19 @@ package cnc.gcode.controller;
  */
 public class MyException extends Exception{
 
+    Object o;
+    
     public MyException(String message) {
         super(message);
+    }
+
+    public MyException(String message, Object o) {
+        super(message);
+        this.o = o;
+    }
+
+    public Object getO() {
+        return o;
     }
 
     

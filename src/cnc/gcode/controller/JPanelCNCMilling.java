@@ -18,6 +18,8 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.text.ParseException;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.logging.Level;
@@ -475,10 +477,11 @@ public class JPanelCNCMilling extends javax.swing.JPanel implements IGUIEvent{
                         .addComponent(jTFmoveX, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                     .addComponent(jCBmirroX))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED, 11, Short.MAX_VALUE)
-                .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jLabel6)
-                    .addComponent(jTFmoveY, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jCBmirroY))
+                .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jCBmirroY)
+                    .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                        .addComponent(jLabel6)
+                        .addComponent(jTFmoveY, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jCBAutoLeveling)
@@ -963,7 +966,7 @@ public class JPanelCNCMilling extends javax.swing.JPanel implements IGUIEvent{
                 CNCCommand.Optimiser o= new CNCCommand.Optimiser(new CNCCommand.Optimiser.IProgress() {
                     @Override
                     public void publish(String message, int progess) throws MyException {
-                        publish(message, progess);
+                        setProgress(progess,message);
                         try {
                             dopause();
                         } catch (InterruptedException ex) {
@@ -975,18 +978,18 @@ public class JPanelCNCMilling extends javax.swing.JPanel implements IGUIEvent{
                 });
                 
                 //Not much to do the CNCOpimiser does all the work :-)
-                CNCCommand[] outcmds=o.execute(incmds);
+                ArrayList<CNCCommand> outcmds=o.execute(new ArrayList<>(Arrays.asList(incmds)));
 
                 //Process new comands
                 CNCCommand.Calchelper c= new CNCCommand.Calchelper();
                 PrintableLayers layer= new PrintableLayers();
                 int warings=0;
                 int errors=0;
-                for(int i=0;i<outcmds.length;i++)
+                for(int i=0;i<outcmds.size();i++)
                 {
-                    setProgress((int)(100*i/(double)outcmds.length),"Recalc Commands...");
-                    
-                    CNCCommand command=outcmds[i];
+                    setProgress((int)(100*i/(double)outcmds.size()),"Recalc");
+                            
+                    CNCCommand command=outcmds.get(i);
 
                     CNCCommand.State t=command.calcCommand(c);
 
@@ -1020,24 +1023,30 @@ public class JPanelCNCMilling extends javax.swing.JPanel implements IGUIEvent{
                 else if(ex!=null)
                 {
                     message="Opimisation faild: "+ex.getMessage();
+                    if(ex instanceof MyException && ((MyException)ex).getO() instanceof CNCCommand)
+                        jLCNCCommands.setSelectedValue(((MyException)ex).getO(), canceled);
                     Logger.getLogger(JPanelCNCMilling.class.getName()).log(Level.SEVERE, null, ex);
                 }
                 else
                 {
                     message=rvalue;
+                    jLCNCCommands.setModel(model);
+                    jCBPerview.setModel(new DefaultComboBoxModel(layers.getLayers())); //Clear Layers
                     jPBar.setString("~"+Tools.formatDuration(secounds));
                     maxTime=secounds;
                     fireupdateGUI();
                 }
-                jLCNCCommands.setModel(model);
-                jCBPerview.setModel(new DefaultComboBoxModel(layers.getLayers())); //Clear Layers
 
                 JOptionPane.showMessageDialog(JPanelCNCMilling.this, message);
 
                 fireupdateGUI();
             }
         };
-        
+
+        worker.execute();
+
+        fireupdateGUI();
+
     }//GEN-LAST:event_jBOptimiseActionPerformed
 
     // Variables declaration - do not modify//GEN-BEGIN:variables

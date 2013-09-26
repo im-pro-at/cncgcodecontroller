@@ -7,8 +7,13 @@ package cnc.gcode.controller;
 import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Graphics2D;
+import java.awt.geom.Point2D;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.ListIterator;
 
 /**
  *
@@ -157,6 +162,11 @@ public class CNCCommand {
         
         ;
         
+        /*
+         * Commands are allwoed for optimisation between the last and the first G1 move:
+         */
+        public final static List<Type> ALLOWEDFOROPTIMISER = Collections.unmodifiableList(Arrays.asList(G0,G1,ARC,SPINDELON,SPINDELOFF,MXX)); 
+        
         private Color color;
 
         private Type(Color color) {
@@ -196,26 +206,32 @@ public class CNCCommand {
     
     public static CNCCommand getStartCommand()
     {
-        CNCCommand c=new CNCCommand("Start Command");
-        c.state= State.NORMAL;
+        CNCCommand c=new CNCCommand("(Start Command)");
         c.type= Type.STARTCOMMAND;
-        c.cin=new Calchelper();
-        c.cout= new Calchelper();
-        c.p= new CommandParsing("");
         return c;
     }
     public static CNCCommand getALStartCommand()
     {
-        CNCCommand c=getStartCommand();
+        CNCCommand c=new CNCCommand("(Autoleveler Start Command)");
         c.type= Type.ALSTARTCOMMAND;
         return c;
+    }
+    
+    @Override
+    public CNCCommand clone()
+    {
+        if(type==Type.STARTCOMMAND)
+            return getStartCommand();
+        if(type==Type.ALSTARTCOMMAND)
+            return getALStartCommand();
+        return new CNCCommand(command);
     }
     
     public State calcCommand(Calchelper c)
     {
         if(state!=State.UNKNOWN)
-            return state; //cale done before!
-        
+            throw new UnsupportedOperationException();
+            
         state= State.NORMAL;
         this.cin= c.clone();
         this.cout= c;
@@ -232,7 +248,8 @@ public class CNCCommand {
         if(p.isEmpty())
         {
             //Empty
-            type= Type.EMPTY;
+            if(type==Type.UNKNOWN)
+                type= Type.EMPTY;
         }
         else
         {
@@ -588,9 +605,24 @@ public class CNCCommand {
         return (long)cout.secounds;
     }
     
-    
     public static class Optimiser {
         //All Your Base Are Belong To Us
+        public static class OElement
+        {
+            public int startcmd;
+            public int endcmd;
+            public Point2D s;
+            public Point2D e;
+
+            public OElement(int startcmd, int endcmd, Point2D s, Point2D e) {
+                this.startcmd = startcmd;
+                this.endcmd = endcmd;
+                this.s = s;
+                this.e = e;
+            }
+            
+            
+        }
         
         public interface IProgress{
             public void publish(String message, int progess) throws MyException;
@@ -602,32 +634,132 @@ public class CNCCommand {
             this.progress = progress;
         }
 
-        public CNCCommand[] execute(CNCCommand[] incmds) throws MyException{
-            progress.publish("Checking commads", 0);
+        public ArrayList<CNCCommand> execute(ArrayList<CNCCommand> incmds) throws MyException{
+            progress.publish("Checking", 0);
 
-            //search first and last g1
-            int fg1=-1,lg1=-1;
-            double g1level;
-            for(int i=0;i<incmds.length;i++)
-                if(incmds[i].getType()==Type.G1)
-                {
-                    if(fg1==-1) fg1=i;
+            //search last g1
+            int lg1=-1;
+            for(int i=0;i<incmds.size();i++)
+                if(incmds.get(i).type==Type.G1)
                     lg1=i;
-                }        
 
-            double levelg1=Double.NaN;
-            for(int i=0;i<incmds.length;i++)
+            if(lg1==-1)
+                throw new MyException("No G1 Found!");
+            
+            boolean g1found=false;
+            double fastmovelevel=Double.NaN;
+            ArrayList<Integer> G0moves= new ArrayList<>();  
+            for(int cmdindex=0;cmdindex<lg1;cmdindex++)
             {
-                //Test if all G0 have the same level
-                //if(cmds)
+                progress.publish("Checking", 100*cmdindex/lg1);
+                CNCCommand cmd=incmds.get(cmdindex);
+                
+                g1found|=(cmd.type==Type.G1);
+                if(g1found)
+                {
+                    if(!Type.ALLOWEDFOROPTIMISER.contains(cmd.type))
+                        throw new MyException("Unsupported Commands found!",cmd);
+                    
+                    if(cmd.type==Type.G0)
+                    {
+                        boolean[] move= new boolean[3];
+                        for(int i=0;i<3;i++)
+                        {
+                            if(Double.isNaN(cmd.cin.axes[i]) || Double.isNaN(cmd.cout.axes[i]))
+                                throw new MyException("G0 command found with undefind context!",cmd);
+                            if(cmd.cin.axes[i]!=cmd.cout.axes[i])
+                                move[i]=true;
+                        }
+                        if((move[0] || move[1]) && move[2])
+                            throw new MyException("Move of [XY] and Z not supporded!",cmd);             
+                        if(move[0] || move[1])
+                        {
+                            //G0 Move to other position => this is what wie want to optimise
+                            if(Double.isNaN(fastmovelevel))
+                                fastmovelevel=cmd.cin.axes[2];
+                            else if(fastmovelevel!=cmd.cin.axes[2])
+                                throw new MyException("G0 move of XY not at the same level!",cmd);                      
+                            
+                            G0moves.add(cmdindex);
+                        }
+                    }
+                }
             }
+            
+            if(G0moves.size()<2)
+                throw new MyException("Nothing to Optimise");
+            
+            //Optimisation:
+            progress.publish("Optimising", 0);
 
+            LinkedList<OElement> in= new LinkedList<>();
+            int startcmd= G0moves.get(0);
+            for(int i=1;i<G0moves.size();i++)
+            {
+                in.add(new OElement(startcmd,G0moves.get(i),
+                        new Point2D.Double(incmds.get(startcmd).cout.axes[0], incmds.get(startcmd).cout.axes[1]),
+                        new Point2D.Double(incmds.get(G0moves.get(i)).cin.axes[0], incmds.get(G0moves.get(i)).cin.axes[1])));
+                startcmd=G0moves.get(i);
+            }
+            LinkedList<OElement> out= new LinkedList<>();
+            
+            Point2D aktpos= new Point2D.Double(incmds.get(G0moves.get(0)).cin.axes[0], incmds.get(G0moves.get(0)).cin.axes[1]);
+            while(in.size()>0)
+            {
+                progress.publish("Optimising", 100*out.size()/G0moves.size());
+    
+                double d=Double.MAX_VALUE;
+                OElement nearest=null;
+                for(OElement e:in)
+                {
+                    double aktd=aktpos.distance(e.s);
+                    if(d>aktd)
+                    {
+                        nearest=e;
+                        d=aktd;
+                    }
+                }
+                
+                if(nearest==null)
+                    throw new MyException("Schould not happen!");
+                
+                in.remove(nearest);
+                out.add(nearest);
+                aktpos=nearest.e;
+            }
+            
+            //Rebuild List
+            progress.publish("Reorder", 0);
+            
+            ArrayList<CNCCommand> outcmds= new ArrayList<>(incmds.size());
+            for(int i=0;i<G0moves.get(0);i++)
+                outcmds.add(incmds.get(i).clone());
+            
+            for(OElement e:out)
+            {
+                progress.publish("Reorder", 100*outcmds.size()/incmds.size());
+                //Make G0 move
+                outcmds.add(new CNCCommand("G0 X"+Tools.dtostr(e.s.getX())+" Y"+Tools.dtostr(e.s.getY())));
 
+                //Copy elements
+                for(int i=e.startcmd+1;i<e.endcmd;i++)
+                    outcmds.add(incmds.get(i).clone());
+                
+            }
+            
+            //Last G0 move
+            int lastG0move=G0moves.get(G0moves.size()-1);
+            outcmds.add(new CNCCommand("G0 X"+Tools.dtostr(incmds.get(lastG0move).cout.axes[0])+" Y"+Tools.dtostr(incmds.get(lastG0move).cout.axes[1])));
 
-
-            throw new MyException("Not implement!");
+            //Copy rest
+            for(int i=lastG0move+1;i<incmds.size();i++)
+                outcmds.add(incmds.get(i).clone());
+            
+            if(incmds.size()!=outcmds.size())
+                throw new MyException("Internal Error size not equal!");
+            
+            return outcmds;
         }
-
 
 
 

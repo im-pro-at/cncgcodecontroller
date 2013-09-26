@@ -7,11 +7,9 @@ package cnc.gcode.controller;
 import de.unikassel.ann.util.ColorHelper;
 import java.awt.Color;
 import java.awt.Font;
-import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Rectangle;
 import java.awt.RenderingHints;
-import java.awt.font.FontRenderContext;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Ellipse2D;
 import java.awt.geom.NoninvertibleTransformException;
@@ -179,7 +177,7 @@ public class JPanelAutoLevel extends javax.swing.JPanel implements IGUIEvent {
                         g2.setColor(c);
                         g2.fillRect(data.jpw+5, dy+zh*i, 90, zh-4);
                         g2.setColor((299*c.getRed() +587*c.getGreen()+114*c.getBlue()>128000)?Color.black:Color.white);
-                        g2.drawString(Tools.dtostr(z), data.jpw+5, dy+zh*i +zh-10);
+                        g2.drawString(Tools.dtostr(z), data.jpw+10, dy+zh*i +zh-10);
                         g2.setColor(Color.black);
                         g2.drawRect(data.jpw+5, dy+zh*i, 90, zh-4);
                     }
