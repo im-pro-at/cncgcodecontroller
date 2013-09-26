@@ -165,7 +165,7 @@ public class CNCCommand {
         /*
          * Commands are allwoed for optimisation between the last and the first G1 move:
          */
-        public final static List<Type> ALLOWEDFOROPTIMISER = Collections.unmodifiableList(Arrays.asList(G0,G1,ARC,SPINDELON,SPINDELOFF,MXX)); 
+        public final static List<Type> ALLOWEDFOROPTIMISER = Collections.unmodifiableList(Arrays.asList(EMPTY, G0, G1, ARC, SPINDELON, SPINDELOFF, MXX)); 
         
         private Color color;
 
