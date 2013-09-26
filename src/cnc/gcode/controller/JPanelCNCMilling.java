@@ -960,7 +960,7 @@ public class JPanelCNCMilling extends javax.swing.JPanel implements IGUIEvent{
             
             @Override
             protected String doInBackground() throws Exception {
-                CNCOptimiser o= new CNCOptimiser(new CNCOptimiser.IProgress() {
+                CNCCommand.Optimiser o= new CNCCommand.Optimiser(new CNCCommand.Optimiser.IProgress() {
                     @Override
                     public void publish(String message, int progess) throws MyException {
                         publish(message, progess);

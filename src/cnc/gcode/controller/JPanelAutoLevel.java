@@ -4,16 +4,14 @@
  */
 package cnc.gcode.controller;
 
-import com.sun.org.apache.bcel.internal.generic.CALOAD;
-import com.sun.swing.internal.plaf.metal.resources.metal;
 import de.unikassel.ann.util.ColorHelper;
 import java.awt.Color;
 import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
-import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.RenderingHints;
+import java.awt.font.FontRenderContext;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Ellipse2D;
 import java.awt.geom.NoninvertibleTransformException;
@@ -23,13 +21,11 @@ import java.awt.image.BufferedImage;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.JOptionPane;
 import javax.swing.SwingUtilities;
-import sun.print.PSPrinterJob;
 
 /**
  *
@@ -90,11 +86,10 @@ public class JPanelAutoLevel extends javax.swing.JPanel implements IGUIEvent {
                 g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
                 g2.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BILINEAR);
                 
-                Graphics guntransformed= g2.create();
-                guntransformed.setColor(Color.black);
-                guntransformed.setFont(new Font(Font.SANS_SERIF, Font.PLAIN, 12));
-                
                 //Scalling transforming ...
+                if(AutoLevelSystem.leveled())
+                    data.jpw-=100;
+                
                 //StartCorner
                 g2.translate(data.jpw/2, data.jph/2);
                 switch(Integer.parseInt(Database.HOMEING.get()))
@@ -113,14 +108,12 @@ public class JPanelAutoLevel extends javax.swing.JPanel implements IGUIEvent {
                         g2.scale(-1,-1);
                         break;
                 }
-                //Zoom
                 g2.translate(-data.jpw/2, -data.jph/2);
                 
                 //Display Position
                 double ariawidth= Database.WORKSPACE0.getsaved(); //x
                 double ariaheight= Database.WORKSPACE1.getsaved(); //y
-                Rectangle rect=Geometrics.placeRectangle(data.jpw, Math.abs(data.jph-20), Geometrics.getRatio(ariawidth,ariaheight));
-                rect.setLocation(rect.x, rect.y+10);
+                Rectangle rect=Geometrics.placeRectangle(data.jpw, data.jph, Geometrics.getRatio(ariawidth,ariaheight));
                 double scalex=rect.width/ariawidth;
                 double scaley=rect.height/ariaheight;
                 g2.translate(rect.x, rect.y);
@@ -139,7 +132,7 @@ public class JPanelAutoLevel extends javax.swing.JPanel implements IGUIEvent {
                 }
                 
                 double d=Math.min(Database.ALDISTANACE.getsaved()/10,10);
-                if(data.al.isLeveled())
+                if(AutoLevelSystem.leveled())
                 {
                     double max=-Double.MAX_VALUE;
                     double min= Double.MAX_VALUE;
@@ -156,7 +149,7 @@ public class JPanelAutoLevel extends javax.swing.JPanel implements IGUIEvent {
                     int cx=Math.max((int)(Database.WORKSPACE0.getsaved()/Database.ALDISTANACE.getsaved()*10),rect.width);
                     int cy=Math.max((int)(Database.WORKSPACE1.getsaved()/Database.ALDISTANACE.getsaved()*10),rect.height);
                     double w=rect.width/(double)cx;
-                    double h=rect.width/(double)cy;
+                    double h=rect.height/(double)cy;
                     for(int x=0;x<cx;x++)
                     {
                         for(int y=0;y<cy;y++)
@@ -171,6 +164,24 @@ public class JPanelAutoLevel extends javax.swing.JPanel implements IGUIEvent {
                             g2.setColor(ColorHelper.numberToColorPercentage(relative));
                             g2.fillRect((int)Math.floor(rect.x+ x*w), (int)Math.floor(rect.y+ y*h),(int)Math.ceil(w),(int)Math.ceil(h));
                         }
+                    }
+                    //Paint scall:
+                    Font font = new Font(Font.SANS_SERIF, Font.PLAIN, 16);
+                    g2.setFont(font);
+                    int zh = (int)(font.getStringBounds(Tools.dtostr(100.0), g2.getFontRenderContext()).getHeight())+10;                    
+                    int elements=data.jph/zh;
+                    int dy=(data.jph-elements*zh)/2;
+                    for(int i=0;i<elements && elements>=2;i++)
+                    {
+                        double z=max - i*(delta/(elements-1));
+                        double relative=(z-min)/delta;
+                        Color c=ColorHelper.numberToColorPercentage(relative);
+                        g2.setColor(c);
+                        g2.fillRect(data.jpw+5, dy+zh*i, 90, zh-4);
+                        g2.setColor((299*c.getRed() +587*c.getGreen()+114*c.getBlue()>128000)?Color.black:Color.white);
+                        g2.drawString(Tools.dtostr(z), data.jpw+5, dy+zh*i +zh-10);
+                        g2.setColor(Color.black);
+                        g2.drawRect(data.jpw+5, dy+zh*i, 90, zh-4);
                     }
                 }
                 else
@@ -261,8 +272,8 @@ public class JPanelAutoLevel extends javax.swing.JPanel implements IGUIEvent {
         
         for(int i=0;i<2;i++)
         {
-                axes[i][0].set(0.0);
-                axes[i][1].set(Database.getWorkspace(i).getsaved());
+                axes[i][0].set(Database.ALDISTANACE.getsaved()/2);
+                axes[i][1].set(Database.getWorkspace(i).getsaved()-Database.ALDISTANACE.getsaved()/2);
         }
         makeNewAl();
 

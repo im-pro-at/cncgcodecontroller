@@ -588,4 +588,49 @@ public class CNCCommand {
         return (long)cout.secounds;
     }
     
+    
+    public static class Optimiser {
+        //All Your Base Are Belong To Us
+        
+        public interface IProgress{
+            public void publish(String message, int progess) throws MyException;
+        }
+
+        IProgress progress;
+
+        public Optimiser(IProgress progress) {
+            this.progress = progress;
+        }
+
+        public CNCCommand[] execute(CNCCommand[] incmds) throws MyException{
+            progress.publish("Checking commads", 0);
+
+            //search first and last g1
+            int fg1=-1,lg1=-1;
+            double g1level;
+            for(int i=0;i<incmds.length;i++)
+                if(incmds[i].getType()==Type.G1)
+                {
+                    if(fg1==-1) fg1=i;
+                    lg1=i;
+                }        
+
+            double levelg1=Double.NaN;
+            for(int i=0;i<incmds.length;i++)
+            {
+                //Test if all G0 have the same level
+                //if(cmds)
+            }
+
+
+
+
+            throw new MyException("Not implement!");
+        }
+
+
+
+
+    }
+
 }
