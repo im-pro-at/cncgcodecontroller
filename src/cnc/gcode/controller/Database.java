@@ -43,6 +43,7 @@ public enum Database {
     SPINDLEOFF("M5"),
     GOFEEDRATE(Tools.dtostr(100.0)),
     TOOLSIZE(Tools.dtostr(5.0)),
+    OPTIMISATIONTIMEOUT(Tools.dtostr(10)),
     
     //Autoleveling
     ALZERO(Tools.dtostr(0.0)),

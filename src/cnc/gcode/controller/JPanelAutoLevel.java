@@ -173,6 +173,10 @@ public class JPanelAutoLevel extends javax.swing.JPanel implements IGUIEvent {
                     {
                         double z=max - i*(delta/(elements-1));
                         double relative=(z-min)/delta;
+                        if(relative>1) 
+                            relative=1;
+                        if(relative<0)
+                            relative=0;
                         Color c=ColorHelper.numberToColorPercentage(relative);
                         g2.setColor(c);
                         g2.fillRect(data.jpw+5, dy+zh*i, 90, zh-4);

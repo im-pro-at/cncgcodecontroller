@@ -51,6 +51,7 @@ public class JPanelSettings extends javax.swing.JPanel implements IGUIEvent{
         jLSCNCSpindleOFF.setText(Tools.convertToMultiline(Database.SPINDLEOFF.get()));
         jLSCNCG0Feedrate.setText(Database.GOFEEDRATE.get());
         jLSCNCToolSize.setText(Database.TOOLSIZE.get());
+        jLSCNCOptimiserTime.setText(Database.OPTIMISATIONTIMEOUT.get());
         jLSALOptions.setText(Tools.convertToMultiline("Zero height: "+Database.ALZERO+
                 "\nMax depth: "+Database.ALMAXPROPDEPTH+
                 "\nSafe height: "+Database.ALSAVEHEIGHT+
@@ -103,6 +104,9 @@ public class JPanelSettings extends javax.swing.JPanel implements IGUIEvent{
         jLabel34 = new javax.swing.JLabel();
         jBSCNCToolSize = new javax.swing.JButton();
         jLSCNCToolSize = new javax.swing.JLabel();
+        jLabel39 = new javax.swing.JLabel();
+        jBSCNCOptimiserTime = new javax.swing.JButton();
+        jLSCNCOptimiserTime = new javax.swing.JLabel();
         jLabel37 = new javax.swing.JLabel();
         jBSALOptions = new javax.swing.JButton();
         jLSALOptions = new javax.swing.JLabel();
@@ -211,6 +215,17 @@ public class JPanelSettings extends javax.swing.JPanel implements IGUIEvent{
 
         jLSCNCToolSize.setText("Settings Text");
 
+        jLabel39.setText("CNC/Optimise Time:");
+
+        jBSCNCOptimiserTime.setText("Change");
+        jBSCNCOptimiserTime.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jBSettingsActionPerformed(evt);
+            }
+        });
+
+        jLSCNCOptimiserTime.setText("Settings Text");
+
         jLabel37.setText("Autolevel/Options:");
 
         jBSALOptions.setText("Change");
@@ -255,7 +270,12 @@ public class JPanelSettings extends javax.swing.JPanel implements IGUIEvent{
                 .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(layout.createSequentialGroup()
+                        .addComponent(jBexport)
+                        .addGap(18, 18, 18)
+                        .addComponent(jBImport))
+                    .addGroup(layout.createSequentialGroup()
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(jLabel39)
                             .addComponent(jLabel2)
                             .addComponent(jLabel19)
                             .addComponent(jLabel20)
@@ -264,40 +284,38 @@ public class JPanelSettings extends javax.swing.JPanel implements IGUIEvent{
                             .addComponent(jLabel36)
                             .addComponent(jLabel33)
                             .addComponent(jLabel34)
+                            .addComponent(jLabel21)
                             .addComponent(jLabel37)
-                            .addComponent(jLabel38)
-                            .addComponent(jLabel21))
-                        .addGap(50, 50, 50)
+                            .addComponent(jLabel38))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 50, Short.MAX_VALUE)
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(jBSALOptions)
-                            .addComponent(jBSCNCToolSize)
-                            .addComponent(jBSCNCG0Feedrate)
+                            .addComponent(jBSCNCStart)
+                            .addComponent(jBSCNCOptimiserTime)
+                            .addComponent(jBSCNCToolChange)
+                            .addComponent(jBSALStart)
                             .addComponent(jBSCNCSpindleOFF)
                             .addComponent(jBSCNCSpindleON)
-                            .addComponent(jBSCNCToolChange)
-                            .addComponent(jBSWorkSpace)
-                            .addComponent(jBSFastFeedrate)
+                            .addComponent(jBSALOptions)
                             .addComponent(jBSHomeing)
-                            .addComponent(jBSALStart)
-                            .addComponent(jBSCNCStart))
+                            .addComponent(jBSCNCToolSize)
+                            .addComponent(jBSCNCG0Feedrate)
+                            .addComponent(jBSFastFeedrate)
+                            .addComponent(jBSWorkSpace))
                         .addGap(50, 50, 50)
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(jLSCNCStart)
-                            .addComponent(jLSALStart)
-                            .addComponent(jLSALOptions)
                             .addComponent(jLSCNCToolSize)
-                            .addComponent(jLSCNCG0Feedrate)
-                            .addComponent(jLSCNCSpindleOFF)
-                            .addComponent(jLSCNCSpindleON)
-                            .addComponent(jLSCNCToolChange)
-                            .addComponent(jLSWorkSpace)
+                            .addComponent(jLSCNCOptimiserTime)
+                            .addComponent(jLSALOptions)
+                            .addComponent(jLSCNCStart)
                             .addComponent(jLSFastFeedrate)
-                            .addComponent(jLSHomeing)))
-                    .addGroup(layout.createSequentialGroup()
-                        .addComponent(jBexport)
-                        .addGap(18, 18, 18)
-                        .addComponent(jBImport)))
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                            .addComponent(jLSWorkSpace)
+                            .addComponent(jLSCNCToolChange)
+                            .addComponent(jLSALStart)
+                            .addComponent(jLSCNCSpindleON)
+                            .addComponent(jLSCNCSpindleOFF)
+                            .addComponent(jLSHomeing)
+                            .addComponent(jLSCNCG0Feedrate))))
+                .addContainerGap(236, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -349,19 +367,24 @@ public class JPanelSettings extends javax.swing.JPanel implements IGUIEvent{
                     .addComponent(jLSCNCToolSize))
                 .addGap(18, 18, 18)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jLabel39)
+                    .addComponent(jBSCNCOptimiserTime)
+                    .addComponent(jLSCNCOptimiserTime))
+                .addGap(18, 18, 18)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel37)
                     .addComponent(jBSALOptions)
                     .addComponent(jLSALOptions))
                 .addGap(18, 18, 18)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel38)
-                    .addComponent(jBSALStart)
-                    .addComponent(jLSALStart))
+                    .addComponent(jLSALStart)
+                    .addComponent(jBSALStart))
                 .addGap(18, 18, 18)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jBexport)
                     .addComponent(jBImport))
-                .addContainerGap(13, Short.MAX_VALUE))
+                .addContainerGap(112, Short.MAX_VALUE))
         );
     }// </editor-fold>//GEN-END:initComponents
 
@@ -485,6 +508,13 @@ public class JPanelSettings extends javax.swing.JPanel implements IGUIEvent{
         {
             Double[] d=Tools.getValues(new String[]{"Set the Toolsize for CNC Milling Simulation:"}, new Double[]{Database.TOOLSIZE.getsaved()}, new Double[]{Double.MAX_VALUE}, new Double[]{0.0});
             if(d!= null) Database.TOOLSIZE.set(Tools.dtostr(d[0]));
+        }
+        
+        //Tooldiameter
+        if(evt.getSource()==jBSCNCOptimiserTime)
+        {
+            Double[] d=Tools.getValues(new String[]{"Set the Timeout in Secounds for Optimising:"}, new Double[]{Database.OPTIMISATIONTIMEOUT.getsaved()}, new Double[]{Double.MAX_VALUE}, new Double[]{0.0});
+            if(d!= null) Database.OPTIMISATIONTIMEOUT.set(Tools.dtostr(d[0]));
         }
         
         //AL Options
@@ -615,6 +645,7 @@ public class JPanelSettings extends javax.swing.JPanel implements IGUIEvent{
     private javax.swing.JButton jBSALOptions;
     private javax.swing.JButton jBSALStart;
     private javax.swing.JButton jBSCNCG0Feedrate;
+    private javax.swing.JButton jBSCNCOptimiserTime;
     private javax.swing.JButton jBSCNCSpindleOFF;
     private javax.swing.JButton jBSCNCSpindleON;
     private javax.swing.JButton jBSCNCStart;
@@ -627,6 +658,7 @@ public class JPanelSettings extends javax.swing.JPanel implements IGUIEvent{
     private javax.swing.JLabel jLSALOptions;
     private javax.swing.JLabel jLSALStart;
     private javax.swing.JLabel jLSCNCG0Feedrate;
+    private javax.swing.JLabel jLSCNCOptimiserTime;
     private javax.swing.JLabel jLSCNCSpindleOFF;
     private javax.swing.JLabel jLSCNCSpindleON;
     private javax.swing.JLabel jLSCNCStart;
@@ -646,5 +678,6 @@ public class JPanelSettings extends javax.swing.JPanel implements IGUIEvent{
     private javax.swing.JLabel jLabel36;
     private javax.swing.JLabel jLabel37;
     private javax.swing.JLabel jLabel38;
+    private javax.swing.JLabel jLabel39;
     // End of variables declaration//GEN-END:variables
 }
