@@ -16,6 +16,7 @@ import java.util.List;
  * @author patrick
  */
 public class AutoLevelSystem {
+
     public static class Point
     {
         private Point2D.Double p;
@@ -180,7 +181,7 @@ public class AutoLevelSystem {
     public static double correctz(double x, double y, double z)
     {
         if(!leveled())
-            return z;
+            return z+maxz()-Database.ALZERO.getsaved();
         
         double d=al.getdZ(new Point2D.Double(x, y))-Database.ALZERO.getsaved();
         
@@ -188,12 +189,22 @@ public class AutoLevelSystem {
         {
             //this schould never happens!
             (new MyException("Autolefeling Problems!")).printStackTrace();
-            d=0.0; 
+            d=maxz()-Database.ALZERO.getsaved(); 
         }
         
         return z+d;
         
     }
+    
+    private static double maxz() {
+        double max=-Double.MAX_VALUE;
+        for(Point[] xy:al.points)
+            for(Point p:xy)
+                if(max<p.value)
+                    max=p.value;
+        return max;
+    }
+    
     
     public static boolean leveled()
     {

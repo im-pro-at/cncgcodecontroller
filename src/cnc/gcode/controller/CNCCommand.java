@@ -506,7 +506,7 @@ public class CNCCommand {
                     boolean domove=false;
                     //Cordinates
                     for(int i=0;i<3;i++)
-                        if(autoleveling && i==2 && !Double.isNaN(move.e[0]) && !Double.isNaN(move.e[1]) && !Double.isNaN(move.e[2]) )
+                        if(autoleveling && i==2 && !Double.isNaN(move.e[2]) )
                         {
                             //Autoleveld Z
                             cmd+=" "+CommandParsing.axesName[i]+Tools.dtostr(AutoLevelSystem.correctz(t.t(0,move.e[0]), t.t(1,move.e[1]), move.e[2]));
@@ -625,6 +625,17 @@ public class CNCCommand {
                 this.endcmd = endcmd;
                 this.s = s;
                 this.e = e;
+                
+            }
+            
+            public boolean isneighbor(OElement e)
+            {
+                return this==e || n==e || l==e;
+            }
+            
+            public boolean isfarneighbor(OElement e)
+            {
+                return isneighbor(e) || (n!=null?n.l==e:false) || (l!=null?l.l==e:false);
             }
             
             
@@ -785,19 +796,94 @@ public class CNCCommand {
                         
                     }
                     
-                    for(OElement e=TAIL.n;e!=HEAD;e=e.n)
+                    for(OElement e=TAIL;e!=HEAD;e=e.n)
                     {
-                        if(e!=e.n.l || e!=e.l.n)
+                        if(e!=TAIL &&(e!=e.n.l || e!=e.l.n))
                             throw new MyException("Internal structure error");
                         e.d=e.e.distance(e.n.s);
                     }
                     
+                    //Secound Algoritim
+                    while(timeout>System.currentTimeMillis())
+                    {
+                        progress.publish("Optimising", (int)(doneccount*(100/reccount) + 100/reccount-(timeout-System.currentTimeMillis())/(10*Database.OPTIMISATIONTIMEOUT.getsaved())));
+
+                        OElement as=null;
+                        double d=0;
+                        for(OElement s=TAIL;s!=HEAD && s!=HEAD.l;s=s.n)
+                            if(d < s.d && !s.done)
+                            {
+                                as=s;
+                                d=s.d;
+                            }
+                        
+                        if(as!=null)
+                        {
+                            as.done=true;
+                            OElement ae=null;
+                            OElement bs=null;
+                            OElement be=null;
+                            d=0;
+                            for(ae=as.n;ae!=HEAD;ae=ae.n)
+                            {
+                                for(OElement s=ae.n;s!=HEAD && s!=HEAD.l;s=s.n)
+                                    if(as.d+ae.d <  as.e.distance(s.n.s) + s.e.distance(as.n.s))
+                                    {
+                                        for(OElement e=s.n;e!=HEAD;e=e.n)
+                                        {
+                                            double t=ae.d+e.d + as.d+s.d - (ae.e.distance(e.n.s) + e.e.distance(ae.n.s) + as.e.distance(s.n.s) + s.e.distance(as.n.s));
+                                            if(d < t)
+                                            {
+                                                bs=s;
+                                                be=e;
+                                                d=t;
+                                                break;
+                                            }
+                                        }
+                                    }      
+                                if(bs!=null && be!=null)
+                                    break;
+                            }
+                            if(ae!=HEAD && bs!=null && be!=null)
+                            {
+                                //S
+                                OElement asn=as.n;
+                                OElement bsn=bs.n;
+                                as.n=bsn;
+                                asn.l=bs;
+                                bs.n=asn;
+                                bsn.l=as;
+ 
+                                //e
+                                OElement aen=ae.n;
+                                OElement ben=be.n;
+                                ae.n=ben;
+                                aen.l=be;
+                                be.n=aen;
+                                ben.l=ae;
+
+                                //recalc d
+                                as.d=as.e.distance(as.n.s);
+                                bs.d=bs.e.distance(bs.n.s);
+                                ae.d=ae.e.distance(ae.n.s);
+                                be.d=be.e.distance(be.n.s);
+                                
+                                for(OElement e=TAIL.n;e!=HEAD;e=e.n)
+                                    e.done=false; 
+                    
+                                continue;
+                            }
+                            continue;
+                        }
+
+                        break;
+                    }
                     //Rebuild List
                     progress.publish("Reorder", 0);
 
                     outcmds= new ArrayList<>(processcmds.size());
                     for(OElement e=TAIL;e!=null;e=e.n)
-                    {
+                        {
                         progress.publish("Reorder", 100*outcmds.size()/processcmds.size());
                         //Make G0 move
                         if(!Double.isNaN(e.s.getX()) && !Double.isNaN(e.s.getY()))
