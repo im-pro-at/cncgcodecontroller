@@ -803,6 +803,7 @@ public class JPanelCNCMilling extends javax.swing.JPanel implements IGUIEvent{
 
                 if(ex!=null)
                 {
+                    ex.printStackTrace();
                     JOptionPane.showMessageDialog(JPanelCNCMilling.this, "Error during Milling ("+ex.toString()+")");
                 }
                 
@@ -879,7 +880,9 @@ public class JPanelCNCMilling extends javax.swing.JPanel implements IGUIEvent{
 
                 if (length==0) length=1;
                 
-                cmds.add(CNCCommand.getStartCommand());
+                CNCCommand start=CNCCommand.getStartCommand();
+                start.calcCommand(c);
+                cmds.add(start);
                 
                 try (BufferedReader br = new BufferedReader(new FileReader(f))) {
 
