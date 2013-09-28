@@ -300,7 +300,8 @@ public class JPanelAutoLevel extends javax.swing.JPanel implements IGUIEvent {
                         try {
                             hitvalue=Tools.strtod(line.substring(line.indexOf("Z:")+2));
                             hit=true;  
-                            worker.trigger();
+                            if(worker!=null)
+                                worker.trigger();
                         } catch (ParseException ex) {
                             Logger.getLogger(JPanelAutoLevel.class.getName()).log(Level.SEVERE, null, ex);
                         }
