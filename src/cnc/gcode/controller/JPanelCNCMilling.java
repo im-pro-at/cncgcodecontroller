@@ -7,6 +7,7 @@ package cnc.gcode.controller;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Graphics2D;
+import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.RenderingHints;
 import java.awt.geom.AffineTransform;
@@ -60,6 +61,11 @@ public class JPanelCNCMilling extends javax.swing.JPanel implements IGUIEvent{
     private AffineTransform trans=new AffineTransform();
     private long maxTime=0;
     private BufferedImage image;
+    
+    private Point2D viewmove=  new Point();
+    private Point2D viewmovelast=  new Point();
+    private Point viewmovestart= new Point();
+    private AffineTransform viewmovetrans=new AffineTransform();
 
     private final TriggertSwingWorker<BufferedImage> painter =new TriggertSwingWorker<BufferedImage>() {
             class GetDataSyncedHelper
@@ -72,7 +78,7 @@ public class JPanelCNCMilling extends javax.swing.JPanel implements IGUIEvent{
                 private boolean mirrorx;
                 private boolean mirrory;
                 private int index;
-                
+                private Point2D viewmove;
                 
             }
             
@@ -92,6 +98,7 @@ public class JPanelCNCMilling extends javax.swing.JPanel implements IGUIEvent{
                         data.mirrorx=jCBmirroX.isSelected();
                         data.mirrory=jCBmirroY.isSelected();
                         data.index=jCBPerview.getSelectedIndex();
+                        data.viewmove=viewmove;
                     }
                 });        
                 
@@ -105,32 +112,37 @@ public class JPanelCNCMilling extends javax.swing.JPanel implements IGUIEvent{
                 
                 g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
                 g2.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BILINEAR);
-                
+
                 //Scalling transforming ...
+
                 //StartCorner
                 g2.translate(data.jpw/2, data.jph/2);
                 switch(Integer.parseInt(Database.HOMEING.get()))
                 {
                     case 0:
                     default:
-                        g2.scale(1,1);                
+                        g2.scale(1,1);
                         break;
                     case 1:
-                        g2.scale(-1,1);
-                        break;
+                       g2.scale(-1,1);
+                       break;
                     case 2:
-                        g2.scale(1,-1); 
-                        break;
+                       g2.scale(1,-1);
+                       break;
                     case 3:                
-                        g2.scale(-1,-1);
-                        break;
+                       g2.scale(-1,-1);
+                       break;
                 }
                 //Zoom
-                double zoom=(10-data.zoom)/10.0;
+                double zoom=1;
+                if(data.zoom<=10)
+                    zoom=data.zoom/10.0;
+                else
+                    zoom=data.zoom-9;
                 g2.scale(zoom, zoom);
 
                 g2.translate(-data.jpw/2, -data.jph/2);
-                
+
                 //Display Position
                 double ariawidth= Database.WORKSPACE0.getsaved(); //x
                 double ariaheight= Database.WORKSPACE1.getsaved(); //y
@@ -139,11 +151,21 @@ public class JPanelCNCMilling extends javax.swing.JPanel implements IGUIEvent{
                 double scaley=rect.height/ariaheight;
                 g2.translate(rect.x, rect.y);
                 g2.scale(scalex, scaley);
+
+                //ViewMove
+                g2.translate(data.viewmove.getX(), data.viewmove.getY());                
+                try {
+                    AffineTransform t=g2.getTransform();
+                    t.invert();
+                    viewmovetrans=t;
+                } catch (NoninvertibleTransformException ex) {
+                    viewmovetrans=new AffineTransform();
+                }
                 
                 //Draw base
                 g2.setColor(Color.white);
                 g2.fill(new Rectangle2D.Double(0, 0, ariawidth, ariaheight));
-                
+                                
                 //Positioning
                 g2.translate(data.movex, data.movey);
                 g2.scale(data.mirrorx?-1:1, data.mirrory?-1:1);
@@ -323,6 +345,14 @@ public class JPanelCNCMilling extends javax.swing.JPanel implements IGUIEvent{
             public void mouseClicked(java.awt.event.MouseEvent evt) {
                 jPPaintMouseClicked(evt);
             }
+            public void mousePressed(java.awt.event.MouseEvent evt) {
+                jPPaintMousePressed(evt);
+            }
+        });
+        jPPaint.addMouseMotionListener(new java.awt.event.MouseMotionAdapter() {
+            public void mouseDragged(java.awt.event.MouseEvent evt) {
+                jPPaintMouseDragged(evt);
+            }
         });
         jPPaint.addComponentListener(new java.awt.event.ComponentAdapter() {
             public void componentResized(java.awt.event.ComponentEvent evt) {
@@ -334,7 +364,7 @@ public class JPanelCNCMilling extends javax.swing.JPanel implements IGUIEvent{
         jPPaint.setLayout(jPPaintLayout);
         jPPaintLayout.setHorizontalGroup(
             jPPaintLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 525, Short.MAX_VALUE)
+            .addGap(0, 712, Short.MAX_VALUE)
         );
         jPPaintLayout.setVerticalGroup(
             jPPaintLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -500,11 +530,12 @@ public class JPanelCNCMilling extends javax.swing.JPanel implements IGUIEvent{
             }
         });
 
-        jLabel9.setText("Zoom out:");
+        jLabel9.setText("Zoom:");
 
-        jSZoom.setMaximum(9);
+        jSZoom.setMaximum(19);
+        jSZoom.setMinimum(1);
         jSZoom.setSnapToTicks(true);
-        jSZoom.setValue(0);
+        jSZoom.setValue(10);
         jSZoom.addChangeListener(new javax.swing.event.ChangeListener() {
             public void stateChanged(javax.swing.event.ChangeEvent evt) {
                 jSZoomStateChanged(evt);
@@ -533,7 +564,7 @@ public class JPanelCNCMilling extends javax.swing.JPanel implements IGUIEvent{
                         .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addComponent(jCBScroll)
                             .addComponent(jCBPerview, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                        .addGap(0, 30, Short.MAX_VALUE)))
+                        .addGap(0, 0, Short.MAX_VALUE)))
                 .addContainerGap())
         );
         jPanel2Layout.setVerticalGroup(
@@ -603,7 +634,7 @@ public class JPanelCNCMilling extends javax.swing.JPanel implements IGUIEvent{
         jPanel3Layout.setHorizontalGroup(
             jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel3Layout.createSequentialGroup()
-                .addGap(0, 0, Short.MAX_VALUE)
+                .addGap(0, 0, 0)
                 .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(jPanel2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(jPanel5, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
@@ -656,9 +687,9 @@ public class JPanelCNCMilling extends javax.swing.JPanel implements IGUIEvent{
             .addGroup(layout.createSequentialGroup()
                 .addComponent(jPPaint, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jPanel3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jScrollPane5, javax.swing.GroupLayout.PREFERRED_SIZE, 408, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                    .addComponent(jPanel3, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(jScrollPane5, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addContainerGap())
         );
 
@@ -671,7 +702,7 @@ public class JPanelCNCMilling extends javax.swing.JPanel implements IGUIEvent{
                 .addContainerGap()
                 .addComponent(jPanel3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(jScrollPane5, javax.swing.GroupLayout.DEFAULT_SIZE, 342, Short.MAX_VALUE)
+                .addComponent(jScrollPane5, javax.swing.GroupLayout.DEFAULT_SIZE, 423, Short.MAX_VALUE)
                 .addContainerGap())
         );
     }// </editor-fold>//GEN-END:initComponents
@@ -696,7 +727,7 @@ public class JPanelCNCMilling extends javax.swing.JPanel implements IGUIEvent{
                 JScrollPane sp= new JScrollPane(list);
                 
                 JOptionPane.showMessageDialog(this,sp);
-            
+                
                 
             }
         }
@@ -710,6 +741,8 @@ public class JPanelCNCMilling extends javax.swing.JPanel implements IGUIEvent{
     }//GEN-LAST:event_jBPauseActionPerformed
 
     private void jCBPerviewItemStateChanged(java.awt.event.ItemEvent evt) {//GEN-FIRST:event_jCBPerviewItemStateChanged
+        jSZoom.setValue(10);
+        viewmove=new Point();
         painter.trigger();
     }//GEN-LAST:event_jCBPerviewItemStateChanged
 
@@ -815,13 +848,13 @@ public class JPanelCNCMilling extends javax.swing.JPanel implements IGUIEvent{
             protected void process(List<CNCCommand> chunks) {
                 CNCCommand cmd=chunks.get(chunks.size()-1);
 
-                jLCNCCommands.setSelectedValue(cmd,false);
- 
-                int index=jLCNCCommands.getSelectedIndex();
-                layers.setSelectedRange(0, index);                
-                
                 if(jCBScroll.isSelected())
                 {
+                    jLCNCCommands.setSelectedValue(cmd,false);
+ 
+                    int index=jLCNCCommands.getSelectedIndex();
+                    layers.setSelectedRange(0, index);                
+                
                     //Get cmd centerd:
                     int elementsvisual=jLCNCCommands.getLastVisibleIndex()-jLCNCCommands.getFirstVisibleIndex();
                     if (index==-1) index=0;
@@ -940,6 +973,9 @@ public class JPanelCNCMilling extends javax.swing.JPanel implements IGUIEvent{
                 jLCNCCommands.setModel(model);
                 jCBPerview.setModel(new DefaultComboBoxModel(layers.getLayers())); //Clear Layers
 
+                jSZoom.setValue(10);
+                viewmove=new Point();
+
                 JOptionPane.showMessageDialog(JPanelCNCMilling.this, message);
 
                 fireupdateGUI();
@@ -1051,6 +1087,18 @@ public class JPanelCNCMilling extends javax.swing.JPanel implements IGUIEvent{
         fireupdateGUI();
 
     }//GEN-LAST:event_jBOptimiseActionPerformed
+
+    private void jPPaintMousePressed(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jPPaintMousePressed
+        viewmovelast= viewmove;
+        viewmovestart=evt.getPoint();
+    }//GEN-LAST:event_jPPaintMousePressed
+
+    private void jPPaintMouseDragged(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jPPaintMouseDragged
+        Point2D p1= viewmovetrans.transform(new Point2D.Double(evt.getPoint().getX(), evt.getPoint().getY()),null);        
+        Point2D p2= viewmovetrans.transform(new Point2D.Double(viewmovestart.getX(), viewmovestart.getY()),null);
+        viewmove= new Point2D.Double(viewmovelast.getX() + p1.getX()-p2.getX(), viewmovelast.getY() + p1.getY()-p2.getY());
+        painter.trigger();
+    }//GEN-LAST:event_jPPaintMouseDragged
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton jBAbrote;

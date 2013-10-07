@@ -19,9 +19,9 @@
           <Group type="102" attributes="0">
               <Component id="jPPaint" max="32767" attributes="0"/>
               <EmptySpace max="-2" attributes="0"/>
-              <Group type="103" groupAlignment="0" attributes="0">
-                  <Component id="jPanel3" linkSize="17" min="-2" max="-2" attributes="0"/>
-                  <Component id="jScrollPane5" linkSize="17" alignment="0" min="-2" pref="408" max="-2" attributes="0"/>
+              <Group type="103" groupAlignment="0" max="-2" attributes="0">
+                  <Component id="jPanel3" linkSize="18" max="32767" attributes="0"/>
+                  <Component id="jScrollPane5" linkSize="18" max="32767" attributes="0"/>
               </Group>
               <EmptySpace max="-2" attributes="0"/>
           </Group>
@@ -34,7 +34,7 @@
               <EmptySpace max="-2" attributes="0"/>
               <Component id="jPanel3" min="-2" max="-2" attributes="0"/>
               <EmptySpace type="unrelated" max="-2" attributes="0"/>
-              <Component id="jScrollPane5" pref="342" max="32767" attributes="0"/>
+              <Component id="jScrollPane5" pref="423" max="32767" attributes="0"/>
               <EmptySpace max="-2" attributes="0"/>
           </Group>
       </Group>
@@ -44,13 +44,15 @@
     <Container class="cnc.gcode.controller.JPPaintable" name="jPPaint">
       <Events>
         <EventHandler event="mouseClicked" listener="java.awt.event.MouseListener" parameters="java.awt.event.MouseEvent" handler="jPPaintMouseClicked"/>
+        <EventHandler event="mousePressed" listener="java.awt.event.MouseListener" parameters="java.awt.event.MouseEvent" handler="jPPaintMousePressed"/>
+        <EventHandler event="mouseDragged" listener="java.awt.event.MouseMotionListener" parameters="java.awt.event.MouseEvent" handler="jPPaintMouseDragged"/>
         <EventHandler event="componentResized" listener="java.awt.event.ComponentListener" parameters="java.awt.event.ComponentEvent" handler="jPPaintComponentResized"/>
       </Events>
 
       <Layout>
         <DimensionLayout dim="0">
           <Group type="103" groupAlignment="0" attributes="0">
-              <EmptySpace min="0" pref="525" max="32767" attributes="0"/>
+              <EmptySpace min="0" pref="712" max="32767" attributes="0"/>
           </Group>
         </DimensionLayout>
         <DimensionLayout dim="1">
@@ -66,7 +68,7 @@
         <DimensionLayout dim="0">
           <Group type="103" groupAlignment="0" attributes="0">
               <Group type="102" alignment="1" attributes="0">
-                  <EmptySpace min="0" pref="0" max="32767" attributes="0"/>
+                  <EmptySpace min="0" pref="0" max="-2" attributes="0"/>
                   <Group type="103" groupAlignment="0" attributes="0">
                       <Component id="jPanel2" linkSize="13" alignment="0" min="-2" max="-2" attributes="0"/>
                       <Component id="jPanel5" linkSize="13" alignment="0" min="-2" max="-2" attributes="0"/>
@@ -350,7 +352,7 @@
                                   <Component id="jCBScroll" min="-2" max="-2" attributes="0"/>
                                   <Component id="jCBPerview" min="-2" max="-2" attributes="0"/>
                               </Group>
-                              <EmptySpace min="0" pref="30" max="32767" attributes="0"/>
+                              <EmptySpace min="0" pref="0" max="32767" attributes="0"/>
                           </Group>
                       </Group>
                       <EmptySpace max="-2" attributes="0"/>
@@ -397,14 +399,15 @@
             </Component>
             <Component class="javax.swing.JLabel" name="jLabel9">
               <Properties>
-                <Property name="text" type="java.lang.String" value="Zoom out:"/>
+                <Property name="text" type="java.lang.String" value="Zoom:"/>
               </Properties>
             </Component>
             <Component class="javax.swing.JSlider" name="jSZoom">
               <Properties>
-                <Property name="maximum" type="int" value="9"/>
+                <Property name="maximum" type="int" value="19"/>
+                <Property name="minimum" type="int" value="1"/>
                 <Property name="snapToTicks" type="boolean" value="true"/>
-                <Property name="value" type="int" value="0"/>
+                <Property name="value" type="int" value="10"/>
               </Properties>
               <Events>
                 <EventHandler event="stateChanged" listener="javax.swing.event.ChangeListener" parameters="javax.swing.event.ChangeEvent" handler="jSZoomStateChanged"/>
