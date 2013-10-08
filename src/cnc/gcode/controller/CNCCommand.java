@@ -507,7 +507,7 @@ public class CNCCommand {
                     ArrayList<Move> newmoves=new ArrayList<>(moves.length);
                     for(Move move:moves)
                     {
-                        int parts=(int)Math.ceil(8.0*move.getDistanceXY()/Database.ALDISTANACE.getsaved());
+                        int parts=(int)Math.ceil(move.getDistanceXY()/Database.ALMAXMOVELENGTH.getsaved());
                         for(int part=0;part<parts;part++)
                         {
                             double[] s=new double[3];

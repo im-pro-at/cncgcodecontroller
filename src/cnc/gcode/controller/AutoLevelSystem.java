@@ -138,7 +138,7 @@ public class AutoLevelSystem {
             return 0.0;
 
         //dircet hit!
-        if(Math.abs(points[p0X][p0Y].getPoint().getX()-p.getX()) <0.0001 && Math.abs(points[p0X][p0Y].getPoint().getY()-p.getY()) <0.0001)
+        if(Math.abs(points[p0X][p0Y].getPoint().getX()-p.getX()) <0.00001 && Math.abs(points[p0X][p0Y].getPoint().getY()-p.getY()) <0.00001)
             return points[p0X][p0Y].getValue();
                 
         //nearest is now center -> calc quatrant
@@ -156,10 +156,10 @@ public class AutoLevelSystem {
         if(!neighborX_exists && !neighborY_exists) //no neighbor
             return points[p0X][p0Y].getValue();
         
-        if(neighborX_exists && ( !neighborY_exists || Math.abs( p.getY()-points[p0X][p0Y].getPoint().getY() )<0.0001) )
+        if(neighborX_exists && ( !neighborY_exists || Math.abs( p.getY()-points[p0X][p0Y].getPoint().getY() )<0.00001) )
             return linearInterpolation(points[p0X][p0Y].getPoint().getX(), points[p1X][p0Y].getPoint().getX(), points[p0X][p0Y].getValue(), points[p1X][p0Y].getValue(), p.getX());
 
-        if( neighborY_exists && ( !neighborX_exists || Math.abs( p.getX()-points[p0X][p0Y].getPoint().getX() )<0.0001 ) )
+        if( neighborY_exists && ( !neighborX_exists || Math.abs( p.getX()-points[p0X][p0Y].getPoint().getX() )<0.00001 ) )
             return linearInterpolation(points[p0X][p0Y].getPoint().getY(), points[p0X][p1Y].getPoint().getY(), points[p0X][p0Y].getValue(), points[p0X][p1Y].getValue(), p.getY());
 
         //http://en.wikipedia.org/wiki/Bilinear_interpolation#Algorithm

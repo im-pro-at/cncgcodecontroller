@@ -56,8 +56,9 @@ public class JPanelSettings extends javax.swing.JPanel implements IGUIEvent{
                 "\nMax depth: "+Database.ALMAXPROPDEPTH+
                 "\nSafe height: "+Database.ALSAVEHEIGHT+
                 "\nClearence: "+Database.ALCLEARENCE+
-                "\nFeedrate: "+Database.ALFEEDRATE+
-                "\nDistance: "+Database.ALDISTANACE));
+                "\nFeedrate: "+Database.ALFEEDRATE));
+        jLSALDistance.setText(Tools.convertToMultiline("Distance: "+Database.ALDISTANACE+       
+                "\nMax XY Move Length: "+Database.ALMAXMOVELENGTH));
         jLSALStart.setText(Tools.convertToMultiline(Database.ALSTARTCODE.get()));
     }
     
@@ -110,6 +111,9 @@ public class JPanelSettings extends javax.swing.JPanel implements IGUIEvent{
         jLabel37 = new javax.swing.JLabel();
         jBSALOptions = new javax.swing.JButton();
         jLSALOptions = new javax.swing.JLabel();
+        jLabel41 = new javax.swing.JLabel();
+        jBSALDistance = new javax.swing.JButton();
+        jLSALDistance = new javax.swing.JLabel();
         jLabel38 = new javax.swing.JLabel();
         jBSALStart = new javax.swing.JButton();
         jLSALStart = new javax.swing.JLabel();
@@ -237,6 +241,17 @@ public class JPanelSettings extends javax.swing.JPanel implements IGUIEvent{
 
         jLSALOptions.setText("Settings Text");
 
+        jLabel41.setText("Autolevel/Distance:");
+
+        jBSALDistance.setText("Change");
+        jBSALDistance.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jBSettingsActionPerformed(evt);
+            }
+        });
+
+        jLSALDistance.setText("Settings Text");
+
         jLabel38.setText("Autolevel/Start GCode:");
 
         jBSALStart.setText("Change");
@@ -286,36 +301,43 @@ public class JPanelSettings extends javax.swing.JPanel implements IGUIEvent{
                             .addComponent(jLabel34)
                             .addComponent(jLabel21)
                             .addComponent(jLabel37)
-                            .addComponent(jLabel38))
+                            .addComponent(jLabel38)
+                            .addComponent(jLabel41))
                         .addGap(39, 39, 39)
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(jBSCNCStart)
-                            .addComponent(jBSCNCOptimiserTime)
-                            .addComponent(jBSCNCToolChange)
-                            .addComponent(jBSALStart)
-                            .addComponent(jBSCNCSpindleOFF)
-                            .addComponent(jBSCNCSpindleON)
-                            .addComponent(jBSALOptions)
-                            .addComponent(jBSHomeing)
-                            .addComponent(jBSCNCToolSize)
-                            .addComponent(jBSCNCG0Feedrate)
-                            .addComponent(jBSFastFeedrate)
-                            .addComponent(jBSWorkSpace))
-                        .addGap(50, 50, 50)
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(jLSCNCToolSize)
-                            .addComponent(jLSCNCOptimiserTime)
-                            .addComponent(jLSALOptions)
-                            .addComponent(jLSCNCStart)
-                            .addComponent(jLSFastFeedrate)
-                            .addComponent(jLSWorkSpace)
-                            .addComponent(jLSCNCToolChange)
-                            .addComponent(jLSALStart)
-                            .addComponent(jLSCNCSpindleON)
-                            .addComponent(jLSCNCSpindleOFF)
-                            .addComponent(jLSHomeing)
-                            .addComponent(jLSCNCG0Feedrate))))
-                .addContainerGap(31, Short.MAX_VALUE))
+                            .addGroup(layout.createSequentialGroup()
+                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                    .addComponent(jBSCNCStart)
+                                    .addComponent(jBSCNCOptimiserTime)
+                                    .addComponent(jBSCNCToolChange)
+                                    .addComponent(jBSALStart)
+                                    .addComponent(jBSCNCSpindleOFF)
+                                    .addComponent(jBSCNCSpindleON)
+                                    .addComponent(jBSALOptions)
+                                    .addComponent(jBSHomeing)
+                                    .addComponent(jBSCNCToolSize)
+                                    .addComponent(jBSCNCG0Feedrate)
+                                    .addComponent(jBSFastFeedrate)
+                                    .addComponent(jBSWorkSpace))
+                                .addGap(50, 50, 50)
+                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                    .addComponent(jLSCNCToolSize)
+                                    .addComponent(jLSCNCOptimiserTime)
+                                    .addComponent(jLSALOptions)
+                                    .addComponent(jLSCNCStart)
+                                    .addComponent(jLSFastFeedrate)
+                                    .addComponent(jLSWorkSpace)
+                                    .addComponent(jLSCNCToolChange)
+                                    .addComponent(jLSALStart)
+                                    .addComponent(jLSCNCSpindleON)
+                                    .addComponent(jLSCNCSpindleOFF)
+                                    .addComponent(jLSHomeing)
+                                    .addComponent(jLSCNCG0Feedrate)))
+                            .addGroup(layout.createSequentialGroup()
+                                .addComponent(jBSALDistance)
+                                .addGap(50, 50, 50)
+                                .addComponent(jLSALDistance)))))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -375,6 +397,11 @@ public class JPanelSettings extends javax.swing.JPanel implements IGUIEvent{
                     .addComponent(jLabel37)
                     .addComponent(jBSALOptions)
                     .addComponent(jLSALOptions))
+                .addGap(18, 18, 18)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jBSALDistance)
+                    .addComponent(jLSALDistance)
+                    .addComponent(jLabel41))
                 .addGap(18, 18, 18)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel38)
@@ -527,7 +554,6 @@ public class JPanelSettings extends javax.swing.JPanel implements IGUIEvent{
                     /*ALSAVEHEIGHT*/    "Absulute hight where the CNC can move safely without problems. \nThe first Proping will also start from this position!",
                     /*ALCLEARENCE*/     "The clearence to the object between tow propings.",
                     /*ALFEEDRATE*/      "The feedrate used for the proping",
-                    /*ALDISTANACE*/     "The maximum distance between two props",
                 },
                 new Double[]{ //value
                     Database.ALZERO.getsaved(),
@@ -535,7 +561,6 @@ public class JPanelSettings extends javax.swing.JPanel implements IGUIEvent{
                     Database.ALSAVEHEIGHT.getsaved(),
                     Database.ALCLEARENCE.getsaved(),
                     Database.ALFEEDRATE.getsaved(),
-                    Database.ALDISTANACE.getsaved(),
                 },
                 new Double[]{ //max
                     /*ALZERO*/          Double.MAX_VALUE,
@@ -543,7 +568,6 @@ public class JPanelSettings extends javax.swing.JPanel implements IGUIEvent{
                     /*ALSAVEHEIGHT*/    Database.WORKSPACE2.getsaved(),
                     /*ALCLEARENCE*/     Database.WORKSPACE2.getsaved(),    
                     /*ALFEEDRATE*/      Double.MAX_VALUE,
-                    /*ALDISTANACE*/     Double.MAX_VALUE,
                 },
                 new Double[]{ //min
                     /*ALZERO*/          -Double.MAX_VALUE,
@@ -551,7 +575,6 @@ public class JPanelSettings extends javax.swing.JPanel implements IGUIEvent{
                     /*ALSAVEHEIGHT*/    0.0-Database.WORKSPACE2.getsaved(),                    
                     /*ALCLEARENCE*/     0.0,
                     /*ALFEEDRATE*/      0.0,
-                    /*ALDISTANACE*/     Double.MIN_VALUE, //Not 0 
                 });
 
             if(values!= null)
@@ -561,10 +584,39 @@ public class JPanelSettings extends javax.swing.JPanel implements IGUIEvent{
                 Database.ALSAVEHEIGHT.set(Tools.dtostr(values[2]));
                 Database.ALCLEARENCE.set(Tools.dtostr(values[3]));
                 Database.ALFEEDRATE.set(Tools.dtostr(values[4]));
-                Database.ALDISTANACE.set(Tools.dtostr(values[5]));
             }
         }
- 
+
+        
+        //AL Distance
+        if(evt.getSource()==jBSALDistance)
+        {
+            Double[] values= Tools.getValues(
+                new String[]{ //message
+                    /*ALDISTANACE*/         "The maximum distance between two props",
+                    /*ALMAXMOVELENGTH*/     "The maxiumum Length of a XY move bevore it get split",
+                },
+                new Double[]{ //value
+                    Database.ALDISTANACE.getsaved(),
+                    Database.ALMAXMOVELENGTH.getsaved(),
+                },
+                new Double[]{ //max
+                    /*ALDISTANACE*/         Double.MAX_VALUE,
+                    /*ALMAXMOVELENGTH*/     Double.MAX_VALUE,
+                },
+                new Double[]{ //min
+                    /*ALDISTANACE*/         Double.MIN_VALUE, //Not 0 
+                    /*ALMAXMOVELENGTH*/     Double.MIN_VALUE, //Not 0 
+                });
+
+            if(values!= null)
+            {
+                Database.ALDISTANACE.set(Tools.dtostr(values[0]));
+                Database.ALMAXMOVELENGTH.set(Tools.dtostr(values[1]));
+            }
+        }
+        
+        
         //AutoLavel StartCode
         if(evt.getSource()==jBSALStart)
         {
@@ -642,6 +694,7 @@ public class JPanelSettings extends javax.swing.JPanel implements IGUIEvent{
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton jBImport;
+    private javax.swing.JButton jBSALDistance;
     private javax.swing.JButton jBSALOptions;
     private javax.swing.JButton jBSALStart;
     private javax.swing.JButton jBSCNCG0Feedrate;
@@ -655,6 +708,7 @@ public class JPanelSettings extends javax.swing.JPanel implements IGUIEvent{
     private javax.swing.JButton jBSHomeing;
     private javax.swing.JButton jBSWorkSpace;
     private javax.swing.JButton jBexport;
+    private javax.swing.JLabel jLSALDistance;
     private javax.swing.JLabel jLSALOptions;
     private javax.swing.JLabel jLSALStart;
     private javax.swing.JLabel jLSCNCG0Feedrate;
@@ -679,5 +733,6 @@ public class JPanelSettings extends javax.swing.JPanel implements IGUIEvent{
     private javax.swing.JLabel jLabel37;
     private javax.swing.JLabel jLabel38;
     private javax.swing.JLabel jLabel39;
+    private javax.swing.JLabel jLabel41;
     // End of variables declaration//GEN-END:variables
 }

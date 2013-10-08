@@ -38,40 +38,50 @@
                           <Component id="jLabel21" alignment="0" min="-2" max="-2" attributes="0"/>
                           <Component id="jLabel37" alignment="0" min="-2" max="-2" attributes="0"/>
                           <Component id="jLabel38" alignment="0" min="-2" max="-2" attributes="0"/>
+                          <Component id="jLabel41" alignment="0" min="-2" max="-2" attributes="0"/>
                       </Group>
                       <EmptySpace min="-2" pref="39" max="-2" attributes="0"/>
                       <Group type="103" groupAlignment="0" attributes="0">
-                          <Component id="jBSCNCStart" alignment="0" min="-2" max="-2" attributes="0"/>
-                          <Component id="jBSCNCOptimiserTime" alignment="0" min="-2" max="-2" attributes="0"/>
-                          <Component id="jBSCNCToolChange" alignment="0" min="-2" max="-2" attributes="0"/>
-                          <Component id="jBSALStart" alignment="0" min="-2" max="-2" attributes="0"/>
-                          <Component id="jBSCNCSpindleOFF" alignment="0" min="-2" max="-2" attributes="0"/>
-                          <Component id="jBSCNCSpindleON" alignment="0" min="-2" max="-2" attributes="0"/>
-                          <Component id="jBSALOptions" alignment="0" min="-2" max="-2" attributes="0"/>
-                          <Component id="jBSHomeing" alignment="0" min="-2" max="-2" attributes="0"/>
-                          <Component id="jBSCNCToolSize" alignment="0" min="-2" max="-2" attributes="0"/>
-                          <Component id="jBSCNCG0Feedrate" alignment="0" min="-2" max="-2" attributes="0"/>
-                          <Component id="jBSFastFeedrate" alignment="0" min="-2" max="-2" attributes="0"/>
-                          <Component id="jBSWorkSpace" alignment="0" min="-2" max="-2" attributes="0"/>
-                      </Group>
-                      <EmptySpace min="50" pref="50" max="-2" attributes="0"/>
-                      <Group type="103" groupAlignment="0" attributes="0">
-                          <Component id="jLSCNCToolSize" alignment="0" min="-2" max="-2" attributes="0"/>
-                          <Component id="jLSCNCOptimiserTime" alignment="0" min="-2" max="-2" attributes="0"/>
-                          <Component id="jLSALOptions" alignment="0" min="-2" max="-2" attributes="0"/>
-                          <Component id="jLSCNCStart" alignment="0" min="-2" max="-2" attributes="0"/>
-                          <Component id="jLSFastFeedrate" alignment="0" min="-2" max="-2" attributes="0"/>
-                          <Component id="jLSWorkSpace" alignment="0" min="-2" max="-2" attributes="0"/>
-                          <Component id="jLSCNCToolChange" alignment="0" min="-2" max="-2" attributes="0"/>
-                          <Component id="jLSALStart" alignment="0" min="-2" max="-2" attributes="0"/>
-                          <Component id="jLSCNCSpindleON" alignment="0" min="-2" max="-2" attributes="0"/>
-                          <Component id="jLSCNCSpindleOFF" alignment="0" min="-2" max="-2" attributes="0"/>
-                          <Component id="jLSHomeing" alignment="0" min="-2" max="-2" attributes="0"/>
-                          <Component id="jLSCNCG0Feedrate" alignment="0" min="-2" max="-2" attributes="0"/>
+                          <Group type="102" attributes="0">
+                              <Group type="103" groupAlignment="0" attributes="0">
+                                  <Component id="jBSCNCStart" alignment="0" min="-2" max="-2" attributes="0"/>
+                                  <Component id="jBSCNCOptimiserTime" alignment="0" min="-2" max="-2" attributes="0"/>
+                                  <Component id="jBSCNCToolChange" alignment="0" min="-2" max="-2" attributes="0"/>
+                                  <Component id="jBSALStart" alignment="0" min="-2" max="-2" attributes="0"/>
+                                  <Component id="jBSCNCSpindleOFF" alignment="0" min="-2" max="-2" attributes="0"/>
+                                  <Component id="jBSCNCSpindleON" alignment="0" min="-2" max="-2" attributes="0"/>
+                                  <Component id="jBSALOptions" alignment="0" min="-2" max="-2" attributes="0"/>
+                                  <Component id="jBSHomeing" alignment="0" min="-2" max="-2" attributes="0"/>
+                                  <Component id="jBSCNCToolSize" alignment="0" min="-2" max="-2" attributes="0"/>
+                                  <Component id="jBSCNCG0Feedrate" alignment="0" min="-2" max="-2" attributes="0"/>
+                                  <Component id="jBSFastFeedrate" alignment="0" min="-2" max="-2" attributes="0"/>
+                                  <Component id="jBSWorkSpace" alignment="0" min="-2" max="-2" attributes="0"/>
+                              </Group>
+                              <EmptySpace min="50" pref="50" max="-2" attributes="0"/>
+                              <Group type="103" groupAlignment="0" attributes="0">
+                                  <Component id="jLSCNCToolSize" alignment="0" min="-2" max="-2" attributes="0"/>
+                                  <Component id="jLSCNCOptimiserTime" alignment="0" min="-2" max="-2" attributes="0"/>
+                                  <Component id="jLSALOptions" alignment="0" min="-2" max="-2" attributes="0"/>
+                                  <Component id="jLSCNCStart" alignment="0" min="-2" max="-2" attributes="0"/>
+                                  <Component id="jLSFastFeedrate" alignment="0" min="-2" max="-2" attributes="0"/>
+                                  <Component id="jLSWorkSpace" alignment="0" min="-2" max="-2" attributes="0"/>
+                                  <Component id="jLSCNCToolChange" alignment="0" min="-2" max="-2" attributes="0"/>
+                                  <Component id="jLSALStart" alignment="0" min="-2" max="-2" attributes="0"/>
+                                  <Component id="jLSCNCSpindleON" alignment="0" min="-2" max="-2" attributes="0"/>
+                                  <Component id="jLSCNCSpindleOFF" alignment="0" min="-2" max="-2" attributes="0"/>
+                                  <Component id="jLSHomeing" alignment="0" min="-2" max="-2" attributes="0"/>
+                                  <Component id="jLSCNCG0Feedrate" alignment="0" min="-2" max="-2" attributes="0"/>
+                              </Group>
+                          </Group>
+                          <Group type="102" attributes="0">
+                              <Component id="jBSALDistance" min="-2" max="-2" attributes="0"/>
+                              <EmptySpace min="50" pref="50" max="-2" attributes="0"/>
+                              <Component id="jLSALDistance" min="-2" max="-2" attributes="0"/>
+                          </Group>
                       </Group>
                   </Group>
               </Group>
-              <EmptySpace pref="31" max="32767" attributes="0"/>
+              <EmptySpace max="32767" attributes="0"/>
           </Group>
       </Group>
     </DimensionLayout>
@@ -143,6 +153,12 @@
                   <Component id="jLabel37" alignment="3" min="-2" max="-2" attributes="0"/>
                   <Component id="jBSALOptions" alignment="3" min="-2" max="-2" attributes="0"/>
                   <Component id="jLSALOptions" alignment="3" min="-2" max="-2" attributes="0"/>
+              </Group>
+              <EmptySpace type="separate" max="-2" attributes="0"/>
+              <Group type="103" groupAlignment="3" attributes="0">
+                  <Component id="jBSALDistance" alignment="3" min="-2" max="-2" attributes="0"/>
+                  <Component id="jLSALDistance" alignment="3" min="-2" max="-2" attributes="0"/>
+                  <Component id="jLabel41" alignment="3" min="-2" max="-2" attributes="0"/>
               </Group>
               <EmptySpace type="separate" max="-2" attributes="0"/>
               <Group type="103" groupAlignment="3" attributes="0">
@@ -355,6 +371,24 @@
       </Events>
     </Component>
     <Component class="javax.swing.JLabel" name="jLSALOptions">
+      <Properties>
+        <Property name="text" type="java.lang.String" value="Settings Text"/>
+      </Properties>
+    </Component>
+    <Component class="javax.swing.JLabel" name="jLabel41">
+      <Properties>
+        <Property name="text" type="java.lang.String" value="Autolevel/Distance:"/>
+      </Properties>
+    </Component>
+    <Component class="javax.swing.JButton" name="jBSALDistance">
+      <Properties>
+        <Property name="text" type="java.lang.String" value="Change"/>
+      </Properties>
+      <Events>
+        <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="jBSettingsActionPerformed"/>
+      </Events>
+    </Component>
+    <Component class="javax.swing.JLabel" name="jLSALDistance">
       <Properties>
         <Property name="text" type="java.lang.String" value="Settings Text"/>
       </Properties>

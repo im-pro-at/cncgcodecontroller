@@ -52,6 +52,7 @@ public enum Database {
     ALCLEARENCE(Tools.dtostr(10.0)),
     ALFEEDRATE(Tools.dtostr(10.0)),
     ALDISTANACE(Tools.dtostr(10.0)),
+    ALMAXMOVELENGTH(Tools.dtostr(1.0)), 
     ALSTARTCODE("G28"), 
     
     ;
