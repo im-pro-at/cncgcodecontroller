@@ -11,11 +11,8 @@ import java.awt.geom.Point2D;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.ListIterator;
-import java.util.Random;
-import javax.print.attribute.standard.DateTimeAtCompleted;
 
 /**
  *
@@ -90,8 +87,14 @@ public class CNCCommand {
             double dz=s[2]-e[2];
             return Math.sqrt(dx*dx+dy*dy+dz*dz);
         }
-    }        
-    
+        public double getDistanceXY()
+        {
+            double dx=s[0]-e[0];
+            double dy=s[1]-e[1];
+            return Math.sqrt(dx*dx+dy*dy);
+        }
+   }        
+   
     public static class Calchelper
     {
         double[] axes= new double[]{Double.NaN,Double.NaN,Double.NaN,Double.NaN}; //X,Y,Z,F
@@ -471,6 +474,7 @@ public class CNCCommand {
 
     public Move[] getMoves()
     {
+        Move[] moves= new Move[0];
         //calc move
         switch(type)
         {
@@ -478,13 +482,13 @@ public class CNCCommand {
             case G1:
             case HOMEING:
             case SETPOS:
-                return new Move[]{new Move(Arrays.copyOfRange(cin.axes, 0, 3), Arrays.copyOfRange(cout.axes, 0, 3), type)};
+                moves= new Move[]{new Move(Arrays.copyOfRange(cin.axes, 0, 3), Arrays.copyOfRange(cout.axes, 0, 3), type)};
                 
             case ARC:
                 //TODO!
                 break;
         }
-        return new Move[0];
+        return moves;
     }
 
     String[] execute(Transform t, boolean autoleveling) {
@@ -497,6 +501,29 @@ public class CNCCommand {
             case G1:
             case ARC:
                 Move[] moves= getMoves();
+                //if its long moves make it shorter
+                if(autoleveling)
+                {
+                    ArrayList<Move> newmoves=new ArrayList<>(moves.length);
+                    for(Move move:moves)
+                    {
+                        int parts=(int)Math.ceil(8.0*move.getDistanceXY()/Database.ALDISTANACE.getsaved());
+                        for(int part=0;part<parts;part++)
+                        {
+                            double[] s=new double[3];
+                            double[] e=new double[3];
+                            for(int i=0;i<3;i++)
+                            {
+                                double d=(move.e[i]-move.s[i])/parts;
+                                s[i]=move.s[i]+d*part;
+                                e[i]=move.s[i]+d*(part+1);
+                            }
+                            newmoves.add(new Move(s, e , move.t));
+                        }
+                    }
+                    moves=newmoves.toArray(new Move[0]);
+                }
+                //Make moves command Strings
                 for(Move move:moves)
                 {
                     //Name
@@ -657,10 +684,10 @@ public class CNCCommand {
         public ArrayList<CNCCommand> execute(ArrayList<CNCCommand> incmds) throws MyException{
             reccount=0;
             doneccount=0;
-            return recexecute(incmds);
+            return rec_execute(incmds);
         }
         
-        private ArrayList<CNCCommand> recexecute(ArrayList<CNCCommand> incmds) throws MyException{
+        private ArrayList<CNCCommand> rec_execute(ArrayList<CNCCommand> incmds) throws MyException{
             progress.publish("Checking", 0);
             reccount++;
             
@@ -673,7 +700,7 @@ public class CNCCommand {
                 {
                     processcmds=new ArrayList<>(incmds.subList(0, i+1));
                     outcmds=processcmds;
-                    calced=recexecute(new ArrayList<>(incmds.subList(i+1,incmds.size()))); //Recrution
+                    calced=rec_execute(new ArrayList<>(incmds.subList(i+1,incmds.size()))); //Recrution
                     break;
                 }
             
@@ -826,7 +853,10 @@ public class CNCCommand {
                             d=0;
                             for(ae=as.n;ae!=HEAD;ae=ae.n)
                             {
+                                progress.publish("Optimising", (int)(doneccount*(100/reccount) + 100/reccount-(timeout-System.currentTimeMillis())/(10*Database.OPTIMISATIONTIMEOUT.getsaved())));
+
                                 for(OElement s=ae.n;s!=HEAD && s!=HEAD.l;s=s.n)
+                                {
                                     if(as.d+ae.d <  as.e.distance(s.n.s) + s.e.distance(as.n.s))
                                     {
                                         for(OElement e=s.n;e!=HEAD;e=e.n)
@@ -839,9 +869,16 @@ public class CNCCommand {
                                                 d=t;
                                                 break;
                                             }
+                                            if(timeout<System.currentTimeMillis())
+                                                break;
                                         }
-                                    }      
+                                    }    
+                                    if(timeout<System.currentTimeMillis())
+                                        break;
+                                }
                                 if(bs!=null && be!=null)
+                                    break;
+                                if(timeout<System.currentTimeMillis())
                                     break;
                             }
                             if(ae!=HEAD && bs!=null && be!=null)
