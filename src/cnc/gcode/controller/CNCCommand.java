@@ -149,7 +149,7 @@ public class CNCCommand {
         G0(Color.black), 
         G1(Color.orange.darker()), 
         ARC(Color.orange),
-        HOMEING(Color.orange),
+        HOMEING(Color.orange), 
         SETPOS(Color.orange),
         
         //Settings
