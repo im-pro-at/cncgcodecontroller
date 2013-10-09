@@ -55,6 +55,9 @@ public enum Database {
     ALMAXMOVELENGTH(Tools.dtostr(1.0)), 
     ALSTARTCODE("G28"), 
     
+    //ARC
+    ARCSEGMENTLENGTH(Tools.dtostr(0.1)),
+    
     ;
 
     private final String defaultValue;
@@ -185,4 +188,5 @@ public enum Database {
                 return WORKSPACE2;
         }
     }
+
 }

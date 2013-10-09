@@ -279,9 +279,7 @@ public class CNCCommand {
                         case 2:
                         case 3:
                             type=Type.ARC;
-                            if(state== State.NORMAL)
-                                state=State.WARNING;
-                            message+="Not Implemented jet may cause problems! ";
+                            message+="ARC moves are experimental and may cause problems look at the perview if the are right! ";
                             break;
                         case 28:
                             type=Type.HOMEING;
@@ -352,9 +350,22 @@ public class CNCCommand {
         switch(type)
         {
             case ARC:
-                if(p.contains('Z')){
+                if(p.contains('Z') || p.contains('K')){
                     state=State.ERROR;
                     message+="ARC in Z not Sopported! ";
+                }
+                if(p.contains('P') ){
+                    state=State.ERROR;
+                    message+="ARC with P not Sopported! ";
+                }
+                if(p.contains('R') ){
+                    state=State.ERROR;
+                    message+="ARC with R not Sopported! ";
+                }
+                if(!p.contains('I') || !p.contains('I'))
+                {
+                    state=State.ERROR;
+                    message+="ARC as to have I and J as Parameter! ";
                 }
             case G0:
             case G1:
@@ -367,6 +378,13 @@ public class CNCCommand {
                     if(p.contains(CommandParsing.axesName[i]))
                         c.axes[i]=p.get(CommandParsing.axesName[i]).value;
                 c.lastMovetype=type;
+
+                if(type==Type.ARC && p.contains('I') && p.contains('J') && Math.abs(Math.hypot(p.get('I').value, p.get('J').value)-Math.hypot(cin.axes[0]+p.get('I').value-cout.axes[0] , cin.axes[1]+p.get('J').value-cout.axes[1]))>0.01)
+                {
+                    if(state== State.NORMAL)
+                        state=State.WARNING;
+                    message+="Distance from current point to the center differs form the dictance from current to the end point! ";
+                }
                 break;
                 
             case HOMEING:
@@ -467,6 +485,9 @@ public class CNCCommand {
                 }
         }
         
+        if(message.equals(""))
+            message="OK!";
+        
         this.cout= c.clone();
 
         return state;
@@ -474,7 +495,7 @@ public class CNCCommand {
 
     public Move[] getMoves()
     {
-        Move[] moves= new Move[0];
+        ArrayList<Move> moves= new ArrayList<>();
         //calc move
         switch(type)
         {
@@ -482,13 +503,87 @@ public class CNCCommand {
             case G1:
             case HOMEING:
             case SETPOS:
-                moves= new Move[]{new Move(Arrays.copyOfRange(cin.axes, 0, 3), Arrays.copyOfRange(cout.axes, 0, 3), type)};
-                
+                moves.add(new Move(Arrays.copyOfRange(cin.axes, 0, 3), Arrays.copyOfRange(cout.axes, 0, 3), type));
+                break;
+
             case ARC:
-                //TODO!
+                /* Vector rotation by transformation matrix: r is the original vector, r_T is the rotated vector,
+                   and phi is the angle of rotation. Based on the solution approach by Jens Geisler.
+                       r_T = [cos(phi) -sin(phi);
+                              sin(phi)  cos(phi] * r ;
+
+                   For arc generation, the center of the circle is the axis of rotation and the radius vector is 
+                   defined from the circle center to the initial position. Each line segment is formed by successive
+                   vector rotations. This requires only two cos() and sin() computations to form the rotation
+                   matrix for the duration of the entire arc. Error may accumulate from numerical round-off, since
+                   all double numbers are single precision on the Arduino. (True double precision will not have
+                   round off issues for CNC applications.) Single precision error can accumulate to be greater than
+                   tool precision in some cases. Therefore, arc path correction is implemented. 
+                */
+
+                //radius=hypot(I,J)
+                double radius=Math.hypot(p.get('I').value, p.get('J').value);
+                //isclockwise=true for G2 and false for G3      
+                boolean isclockwise=((int)p.get(0).value)==2?true:false;
+                //float center_axis0 = position[axis_0] + offset[axis_0];
+                double center_axis0=cin.axes[0] + p.get('I').value;
+                //float center_axis1 = position[axis_1] + offset[axis_1];
+                double center_axis1=cin.axes[1] + p.get('J').value;
+                //float r_axis0 = -offset[axis_0];  // Radius vector from center to current location
+                double r_axis0 = -p.get('I').value;
+                //float r_axis1 = -offset[axis_1];
+                double r_axis1 = -p.get('J').value;
+                //float rt_axis0 = target[axis_0] - center_axis0;
+                double rt_axis0 = cout.axes[0] - center_axis0;
+                //float rt_axis1 = target[axis_1] - center_axis1;
+                double rt_axis1 = cout.axes[1] - center_axis1;
+
+                // CCW angle between position and target from circle center. Only one atan2() trig computation required.
+                double angular_travel = Math.atan2(r_axis0*rt_axis1-r_axis1*rt_axis0, r_axis0*rt_axis0+r_axis1*rt_axis1);
+                if (angular_travel < 0) { angular_travel += 2*Math.PI; }
+                if (isclockwise) { angular_travel -= 2*Math.PI; }
+
+                double millimeters_of_travel = angular_travel*radius;
+                if (Math.abs(millimeters_of_travel) > 0.00001) 
+                {
+                    int segments = (int)Math.floor(Math.abs(millimeters_of_travel)/Database.ARCSEGMENTLENGTH.getsaved());
+                    if(segments == 0) segments = 1;
+
+                    double theta_per_segment = angular_travel/segments;
+
+                    double[] position= Arrays.copyOfRange(cin.axes, 0, 3);
+                    double sin_T;
+                    double cos_T;
+                    int i;
+
+                    for (i = 1; i<segments; i++) 
+                    { 
+                        // Compute exact location by applying transformation matrix from initial radius vector(=-offset).
+                        cos_T = Math.cos(i*theta_per_segment);
+                        sin_T = Math.sin(i*theta_per_segment);
+                        //r_axis0 = -offset[axis_0]*cos_Ti + offset[axis_1]*sin_Ti;
+                        r_axis0 = -p.get('I').value*cos_T + p.get('J').value*sin_T;
+                        //r_axis1 = -offset[axis_0]*sin_Ti - offset[axis_1]*cos_Ti;
+                        r_axis1 = -p.get('I').value*sin_T - p.get('J').value*cos_T;
+                        
+                        // Update akt_position
+                        double[] temp=position.clone();
+                        position[0] = center_axis0 + r_axis0;
+                        position[1] = center_axis1 + r_axis1;
+
+                        //Add move
+                        moves.add(new Move(temp, position.clone(), type));
+                    }
+                    moves.add(new Move(position.clone(),Arrays.copyOfRange(cout.axes, 0, 3), type));
+
+                }
+                else
+                    moves.add(new Move(Arrays.copyOfRange(cin.axes, 0, 3), Arrays.copyOfRange(cout.axes, 0, 3), type));
+                    
+                
                 break;
         }
-        return moves;
+        return moves.toArray(new Move[0]);
     }
 
     String[] execute(Transform t, boolean autoleveling) {
@@ -524,6 +619,7 @@ public class CNCCommand {
                     moves=newmoves.toArray(new Move[0]);
                 }
                 //Make moves command Strings
+                boolean feedRateSet=false; 
                 for(Move move:moves)
                 {
                     //Name
@@ -549,12 +645,13 @@ public class CNCCommand {
                         continue;
                     
                     //Feedrate
-                    if(cin.lastMovetype!=type)
+                    if(cin.lastMovetype!=type && !feedRateSet)
                     {
                         if(type==Type.G0)
                             cmd+=" "+CommandParsing.axesName[3]+Database.GOFEEDRATE.get();
                         else if(!Double.isNaN(cout.axes[3]))
                             cmd+=" "+CommandParsing.axesName[3]+Tools.dtostr(cout.axes[3]);
+                        feedRateSet=true;
                     }
                     cmds.add(cmd);
                 }

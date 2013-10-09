@@ -163,7 +163,10 @@ public class CommandParsing {
     
     public Parameter get(char letter)
     {
-        return parameters.get(parameters.indexOf(new Parameter(letter)));
+        if(contains(letter))
+            return parameters.get(parameters.indexOf(new Parameter(letter)));
+        else
+            return new Parameter(letter, Double.NaN, false);            
     }
 
     public boolean iserror()

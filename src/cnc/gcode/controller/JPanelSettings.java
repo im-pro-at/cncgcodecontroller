@@ -60,6 +60,7 @@ public class JPanelSettings extends javax.swing.JPanel implements IGUIEvent{
         jLSALDistance.setText(Tools.convertToMultiline("Distance: "+Database.ALDISTANACE+       
                 "\nMax XY Move Length: "+Database.ALMAXMOVELENGTH));
         jLSALStart.setText(Tools.convertToMultiline(Database.ALSTARTCODE.get()));
+        jLSARC.setText(Database.ARCSEGMENTLENGTH.get());
     }
     
     private void fireupdateGUI()
@@ -117,6 +118,9 @@ public class JPanelSettings extends javax.swing.JPanel implements IGUIEvent{
         jLabel38 = new javax.swing.JLabel();
         jBSALStart = new javax.swing.JButton();
         jLSALStart = new javax.swing.JLabel();
+        jLabel40 = new javax.swing.JLabel();
+        jBSARC = new javax.swing.JButton();
+        jLSARC = new javax.swing.JLabel();
         jBexport = new javax.swing.JButton();
         jBImport = new javax.swing.JButton();
 
@@ -263,6 +267,17 @@ public class JPanelSettings extends javax.swing.JPanel implements IGUIEvent{
 
         jLSALStart.setText("Settings Text");
 
+        jLabel40.setText("ARC/ Max Sigment Length:");
+
+        jBSARC.setText("Change");
+        jBSARC.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jBSettingsActionPerformed(evt);
+            }
+        });
+
+        jLSARC.setText("Settings Text");
+
         jBexport.setText("Export");
         jBexport.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -302,9 +317,14 @@ public class JPanelSettings extends javax.swing.JPanel implements IGUIEvent{
                             .addComponent(jLabel21)
                             .addComponent(jLabel37)
                             .addComponent(jLabel38)
-                            .addComponent(jLabel41))
-                        .addGap(39, 39, 39)
+                            .addComponent(jLabel41)
+                            .addComponent(jLabel40))
+                        .addGap(50, 50, 50)
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addGroup(layout.createSequentialGroup()
+                                .addComponent(jBSALDistance)
+                                .addGap(50, 50, 50)
+                                .addComponent(jLSALDistance))
                             .addGroup(layout.createSequentialGroup()
                                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                                     .addComponent(jBSCNCStart)
@@ -318,9 +338,11 @@ public class JPanelSettings extends javax.swing.JPanel implements IGUIEvent{
                                     .addComponent(jBSCNCToolSize)
                                     .addComponent(jBSCNCG0Feedrate)
                                     .addComponent(jBSFastFeedrate)
-                                    .addComponent(jBSWorkSpace))
+                                    .addComponent(jBSWorkSpace)
+                                    .addComponent(jBSARC))
                                 .addGap(50, 50, 50)
                                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                    .addComponent(jLSARC)
                                     .addComponent(jLSCNCToolSize)
                                     .addComponent(jLSCNCOptimiserTime)
                                     .addComponent(jLSALOptions)
@@ -332,11 +354,7 @@ public class JPanelSettings extends javax.swing.JPanel implements IGUIEvent{
                                     .addComponent(jLSCNCSpindleON)
                                     .addComponent(jLSCNCSpindleOFF)
                                     .addComponent(jLSHomeing)
-                                    .addComponent(jLSCNCG0Feedrate)))
-                            .addGroup(layout.createSequentialGroup()
-                                .addComponent(jBSALDistance)
-                                .addGap(50, 50, 50)
-                                .addComponent(jLSALDistance)))))
+                                    .addComponent(jLSCNCG0Feedrate))))))
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
@@ -407,6 +425,11 @@ public class JPanelSettings extends javax.swing.JPanel implements IGUIEvent{
                     .addComponent(jLabel38)
                     .addComponent(jLSALStart)
                     .addComponent(jBSALStart))
+                .addGap(18, 18, 18)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jLabel40)
+                    .addComponent(jLSARC)
+                    .addComponent(jBSARC))
                 .addGap(18, 18, 18)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jBexport)
@@ -635,6 +658,12 @@ public class JPanelSettings extends javax.swing.JPanel implements IGUIEvent{
                 Database.ALSTARTCODE.set(textArea.getText().trim());
         }
         
+        //ARC
+        if(evt.getSource()==jBSARC)
+        {
+            Double[] d=Tools.getValues(new String[]{"Set the Maximum Segment length for ARC to linear move converstion \n The lower the value the more communication is nessesarry:"}, new Double[]{Database.ARCSEGMENTLENGTH.getsaved()}, new Double[]{Double.MAX_VALUE}, new Double[]{Double.MIN_VALUE});
+            if(d!= null) Database.ARCSEGMENTLENGTH.set(Tools.dtostr(d[0]));
+        }
         
         fireupdateGUI();
     }//GEN-LAST:event_jBSettingsActionPerformed
@@ -697,6 +726,7 @@ public class JPanelSettings extends javax.swing.JPanel implements IGUIEvent{
     private javax.swing.JButton jBSALDistance;
     private javax.swing.JButton jBSALOptions;
     private javax.swing.JButton jBSALStart;
+    private javax.swing.JButton jBSARC;
     private javax.swing.JButton jBSCNCG0Feedrate;
     private javax.swing.JButton jBSCNCOptimiserTime;
     private javax.swing.JButton jBSCNCSpindleOFF;
@@ -711,6 +741,7 @@ public class JPanelSettings extends javax.swing.JPanel implements IGUIEvent{
     private javax.swing.JLabel jLSALDistance;
     private javax.swing.JLabel jLSALOptions;
     private javax.swing.JLabel jLSALStart;
+    private javax.swing.JLabel jLSARC;
     private javax.swing.JLabel jLSCNCG0Feedrate;
     private javax.swing.JLabel jLSCNCOptimiserTime;
     private javax.swing.JLabel jLSCNCSpindleOFF;
@@ -733,6 +764,7 @@ public class JPanelSettings extends javax.swing.JPanel implements IGUIEvent{
     private javax.swing.JLabel jLabel37;
     private javax.swing.JLabel jLabel38;
     private javax.swing.JLabel jLabel39;
+    private javax.swing.JLabel jLabel40;
     private javax.swing.JLabel jLabel41;
     // End of variables declaration//GEN-END:variables
 }
