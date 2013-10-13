@@ -20,6 +20,7 @@ import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Random;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.JOptionPane;
@@ -294,8 +295,14 @@ public class JPanelAutoLevel extends javax.swing.JPanel implements IGUIEvent {
                 for(String line: lines)
                 {
                     //echo:endstops hit:  Z:0.00
-                            
-                    if(line.contains("endstops") && line.contains("hit") && line.contains("Z:"))
+                    if(Communication.getInstance().isSimulation())
+                    {
+                        hitvalue=(new Random()).nextDouble();
+                        hit=true;  
+                        if(worker!=null)
+                            worker.trigger();
+                    }
+                    else if(line.contains("endstops") && line.contains("hit") && line.contains("Z:"))
                     {
                         try {
                             hitvalue=Tools.strtod(line.substring(line.indexOf("Z:")+2));

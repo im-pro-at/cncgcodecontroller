@@ -5,6 +5,7 @@
 package cnc.gcode.controller;
 
 import gnu.io.NRSerialPort;
+import java.util.ArrayList;
 import java.util.Set;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.JOptionPane;
@@ -47,7 +48,7 @@ public final class MainForm extends javax.swing.JFrame implements IGUIEvent{
                 Database.SPEED.get()));
 
         //Show Comports avilable
-        Set<String> ports=NRSerialPort.getAvailableSerialPorts();
+        ArrayList<String> ports=Communication.getPortsNames();
         if(ports.isEmpty())
         {
             ports.add("No Serialport found!");

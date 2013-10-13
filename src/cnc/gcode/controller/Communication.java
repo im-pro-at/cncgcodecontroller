@@ -11,6 +11,7 @@ import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.Random;
+import java.util.Set;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.logging.Level;
@@ -40,13 +41,23 @@ public class Communication {
         void send(String cmd);
     }
     
+    public static ArrayList<String> getPortsNames()
+    {
+        return new ArrayList<String>(NRSerialPort.getAvailableSerialPorts()){
+            {
+                this.add("SIM");
+            }
+        };                
+    }
+    
     /*
      * Class:
      */
+    private boolean simulation=false;
     private Timer resivetimer;
-    String lastserialstring="";
-    LinkedList<String> cmdhistroy= new LinkedList<>();
-    long resivecount=0;
+    private String lastserialstring="";
+    private LinkedList<String> cmdhistroy= new LinkedList<>();
+    private int resivecount=0;
     private ArrayList<IEvent> changed=new ArrayList<>();
     private ArrayList<IResivedLines> resived=new ArrayList<>();
     private ArrayList<ISend> send=new ArrayList<>();
@@ -93,24 +104,32 @@ public class Communication {
         if(isConnect())
         {
             String input = "";
-            while (true) {
-                try {
-                    int c = is.read();
-                    if (c != -1) {
-                        input = input + ((char) c);
-                    } else {
-                        break;
+            if(simulation)
+            {
+               if(cmdhistroy.size()>resivecount) 
+                   input="ok nr="+resivecount+" command: "+cmdhistroy.get(resivecount)+"\n";
+            }
+            else
+            {
+                while (true) 
+                {
+                    try {
+                        int c = is.read();
+                        if (c != -1) {
+                            input = input + ((char) c);
+                        } else {
+                            break;
+                        }
+                    } catch (Exception ex) {
+                        status = ex.toString();
+                        if(sp!=null)    
+                            sp.disconnect();
+                        sp=null;
+                        doUpdate();
+                        return;
                     }
-                } catch (Exception ex) {
-                    status = ex.toString();
-                    if(sp!=null)    
-                        sp.disconnect();
-                    sp=null;
-                    doUpdate();
-                    return;
                 }
             }
-            
             ArrayList<String> inputs= new ArrayList<>();
             inputs.add("");
             for(char c:input.toCharArray())
@@ -192,6 +211,8 @@ public class Communication {
     
     public synchronized boolean isConnect()
     {
+        if(simulation)
+            return true;
         if(sp==null)
             return false;
         return sp.isConnected();
@@ -204,8 +225,15 @@ public class Communication {
             doUpdate();
             return;
         }
-        sp.disconnect();
-        sp=null;
+        if(simulation)
+        {
+            simulation=false;
+        }
+        else
+        {
+            sp.disconnect();
+            sp=null;
+        }
         status="Disconneded!";
         doUpdate();
         
@@ -225,15 +253,21 @@ public class Communication {
 
         try
         {
-            sp = new NRSerialPort(port, speed);
-            if(sp.connect()==false)
+            if(port.equals("SIM"))
             {
-                status="Cannot connect!";
-                return;
+                simulation=true;
             }
-            is = sp.getInputStream();
-            os = sp.getOutputStream();
-            
+            else
+            {
+                sp = new NRSerialPort(port, speed);
+                if(sp.connect()==false)
+                {
+                    status="Cannot connect!";
+                    return;
+                }
+                is = sp.getInputStream();
+                os = sp.getOutputStream();
+            }
             //Send M110 to reset checksum
             send("M110");
 
@@ -242,7 +276,6 @@ public class Communication {
             if(isbussy())
                 //Printer not answered!
                 throw new MyException("Printer did not respons!"); 
-            
         }
         catch(Exception e)
         {
@@ -306,7 +339,8 @@ public class Communication {
                cs = (byte)(cs ^ b[i]);
             command+=""+cs;
 
-            os.write((command+"\n").getBytes());
+            if(!simulation)
+                os.write((command+"\n").getBytes());
 
             final String ccommand=cmdhistroy.get(rs-1);
             for(final ISend e:send)
@@ -326,6 +360,10 @@ public class Communication {
         }
     }
     
+    public boolean isSimulation()
+    {
+        return simulation;
+    }
     
 
     public synchronized String getStatus() {
