@@ -603,17 +603,25 @@ public class CNCCommand {
                     for(Move move:moves)
                     {
                         int parts=(int)Math.ceil(move.getDistanceXY()/Database.ALMAXMOVELENGTH.getsaved());
-                        for(int part=0;part<parts;part++)
+                        if(parts==0)
                         {
-                            double[] s=new double[3];
-                            double[] e=new double[3];
-                            for(int i=0;i<3;i++)
+                            //no X or Y move
+                            newmoves.add(move);
+                        }
+                        else
+                        {
+                            for(int part=0;part<parts;part++)
                             {
-                                double d=(move.e[i]-move.s[i])/parts;
-                                s[i]=move.s[i]+d*part;
-                                e[i]=move.s[i]+d*(part+1);
+                                double[] s=new double[3];
+                                double[] e=new double[3];
+                                for(int i=0;i<3;i++)
+                                {
+                                    double d=(move.e[i]-move.s[i])/parts;
+                                    s[i]=move.s[i]+d*part;
+                                    e[i]=move.s[i]+d*(part+1);
+                                }
+                                newmoves.add(new Move(s, e , move.t));
                             }
-                            newmoves.add(new Move(s, e , move.t));
                         }
                     }
                     moves=newmoves.toArray(new Move[0]);
