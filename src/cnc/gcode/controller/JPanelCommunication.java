@@ -17,6 +17,7 @@ import javax.swing.SwingUtilities;
 public class JPanelCommunication extends javax.swing.JPanel implements IGUIEvent{
 
     private IEvent GUIEvent=null;
+    private static volatile boolean setview=false;
 
     /**
      * Creates new form JPanelCommunication
@@ -32,12 +33,17 @@ public class JPanelCommunication extends javax.swing.JPanel implements IGUIEvent
                     ((DefaultComboBoxModel<SendListElement>)jLCInOut.getModel()).addElement(new SendListElement(line, SendListElement.EType.IN));
                     if(((DefaultComboBoxModel<SendListElement>)jLCInOut.getModel()).getSize()>100)
                         ((DefaultComboBoxModel<SendListElement>)jLCInOut.getModel()).removeElementAt(0);
-                    SwingUtilities.invokeLater(new Runnable() {
-                        @Override
-                        public void run() {
-                            jLCInOut.ensureIndexIsVisible(jLCInOut.getModel().getSize()-1);
-                        }
-                    });
+                    if(!setview)
+                    {
+                        setview=true;
+                        SwingUtilities.invokeLater(new Runnable() {
+                            @Override
+                            public void run() {
+                                setview=false;
+                                jLCInOut.ensureIndexIsVisible(jLCInOut.getModel().getSize()-1);
+                            }
+                        });
+                    }
                 }
             }
         });
@@ -47,12 +53,19 @@ public class JPanelCommunication extends javax.swing.JPanel implements IGUIEvent
             public void send(String cmd) {
                 //Add to list 
                 ((DefaultComboBoxModel<SendListElement>) jLCInOut.getModel()).addElement(new SendListElement(cmd, SendListElement.EType.OUT));
-                SwingUtilities.invokeLater(new Runnable() {
-                    @Override
-                    public void run() {
-                        jLCInOut.ensureIndexIsVisible(jLCInOut.getModel().getSize() - 1);
-                    }
-                });
+                if(((DefaultComboBoxModel<SendListElement>)jLCInOut.getModel()).getSize()>100)
+                    ((DefaultComboBoxModel<SendListElement>)jLCInOut.getModel()).removeElementAt(0);
+                if(!setview)
+                {
+                    setview=true;
+                    SwingUtilities.invokeLater(new Runnable() {
+                        @Override
+                        public void run() {
+                            setview=false;
+                            jLCInOut.ensureIndexIsVisible(jLCInOut.getModel().getSize() - 1);
+                        }
+                    });
+                }
             }
         });
     }
