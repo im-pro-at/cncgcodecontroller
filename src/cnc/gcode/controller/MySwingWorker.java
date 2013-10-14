@@ -78,11 +78,14 @@ public abstract class MySwingWorker<R,P> {
                         List<P> list;
                         synchronized(syncprocess)
                         {
-                            MySwingWorker.this.processstate=false;
                             list=MySwingWorker.this.chunkes;
                             MySwingWorker.this.chunkes= new LinkedList<>();
                         }
                         process(list);
+                        synchronized(syncprocess)
+                        {
+                            MySwingWorker.this.processstate=false;
+                        }
                     }
                 });
             }
@@ -109,11 +112,14 @@ public abstract class MySwingWorker<R,P> {
                         //Acess Value
                         synchronized(syncprogress)
                         {
-                            MySwingWorker.this.progressstate=false;
                             value=MySwingWorker.this.progress;
                             message=MySwingWorker.this.mprogress;
                         }
                         progress(value,message);
+                        synchronized(syncprogress)
+                        {
+                            MySwingWorker.this.progressstate=false;
+                        }
                     }
                 });
             }
