@@ -653,7 +653,7 @@ public class JPanelAutoLevel extends javax.swing.JPanel implements IGUIEvent {
 
                     AutoLevelSystem.Point aktpoint=points[0];
                     Point2D lastpos=null;
-                    
+
                     while(true)
                     {
                         if(this.isCancelled())
@@ -701,7 +701,7 @@ public class JPanelAutoLevel extends javax.swing.JPanel implements IGUIEvent {
                         cmds.get(i).calcCommand(c);
                         
                         //secound command go to save hight so no x and y are known => waring can be ignored! 
-                        if((cmds.get(i).getState()==CNCCommand.State.ERROR || cmds.get(i).getState()==CNCCommand.State.WARNING) && i!=1 ) 
+                        if((cmds.get(i).getState()==CNCCommand.State.ERROR || cmds.get(i).getState()==CNCCommand.State.WARNING) && i>1 ) 
                             throw new MyException("Should not happen :-(");
                         
                         //Simulate Clearancemove
@@ -724,30 +724,31 @@ public class JPanelAutoLevel extends javax.swing.JPanel implements IGUIEvent {
                         for(String execute:cmd.execute(new CNCCommand.Transform(0, 0, false, false),false))
                         {
                             waitfornexdSend();
+                            hit=false;
                             Communication.getInstance().send(execute);
-
+                            
                         }
                         
                         if(Arrays.asList(cmdpropeindex).contains(i))
                         {
                             //Proping Done waiting for hit:
-                            hit=false;
                             waitfortrigger(1000*60*10);
                             
                             if(hit==false)
                                 throw new MyException("Timeout: No End Stop Hit!");
-
                             
-                            //Reset Z position
                             waitfornexdSend();
+                            
+                            //Save pos
+                            points[Arrays.asList(cmdpropeindex).indexOf(i)].setValue(hitvalue);
+
+                            //Reset Z position
                             Communication.getInstance().send("G92 Z"+Tools.dtostr(hitvalue));
 
                             //Clearence
                             waitfornexdSend();
                             Communication.getInstance().send("G0 Z"+Tools.dtostr(hitvalue+Database.ALCLEARENCE.getsaved())+" F"+Database.GOFEEDRATE);
 
-                            //Save pos
-                            points[Arrays.asList(cmdpropeindex).indexOf(i)].setValue(hitvalue);
                             publish(null);                            
 
                         }
@@ -765,7 +766,10 @@ public class JPanelAutoLevel extends javax.swing.JPanel implements IGUIEvent {
                         Integer[] keys=Arrays.copyOf(cmdpropeindex, cmdpropeindex.length); 
                         Arrays.sort(keys,0,keys.length); 
                         for(int i=0;i<points.length-1;i++)
-                            points[Arrays.asList(cmdpropeindex).indexOf(keys[i])].setValue(points[i].getValue()+i*(error/(points.length-2)));
+                        {
+                            int index=Arrays.asList(cmdpropeindex).indexOf(keys[i]);
+                            points[index].setValue(points[index].getValue()+i*(error/(points.length-2)));
+                        }
                     }
 
                     for(int i=0;i<points.length-1;i++)
