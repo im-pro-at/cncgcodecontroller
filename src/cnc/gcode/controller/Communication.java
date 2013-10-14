@@ -5,17 +5,12 @@
 package cnc.gcode.controller;
 
 import gnu.io.NRSerialPort;
-import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.LinkedList;
-import java.util.Random;
-import java.util.Set;
 import java.util.Timer;
 import java.util.TimerTask;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.swing.SwingUtilities;
 
 /**
@@ -152,6 +147,15 @@ public class Communication {
                     if(temp.length()>=2 && temp.substring(0, 2).equals("ok"))
                     {
                         resivecount++;
+                        if(resivecount>cmdhistroy.size())
+                        {
+                            status = "More OK then send commands!";
+                            if(sp!=null)    
+                                sp.disconnect();
+                            sp=null;
+                            doUpdate();
+                        }
+                            
                     }
                     //resend?
                     if(temp.length()>=2 && temp.substring(0, 2).equals("rs"))
@@ -162,6 +166,14 @@ public class Communication {
                     {
                         resivecount--; //Marlin ok will be comming anyway :-(
                         rs=Integer.parseInt(temp.substring(7));
+                        if(rs<cmdhistroy.size()-1)
+                        {
+                            status = "Resend of old command!";
+                            if(sp!=null)
+                                sp.disconnect();
+                            sp=null;
+                            doUpdate();
+                        }
                     }
                 }
 
@@ -330,7 +342,13 @@ public class Communication {
         try {
            //Cecksum:
             if(rs>cmdhistroy.size())
-                rs=cmdhistroy.size();
+            {
+                status = "Resend bigger then send history!";
+                if(sp!=null)    
+                    sp.disconnect();
+                sp=null;
+                doUpdate();
+            }
             String command=cmdhistroy.get(rs-1);
             command="N"+cmdhistroy.size()+" "+command+" *";
             byte cs = 0;

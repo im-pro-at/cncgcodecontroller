@@ -199,6 +199,8 @@ public class JPanelCNCMilling extends javax.swing.JPanel implements IGUIEvent{
     public JPanelCNCMilling() {
         initComponents();
 
+        jLCNCCommands.setModel(new DefaultListModel());
+        
         NumberFildManipulator.IAxesEvent numberevent= new NumberFildManipulator.IAxesEvent() {
             @Override
             public void fired(NumberFildManipulator axis) {
@@ -657,8 +659,7 @@ public class JPanelCNCMilling extends javax.swing.JPanel implements IGUIEvent{
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(jPanel2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, 101, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addGap(0, 0, Short.MAX_VALUE))
+                    .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, 101, javax.swing.GroupLayout.PREFERRED_SIZE)))
         );
 
         jPanel3Layout.linkSize(javax.swing.SwingConstants.VERTICAL, new java.awt.Component[] {jPanel4, jPanel5});
@@ -667,7 +668,13 @@ public class JPanelCNCMilling extends javax.swing.JPanel implements IGUIEvent{
 
         jScrollPane5.setMaximumSize(new java.awt.Dimension(258, 130));
         jScrollPane5.setMinimumSize(new java.awt.Dimension(258, 130));
+        jScrollPane5.setPreferredSize(new java.awt.Dimension(258, 130));
 
+        jLCNCCommands.setModel(new javax.swing.AbstractListModel() {
+            String[] strings = { "dsfds", "sd", "f", "sd", "f", "sd", "ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff", "sdfs", " ", "dsf", "ds", "f" };
+            public int getSize() { return strings.length; }
+            public Object getElementAt(int i) { return strings[i]; }
+        });
         jLCNCCommands.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseClicked(java.awt.event.MouseEvent evt) {
                 jLCNCCommandsMouseClicked(evt);
