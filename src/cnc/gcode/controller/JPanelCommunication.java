@@ -30,6 +30,8 @@ public class JPanelCommunication extends javax.swing.JPanel implements IGUIEvent
                 for(String line: lines)
                 {
                     ((DefaultComboBoxModel<SendListElement>)jLCInOut.getModel()).addElement(new SendListElement(line, SendListElement.EType.IN));
+                    if(((DefaultComboBoxModel<SendListElement>)jLCInOut.getModel()).getSize()>100)
+                        ((DefaultComboBoxModel<SendListElement>)jLCInOut.getModel()).removeElementAt(0);
                     SwingUtilities.invokeLater(new Runnable() {
                         @Override
                         public void run() {
