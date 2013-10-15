@@ -44,7 +44,7 @@ public class JPanelSettings extends javax.swing.JPanel implements IGUIEvent{
         jLSFastFeedrate.setText(Database.MAXFEEDRATE.get());
         jLSWorkSpace.setText("");
         for(int i=0; i<3;i++ )
-            jLSWorkSpace.setText(jLSWorkSpace.getText() +CommandParsing.axesName[i]+" = "+ Database.getWorkspace(i).get()+"   ");        
+            jLSWorkSpace.setText(jLSWorkSpace.getText() +CommandParsing.axesName[i]+" = "+ Database.getWorkspace(i)+"   ");        
         jLSCNCStart.setText(Tools.convertToMultiline(Database.STARTCODE.get()));
         jLSCNCToolChange.setText(Tools.convertToMultiline(Database.TOOLCHANGE.get()));
         jLSCNCSpindleON.setText(Tools.convertToMultiline(Database.SPINDLEON.get()));
@@ -61,6 +61,9 @@ public class JPanelSettings extends javax.swing.JPanel implements IGUIEvent{
                 "\nMax XY Move Length: "+Database.ALMAXMOVELENGTH));
         jLSALStart.setText(Tools.convertToMultiline(Database.ALSTARTCODE.get()));
         jLSARC.setText(Database.ARCSEGMENTLENGTH.get());
+        jLSBacklash.setText("");
+        for(int i=0; i<3;i++ )
+            jLSBacklash.setText(jLSBacklash.getText() +CommandParsing.axesName[i]+" = "+ Database.getBacklash(i)+"   ");        
     }
     
     private void fireupdateGUI()
@@ -121,6 +124,9 @@ public class JPanelSettings extends javax.swing.JPanel implements IGUIEvent{
         jLabel40 = new javax.swing.JLabel();
         jBSARC = new javax.swing.JButton();
         jLSARC = new javax.swing.JLabel();
+        jLabel42 = new javax.swing.JLabel();
+        jBSBacklash = new javax.swing.JButton();
+        jLSBacklash = new javax.swing.JLabel();
         jBexport = new javax.swing.JButton();
         jBImport = new javax.swing.JButton();
 
@@ -278,6 +284,17 @@ public class JPanelSettings extends javax.swing.JPanel implements IGUIEvent{
 
         jLSARC.setText("Settings Text");
 
+        jLabel42.setText("Backlash Correction:");
+
+        jBSBacklash.setText("Change");
+        jBSBacklash.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jBSettingsActionPerformed(evt);
+            }
+        });
+
+        jLSBacklash.setText("Settings Text");
+
         jBexport.setText("Export");
         jBexport.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -300,10 +317,6 @@ public class JPanelSettings extends javax.swing.JPanel implements IGUIEvent{
                 .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(layout.createSequentialGroup()
-                        .addComponent(jBexport)
-                        .addGap(18, 18, 18)
-                        .addComponent(jBImport))
-                    .addGroup(layout.createSequentialGroup()
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addComponent(jLabel39)
                             .addComponent(jLabel2)
@@ -318,7 +331,8 @@ public class JPanelSettings extends javax.swing.JPanel implements IGUIEvent{
                             .addComponent(jLabel37)
                             .addComponent(jLabel38)
                             .addComponent(jLabel41)
-                            .addComponent(jLabel40))
+                            .addComponent(jLabel40)
+                            .addComponent(jLabel42))
                         .addGap(50, 50, 50)
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addGroup(layout.createSequentialGroup()
@@ -339,9 +353,11 @@ public class JPanelSettings extends javax.swing.JPanel implements IGUIEvent{
                                     .addComponent(jBSCNCG0Feedrate)
                                     .addComponent(jBSFastFeedrate)
                                     .addComponent(jBSWorkSpace)
-                                    .addComponent(jBSARC))
+                                    .addComponent(jBSARC)
+                                    .addComponent(jBSBacklash))
                                 .addGap(50, 50, 50)
                                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                    .addComponent(jLSBacklash)
                                     .addComponent(jLSARC)
                                     .addComponent(jLSCNCToolSize)
                                     .addComponent(jLSCNCOptimiserTime)
@@ -354,7 +370,11 @@ public class JPanelSettings extends javax.swing.JPanel implements IGUIEvent{
                                     .addComponent(jLSCNCSpindleON)
                                     .addComponent(jLSCNCSpindleOFF)
                                     .addComponent(jLSHomeing)
-                                    .addComponent(jLSCNCG0Feedrate))))))
+                                    .addComponent(jLSCNCG0Feedrate)))))
+                    .addGroup(layout.createSequentialGroup()
+                        .addComponent(jBexport)
+                        .addGap(18, 18, 18)
+                        .addComponent(jBImport)))
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
@@ -430,6 +450,11 @@ public class JPanelSettings extends javax.swing.JPanel implements IGUIEvent{
                     .addComponent(jLabel40)
                     .addComponent(jLSARC)
                     .addComponent(jBSARC))
+                .addGap(18, 18, 18)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jLabel42)
+                    .addComponent(jLSBacklash)
+                    .addComponent(jBSBacklash))
                 .addGap(18, 18, 18)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jBexport)
@@ -664,6 +689,24 @@ public class JPanelSettings extends javax.swing.JPanel implements IGUIEvent{
             Double[] d=Tools.getValues(new String[]{"Set the Maximum Segment length for ARC to linear move converstion \n The lower the value the more communication is nessesarry:"}, new Double[]{Database.ARCSEGMENTLENGTH.getsaved()}, new Double[]{Double.MAX_VALUE}, new Double[]{Double.MIN_VALUE});
             if(d!= null) Database.ARCSEGMENTLENGTH.set(Tools.dtostr(d[0]));
         }
+
+        //Backlash
+        if(evt.getSource()==jBSBacklash)
+        {
+            Double[] values = new Double[3];
+            String[] messages= new String[3];
+
+            for(int i=0; i<3;i++ )
+            {
+                values[i] = Database.getBacklash(i).getsaved();
+                messages[i] = "Set the Backlash for the "+CommandParsing.axesName[i]+" axis:";
+            }
+            values= Tools.getValues(messages, values, new Double[]{Double.MAX_VALUE, Double.MAX_VALUE, Double.MAX_VALUE}, new Double[]{0.0,0.0,0.0});
+
+            if(values!= null)
+            for(int i=0; i<3;i++ )
+                Database.getBacklash(i).set(Tools.dtostr(values[i]));
+        }
         
         fireupdateGUI();
     }//GEN-LAST:event_jBSettingsActionPerformed
@@ -727,6 +770,7 @@ public class JPanelSettings extends javax.swing.JPanel implements IGUIEvent{
     private javax.swing.JButton jBSALOptions;
     private javax.swing.JButton jBSALStart;
     private javax.swing.JButton jBSARC;
+    private javax.swing.JButton jBSBacklash;
     private javax.swing.JButton jBSCNCG0Feedrate;
     private javax.swing.JButton jBSCNCOptimiserTime;
     private javax.swing.JButton jBSCNCSpindleOFF;
@@ -742,6 +786,7 @@ public class JPanelSettings extends javax.swing.JPanel implements IGUIEvent{
     private javax.swing.JLabel jLSALOptions;
     private javax.swing.JLabel jLSALStart;
     private javax.swing.JLabel jLSARC;
+    private javax.swing.JLabel jLSBacklash;
     private javax.swing.JLabel jLSCNCG0Feedrate;
     private javax.swing.JLabel jLSCNCOptimiserTime;
     private javax.swing.JLabel jLSCNCSpindleOFF;
@@ -766,5 +811,6 @@ public class JPanelSettings extends javax.swing.JPanel implements IGUIEvent{
     private javax.swing.JLabel jLabel39;
     private javax.swing.JLabel jLabel40;
     private javax.swing.JLabel jLabel41;
+    private javax.swing.JLabel jLabel42;
     // End of variables declaration//GEN-END:variables
 }

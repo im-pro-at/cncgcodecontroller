@@ -180,9 +180,6 @@ public class AutoLevelSystem {
     
     public static double correctz(double x, double y, double z)
     {
-        if(!leveled())
-            return z+maxz()-Database.ALZERO.getsaved();
-        
         double d=al.getdZ(new Point2D.Double(x, y))-Database.ALZERO.getsaved();
         
         if(Double.isNaN(d))
@@ -193,7 +190,6 @@ public class AutoLevelSystem {
         }
         
         return z+d;
-        
     }
     
     private static double maxz() {

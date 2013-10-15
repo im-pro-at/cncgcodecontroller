@@ -20,11 +20,6 @@
               <EmptySpace max="-2" attributes="0"/>
               <Group type="103" groupAlignment="0" attributes="0">
                   <Group type="102" alignment="0" attributes="0">
-                      <Component id="jBexport" min="-2" max="-2" attributes="0"/>
-                      <EmptySpace type="separate" max="-2" attributes="0"/>
-                      <Component id="jBImport" min="-2" max="-2" attributes="0"/>
-                  </Group>
-                  <Group type="102" alignment="0" attributes="0">
                       <Group type="103" groupAlignment="0" attributes="0">
                           <Component id="jLabel39" min="-2" max="-2" attributes="0"/>
                           <Component id="jLabel2" alignment="0" min="-2" max="-2" attributes="0"/>
@@ -40,6 +35,7 @@
                           <Component id="jLabel38" alignment="0" min="-2" max="-2" attributes="0"/>
                           <Component id="jLabel41" alignment="0" min="-2" max="-2" attributes="0"/>
                           <Component id="jLabel40" alignment="0" min="-2" max="-2" attributes="0"/>
+                          <Component id="jLabel42" alignment="0" min="-2" max="-2" attributes="0"/>
                       </Group>
                       <EmptySpace min="-2" pref="50" max="-2" attributes="0"/>
                       <Group type="103" groupAlignment="0" attributes="0">
@@ -63,9 +59,11 @@
                                   <Component id="jBSFastFeedrate" alignment="0" min="-2" max="-2" attributes="0"/>
                                   <Component id="jBSWorkSpace" alignment="0" min="-2" max="-2" attributes="0"/>
                                   <Component id="jBSARC" alignment="0" min="-2" max="-2" attributes="0"/>
+                                  <Component id="jBSBacklash" alignment="0" min="-2" max="-2" attributes="0"/>
                               </Group>
                               <EmptySpace min="-2" pref="50" max="-2" attributes="0"/>
                               <Group type="103" groupAlignment="0" attributes="0">
+                                  <Component id="jLSBacklash" min="-2" max="-2" attributes="0"/>
                                   <Component id="jLSARC" min="-2" max="-2" attributes="0"/>
                                   <Component id="jLSCNCToolSize" alignment="0" min="-2" max="-2" attributes="0"/>
                                   <Component id="jLSCNCOptimiserTime" alignment="0" min="-2" max="-2" attributes="0"/>
@@ -82,6 +80,11 @@
                               </Group>
                           </Group>
                       </Group>
+                  </Group>
+                  <Group type="102" alignment="0" attributes="0">
+                      <Component id="jBexport" min="-2" max="-2" attributes="0"/>
+                      <EmptySpace type="separate" max="-2" attributes="0"/>
+                      <Component id="jBImport" min="-2" max="-2" attributes="0"/>
                   </Group>
               </Group>
               <EmptySpace max="32767" attributes="0"/>
@@ -174,6 +177,12 @@
                   <Component id="jLabel40" alignment="3" min="-2" max="-2" attributes="0"/>
                   <Component id="jLSARC" alignment="3" min="-2" max="-2" attributes="0"/>
                   <Component id="jBSARC" alignment="3" min="-2" max="-2" attributes="0"/>
+              </Group>
+              <EmptySpace type="separate" max="-2" attributes="0"/>
+              <Group type="103" groupAlignment="3" attributes="0">
+                  <Component id="jLabel42" alignment="3" min="-2" max="-2" attributes="0"/>
+                  <Component id="jLSBacklash" alignment="3" min="-2" max="-2" attributes="0"/>
+                  <Component id="jBSBacklash" alignment="3" min="-2" max="-2" attributes="0"/>
               </Group>
               <EmptySpace type="separate" max="-2" attributes="0"/>
               <Group type="103" groupAlignment="3" attributes="0">
@@ -434,6 +443,24 @@
       </Events>
     </Component>
     <Component class="javax.swing.JLabel" name="jLSARC">
+      <Properties>
+        <Property name="text" type="java.lang.String" value="Settings Text"/>
+      </Properties>
+    </Component>
+    <Component class="javax.swing.JLabel" name="jLabel42">
+      <Properties>
+        <Property name="text" type="java.lang.String" value="Backlash Correction:"/>
+      </Properties>
+    </Component>
+    <Component class="javax.swing.JButton" name="jBSBacklash">
+      <Properties>
+        <Property name="text" type="java.lang.String" value="Change"/>
+      </Properties>
+      <Events>
+        <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="jBSettingsActionPerformed"/>
+      </Events>
+    </Component>
+    <Component class="javax.swing.JLabel" name="jLSBacklash">
       <Properties>
         <Property name="text" type="java.lang.String" value="Settings Text"/>
       </Properties>

@@ -45,6 +45,9 @@ public class CNCCommand {
         }
 
         private double t(int i, double d) {
+            if(Double.isNaN(d))
+                return d;
+            
             switch(i)
             {
                 case 0:
@@ -102,6 +105,12 @@ public class CNCCommand {
         Type lastMovetype= Type.UNKNOWN;
         double secounds=0;
         
+        /**
+         * False is positive move
+         * True is negative move
+         */
+        boolean[] lastmovedirection= new boolean[]{true,true,true};
+        
         @Override
         protected Calchelper clone() {
             Calchelper c= new Calchelper();
@@ -109,6 +118,7 @@ public class CNCCommand {
             c.axes=this.axes.clone();
             c.lastMovetype=this.lastMovetype;
             c.secounds=this.secounds;
+            c.lastmovedirection=this.lastmovedirection.clone();
             return c;
         }
 
@@ -485,6 +495,18 @@ public class CNCCommand {
                 }
         }
         
+        //Last move direction:
+        for(Move move:moves)
+        {
+            for(int i=0;i<3;i++)
+            {
+                if(!Double.isNaN(move.s[i]) && !Double.isNaN(move.e[i]) && move.s[i]!=move.e[i])
+                {
+                    c.lastmovedirection[i]=move.s[i]<move.e[i];
+                }
+            }
+        }
+        
         if(message.equals(""))
             message="OK!";
         
@@ -596,9 +618,21 @@ public class CNCCommand {
             case G1:
             case ARC:
                 Move[] moves= getMoves();
-                //if its long moves make it shorter
+                
+                //Do Repositoning
+                for(Move move:moves)
+                {
+                    for(int i=0;i<2;i++)
+                    {
+                        move.s[i]=t.t(i,move.s[i]);
+                        move.e[i]=t.t(i,move.e[i]);
+                    }
+                }
+
+                //Autoleveling
                 if(autoleveling)
                 {
+                    //If its long moves make it shorter
                     ArrayList<Move> newmoves=new ArrayList<>(moves.length);
                     for(Move move:moves)
                     {
@@ -625,7 +659,41 @@ public class CNCCommand {
                         }
                     }
                     moves=newmoves.toArray(new Move[0]);
+
+                    //Correct Z
+                    for(Move move:moves)
+                    {
+                        move.s[2]=AutoLevelSystem.correctz(move.s[0], move.s[1], move.s[2]);
+                        move.e[2]=AutoLevelSystem.correctz(move.e[0], move.e[1], move.e[2]);
+                    }
                 }
+                
+                //Correct Backlash  (http://forums.reprap.org/read.php?154,178612 thanks to georgeflug)
+                boolean[] direction=cin.lastmovedirection.clone(); //fase positive true negative
+                ArrayList<Move> newmoves=new ArrayList<>(moves.length);
+                for(Move move:moves)
+                {
+                    Move compmove= new Move(move.s.clone(), move.s.clone(), move.t);
+                    //calc
+                    for(int i=0;i<3;i++)
+                    {
+                        compmove.s[i]=compmove.s[i] + Database.getBacklash(i).getsaved()/2 * (direction[i]?1:-1);
+                        if(!Double.isNaN(move.s[i]) && !Double.isNaN(move.e[i]) && move.s[i]!=move.e[i])
+                        {
+                            direction[i]=move.s[i]<move.e[i];
+                        }
+                        compmove.e[i]=compmove.e[i] + Database.getBacklash(i).getsaved()/2 * (direction[i]?1:-1);
+                        move.s[i]=compmove.e[i];
+                        move.e[i]=move.e[i] + Database.getBacklash(i).getsaved()/2 * (direction[i]?1:-1);
+                    }
+                    
+                    if(compmove.getDistance()>0.00001)
+                        newmoves.add(compmove);
+                    newmoves.add(move);
+                }
+                moves=newmoves.toArray(new Move[0]);
+                
+                
                 //Make moves command Strings
                 boolean feedRateSet=false; 
                 for(Move move:moves)
@@ -637,16 +705,10 @@ public class CNCCommand {
                     boolean domove=false;
                     //Cordinates
                     for(int i=0;i<3;i++)
-                        if(autoleveling && i==2 && !Double.isNaN(move.e[2]) )
-                        {
-                            //Autoleveld Z
-                            cmd+=" "+CommandParsing.axesName[i]+Tools.dtostr(AutoLevelSystem.correctz(t.t(0,move.e[0]), t.t(1,move.e[1]), move.e[2]));
-                            domove=true;
-                        }
-                        else if((move.s[i]!=move.e[i] || autoleveling )&& !Double.isNaN(move.e[i]))
+                        if(move.s[i]!=move.e[i] && !Double.isNaN(move.e[i]))
                         {
                             //Normal Axis
-                            cmd+=" "+CommandParsing.axesName[i]+Tools.dtostr(t.t(i,move.e[i]));
+                            cmd+=" "+CommandParsing.axesName[i]+Tools.dtostr(move.e[i]);
                             domove=true;
                         }
                     if(!domove)

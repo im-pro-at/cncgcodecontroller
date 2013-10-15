@@ -58,6 +58,11 @@ public enum Database {
     //ARC
     ARCSEGMENTLENGTH(Tools.dtostr(0.1)),
     
+    //Backlash
+    BL0(Tools.dtostr(0.0)),
+    BL1(Tools.dtostr(0.0)),
+    BL2(Tools.dtostr(0.0)),
+    
     ;
 
     private final String defaultValue;
@@ -189,4 +194,18 @@ public enum Database {
         }
     }
 
+    public static Database getBacklash(int i)
+    {
+        switch(i)
+        {
+            case 0:
+            default:
+                return BL0;
+            case 1:
+                return BL1;
+            case 2:
+                return BL2;
+        }
+    }
+    
 }
