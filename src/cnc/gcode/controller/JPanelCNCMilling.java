@@ -282,7 +282,8 @@ public class JPanelCNCMilling extends javax.swing.JPanel implements IGUIEvent{
         jCBmirroX.setEnabled(!cncloadedfile || !isRunning() );
         jCBmirroY.setEnabled(!cncloadedfile || !isRunning() );
         jCBAutoLeveling.setEnabled((!cncloadedfile || !isRunning())&& AutoLevelSystem.leveled()  );
-        
+        if(!AutoLevelSystem.leveled())
+            jCBAutoLeveling.setSelected(false);
         painter.trigger();
 
     }

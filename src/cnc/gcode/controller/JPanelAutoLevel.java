@@ -333,7 +333,7 @@ public class JPanelAutoLevel extends javax.swing.JPanel implements IGUIEvent {
         jTFEndX.setEnabled(!isWorking() && !al.isLeveled());
         jTFEndY.setEnabled(!isWorking() && !al.isLeveled());
 
-        jBAction.setEnabled((!isworking && serial) || isWorking());
+        jBAction.setEnabled((!isworking && serial) || isWorking() || isLeveled());
         if(isLeveled())
             jBAction.setText("Clear");
         else if(isWorking())
