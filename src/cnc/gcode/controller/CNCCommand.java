@@ -757,7 +757,7 @@ public class CNCCommand {
             case GXX:
             case PAUSE:
             case MXX: 
-                cmds.add(command.split(";")[0]);
+                cmds.add(p.getCmdwithoutcomments());
                 break;
         }
         

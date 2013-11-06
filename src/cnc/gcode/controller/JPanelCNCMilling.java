@@ -17,7 +17,9 @@ import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
 import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.FileReader;
+import java.io.PrintWriter;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -268,7 +270,13 @@ public class JPanelCNCMilling extends javax.swing.JPanel implements IGUIEvent{
         jCBPerview.setEnabled(cncloadedfile);
         jLoadFile.setEnabled(!isRunning());
         jBOptimise.setEnabled(cncloadedfile && !isRunning());
-        jBMilling.setEnabled(!isworking && cncloadedfile && serial);
+        jBMilling.setEnabled(!isworking && cncloadedfile);
+        
+        if(serial)
+            jBMilling.setText("Milling");
+        else
+            jBMilling.setText("Export");
+        
         jBAbrote.setEnabled(isRunning());
         if(!isRunning()) 
             jPBar.setValue(0);
@@ -777,9 +785,28 @@ public class JPanelCNCMilling extends javax.swing.JPanel implements IGUIEvent{
     }//GEN-LAST:event_jPPaintMouseClicked
 
     private void jBMillingActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jBMillingActionPerformed
+        final boolean serial=Communication.getInstance().isConnect();
         final CNCCommand[] cmds= new CNCCommand[jLCNCCommands.getModel().getSize()];
         ((DefaultListModel<CNCCommand>)jLCNCCommands.getModel()).copyInto(cmds);
 
+        PrintWriter temp=null;
+        if (!serial)
+        {
+            //File choose dialog
+            JFileChooser fc=Database.getFileChooser();
+            if(fc.showSaveDialog(this)!=JFileChooser.APPROVE_OPTION)
+            {
+                return;
+            }
+            try {
+                temp = new PrintWriter(fc.getSelectedFile());
+            } catch (FileNotFoundException ex) {
+                return;
+            }
+        }
+        final PrintWriter export=temp;
+        
+        
         worker= new PMySwingWorker<Object,CNCCommand>() {
             CNCCommand.Transform t= new CNCCommand.Transform(positioningmove[0].getdsave(), positioningmove[1].getdsave(), jCBmirroX.isSelected(), jCBmirroY.isSelected());
             
@@ -811,6 +838,9 @@ public class JPanelCNCMilling extends javax.swing.JPanel implements IGUIEvent{
                             return null;
                     }
                     
+                    if(!serial)
+                        export.println(";"+cmd.toString());
+                    
                     for(String execute:cmd.execute(t,jCBAutoLeveling.isSelected()))
                     {
                         if(this.isCancelled())
@@ -822,20 +852,29 @@ public class JPanelCNCMilling extends javax.swing.JPanel implements IGUIEvent{
                                 return null;
                             try
                             {
-                                Thread.sleep(1);
+                                if(serial)
+                                    Thread.sleep(1);
                                 dopause();
                             }
                             catch(InterruptedException ex)
                             {
                                 return null;
                             }
+                            
+                            if(!serial) break;
                         }
-                    
-                        Communication.getInstance().send(execute);
+                        
+                        if(serial)
+                            Communication.getInstance().send(execute);
+                        else
+                            export.println(execute);
                     }
                     
                 }
 
+                if(!serial)
+                    export.close();
+                
                 return null;
             }
 
@@ -880,7 +919,7 @@ public class JPanelCNCMilling extends javax.swing.JPanel implements IGUIEvent{
 
         fireupdateGUI();
     }//GEN-LAST:event_jBMillingActionPerformed
-
+    
     private void jLoadFileActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jLoadFileActionPerformed
         JFileChooser fc= Database.getFileChooser();
         fc.setFileSelectionMode(JFileChooser.FILES_ONLY);

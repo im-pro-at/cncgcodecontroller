@@ -66,6 +66,12 @@ public class CommandParsing {
         char letter = 0;
         int comment = 0;
         for (char c : (command + " ").toCharArray()) {
+            
+            if(comment == 0 && c != '(' && c != ';')
+            {
+                cmdwithoutcomments+=""+c;
+            }
+            
             if ((c < '0' || c > '9') && c != '.' && c != '-') {
                 if (letter != 0) {
                     //End of number
@@ -94,10 +100,12 @@ public class CommandParsing {
                 //Number without letter!
                 error = true;
             }
+            
             if (c == ' ' || c == '\t') {
                 continue; //Space
                 //Space
             }
+            
             if (c == '(' || c == ')') {
                 //Comment
                 if (c == '(') {
@@ -111,20 +119,24 @@ public class CommandParsing {
                 }
                 continue;
             }
+            
             if (comment != 0) {
                 continue; //in a comment
                 //in a comment
             }
+            
             if (c == ';') {
                 break; //Start of line comment
                 //Start of line comment
             }
+            
             if (Character.isUpperCase(c)) {
                 //Start Number
                 letter = c;
                 save = "";
                 continue;
             }
+            
             error = true;
         }
     }
@@ -173,6 +185,9 @@ public class CommandParsing {
     {
         return error;
     }
-    
-    
+
+    public String getCmdwithoutcomments() {
+        return cmdwithoutcomments;
+    }
+        
 }
