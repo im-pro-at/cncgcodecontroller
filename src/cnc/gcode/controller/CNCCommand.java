@@ -172,6 +172,7 @@ public class CNCCommand {
         
         //Others
         GXX(Color.darkGray),
+        PAUSE(Color.darkGray),
         MXX(Color.darkGray), 
         ENDPORGRAM(Color.red),
         
@@ -180,7 +181,7 @@ public class CNCCommand {
         /*
          * Commands are allwoed for optimisation between the last and the first G1 move:
          */
-        public final static List<Type> ALLOWEDFOROPTIMISER = Collections.unmodifiableList(Arrays.asList(EMPTY, G0, G1, ARC, SPINDELON, SPINDELOFF, MXX)); 
+        public final static List<Type> ALLOWEDFOROPTIMISER = Collections.unmodifiableList(Arrays.asList(EMPTY, G0, G1, ARC, SPINDELON, SPINDELOFF, MXX, PAUSE)); 
         
         private Color color;
 
@@ -315,6 +316,8 @@ public class CNCCommand {
                             break;
                             
                         case 4: //Dwell (Pause)
+                            type= Type.PAUSE;
+                            break;
                         case 90: //Absolute Positioning
                             type= Type.GXX;
                             break;
@@ -752,6 +755,7 @@ public class CNCCommand {
             case HOMEING:
             case SETPOS:
             case GXX:
+            case PAUSE:
             case MXX: 
                 cmds.add(command.split(";")[0]);
                 break;
