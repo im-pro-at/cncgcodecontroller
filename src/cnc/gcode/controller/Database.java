@@ -42,7 +42,7 @@ public enum Database {
     SPINDLEON("M?"),
     SPINDLEOFF("M5"),
     GOFEEDRATE(Tools.dtostr(100.0)),
-    TOOLSIZE(Tools.dtostr(5.0)),
+    TOOLSIZE(Tools.dtostr(0.5)),
     OPTIMISATIONTIMEOUT(Tools.dtostr(10)),
     
     //Autoleveling

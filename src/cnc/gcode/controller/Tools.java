@@ -104,7 +104,14 @@ public class Tools {
         return values;
     }
 
-    
+    public static String getJarName()
+    {
+        return new java.io.File(Tools.class.getProtectionDomain()
+                     .getCodeSource()
+                     .getLocation()
+                     .getPath())
+                   .getName();
+    }
     
 }
 
