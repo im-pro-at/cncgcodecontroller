@@ -77,16 +77,24 @@ public class CNCGCodeController {
             String line;
             int warings=0;
             int errors=0;
-                
+            int linenumber=0;
+            
             try (BufferedReader br = new BufferedReader(new FileReader(fin))) {
                 while((line = br.readLine() )!=null)
                 {
+                    linenumber++;
                     CNCCommand command= new CNCCommand(line);
                     CNCCommand.State t=command.calcCommand(c);
                     if(t==CNCCommand.State.WARNING)
+                    {
+                        System.out.println(args[1] + ":" + linenumber + ":  WARING: "+command.getMessage());
                         warings++;
+                    }
                     if(t==CNCCommand.State.ERROR)
+                    {
+                        System.out.println(args[1] + ":" + linenumber + ":  ERROR: "+command.getMessage());
                         errors++;
+                    }
                     cmds.add(command);
                 }
             }

@@ -782,6 +782,10 @@ public class CNCCommand {
         return state;
     }
 
+    public String getMessage() {
+        return message;
+    }
+    
     @Override
     public String toString() {
         return command;
