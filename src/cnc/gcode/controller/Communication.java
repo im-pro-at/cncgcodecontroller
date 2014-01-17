@@ -60,7 +60,7 @@ public class Communication {
     private String status="Not Connected!";
     private InputStream is;
     private OutputStream os;
-    
+    private boolean startlinefound=false;    
     
     private Communication()
     {
@@ -125,11 +125,12 @@ public class Communication {
                     }
                 }
             }
+            
             ArrayList<String> inputs= new ArrayList<>();
             inputs.add("");
             for(char c:input.toCharArray())
             {
-                if(c=='\n')
+                if ((c=='\n')||(c=='\r'))
                     inputs.add("");
                 else
                     inputs.set(inputs.size()-1, inputs.get(inputs.size()-1)+c);
@@ -156,6 +157,14 @@ public class Communication {
                             doUpdate();
                         }
                             
+                    }
+                    // "start" line after reset
+                    if(temp.length()>=5 && temp.substring(0, 5).equals("start"))
+                    {
+                        startlinefound=true;
+                        // reset counter
+                        resivecount=0;
+                        cmdhistroy.clear();
                     }
                     //resend?
                     if(temp.length()>=2 && temp.substring(0, 2).equals("rs"))
@@ -271,23 +280,39 @@ public class Communication {
             }
             else
             {
+                // stop timer for 2000 nanoseconds
+                startlinefound=false; // reset flag
                 sp = new NRSerialPort(port, speed);
                 if(sp.connect()==false)
                 {
                     status="Cannot connect!";
                     return;
                 }
+                
                 is = sp.getInputStream();
                 os = sp.getOutputStream();
+             
+                // Wait for "start" line from serial input to dedect Marlin reset
+                for (int i=0;i<20;i++)
+                {
+                    if (startlinefound==true) { break; }
+                    wait(100);
+                }
+
             }
+            
             //Send M110 to reset checksum
             send("M110");
 
-            //1 secound Timout for answere
-            wait(1000);
+            //3 secound Timout for answer
+            for (int i=0;i<30;i++)
+            {
+                wait(100);
+                if (!isbussy()) break;
+            }
             if(isbussy())
                 //Printer not answered!
-                throw new MyException("Printer did not respons!"); 
+                throw new MyException("Printer did not respons! Try to replug USB cable.");
         }
         catch(Exception e)
         {
