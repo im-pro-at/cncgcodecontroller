@@ -280,7 +280,6 @@ public class Communication {
             }
             else
             {
-                // stop timer for 2000 nanoseconds
                 startlinefound=false; // reset flag
                 sp = new NRSerialPort(port, speed);
                 if(sp.connect()==false)
