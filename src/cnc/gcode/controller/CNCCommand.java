@@ -290,7 +290,7 @@ public class CNCCommand {
                         case 2:
                         case 3:
                             type=Type.ARC;
-                            message+="ARC moves are experimental and may cause problems look at the perview if the are right! ";
+                            message+="ARC moves are experimental and may cause problems.  Please look at the perview to determine if they are correct! ";
                             break;
                         case 28:
                             type=Type.HOMEING;
@@ -307,7 +307,7 @@ public class CNCCommand {
                             type=Type.GXX;
                             if(state== State.NORMAL)
                                 state=State.WARNING;
-                            message+="Not Implemented May cause problems! ";
+                            message+="Not Implemented & might cause problems! ";
                             break;
                             
                         case 20:
@@ -365,15 +365,15 @@ public class CNCCommand {
             case ARC:
                 if(p.contains('Z') || p.contains('K')){
                     state=State.ERROR;
-                    message+="ARC in Z not Sopported! ";
+                    message+="ARC in Z not Supported! ";
                 }
                 if(p.contains('P') ){
                     state=State.ERROR;
-                    message+="ARC with P not Sopported! ";
+                    message+="ARC with P not Supported! ";
                 }
                 if(p.contains('R') ){
                     state=State.ERROR;
-                    message+="ARC with R not Sopported! ";
+                    message+="ARC with R not Supported! ";
                 }
                 if(!p.contains('I') || !p.contains('I'))
                 {
@@ -385,7 +385,7 @@ public class CNCCommand {
                 if((p.contains('X')|| p.contains('Y')) && p.contains('Z')){
                     if(state== State.NORMAL)
                         state=State.WARNING;
-                    message+="[X,Y] + Z Move makes Problems with Visualisation! ";
+                    message+="[X,Y] + Z Move makes Problems with Visualization! ";
                 }
                 for(int i=0;i<4;i++)
                     if(p.contains(CommandParsing.axesName[i]))
@@ -396,7 +396,7 @@ public class CNCCommand {
                 {
                     if(state== State.NORMAL)
                         state=State.WARNING;
-                    message+="Distance from current point to the center differs form the dictance from current to the end point! ";
+                    message+="Distance from current point to the center differs form the distance from current to the end point! ";
                 }
                 break;
                 
@@ -417,7 +417,7 @@ public class CNCCommand {
                 }
                 if(state== State.NORMAL)
                     state=State.WARNING;
-                message+="Homing will not be Repositioniged! ";
+                message+="Homing will not be Repositioned! ";
                 break;
                 
             case SETPOS:
@@ -426,7 +426,7 @@ public class CNCCommand {
                         c.axes[i]=p.get(CommandParsing.axesName[i]).value;
                 if(state== State.NORMAL)
                     state=State.WARNING;
-                message+="Setpos will not be Repositioniged! ";
+                message+="Setpos will not be Repositioned! ";
                 break;
             
             case TOOLCHANGE:
@@ -435,7 +435,7 @@ public class CNCCommand {
                 {
                     if(state== State.NORMAL)
                         state=State.WARNING;
-                    message+="Toolchnage Number is not a Number / or missing! ";
+                    message+="Toolchnage Number is not a incorrect/missing! ";
                 }
                 for(int i=0;i<3;i++)
                     c.axes[i]=Double.NaN;
@@ -482,7 +482,7 @@ public class CNCCommand {
                     {
                         if(state== State.NORMAL)
                             state=State.WARNING;
-                        message+="Command Without any Moving! ";
+                        message+="Command Without any movement! ";
                     }
                     
                     if(move.s[2]!=move.e[2] && !Double.isNaN(move.e[2]))
@@ -1004,7 +1004,7 @@ public class CNCCommand {
                     //Secound Algoritim
                     while(timeout>System.currentTimeMillis())
                     {
-                        progress.publish("Optimising", (int)(doneccount*(100/reccount) + 100/reccount-(timeout-System.currentTimeMillis())/(10*Database.OPTIMISATIONTIMEOUT.getsaved())));
+                        progress.publish("Optimizing", (int)(doneccount*(100/reccount) + 100/reccount-(timeout-System.currentTimeMillis())/(10*Database.OPTIMISATIONTIMEOUT.getsaved())));
 
                         OElement as=null;
                         double d=0;
@@ -1024,7 +1024,7 @@ public class CNCCommand {
                             d=0;
                             for(ae=as.n;ae!=HEAD;ae=ae.n)
                             {
-                                progress.publish("Optimising", (int)(doneccount*(100/reccount) + 100/reccount-(timeout-System.currentTimeMillis())/(10*Database.OPTIMISATIONTIMEOUT.getsaved())));
+                                progress.publish("Optimizing", (int)(doneccount*(100/reccount) + 100/reccount-(timeout-System.currentTimeMillis())/(10*Database.OPTIMISATIONTIMEOUT.getsaved())));
 
                                 for(OElement s=ae.n;s!=HEAD && s!=HEAD.l;s=s.n)
                                 {
@@ -1115,7 +1115,7 @@ public class CNCCommand {
             
             //Test if somthing get lost
             if(incmds.size()!=outcmds.size())
-                throw new MyException("Internal Error size not equal!");
+                throw new MyException("Internal Error: Size not equal!");
             
             doneccount++;
             
