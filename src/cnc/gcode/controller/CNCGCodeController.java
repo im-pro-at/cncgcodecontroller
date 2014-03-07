@@ -51,7 +51,7 @@ public class CNCGCodeController {
             File fin= new File(args[1]);
             if(!fin.exists())
             {
-                System.out.println("inout file does not exists!");
+                System.out.println("inout file does not exist!");
                 System.exit(1);
             }
             if(!fin.canRead())
@@ -91,7 +91,7 @@ public class CNCGCodeController {
                 }
             }
             double maxTime=c.secounds;
-            System.out.println("File loaded with "+warings+" Warings and "+errors+" Errors!");
+            System.out.println("File loaded with "+warings+" Warnings and "+errors+" Errors!");
             
             //Optimize
             CNCCommand.Optimiser o= new CNCCommand.Optimiser(new CNCCommand.Optimiser.IProgress() {
@@ -129,7 +129,7 @@ public class CNCGCodeController {
                     errors++;
             }
             
-            System.out.println("Optimised! Saved time: "+Tools.formatDuration((long)(maxTime-c.secounds)) +"! \nCommands now have "+warings+" Warings and "+errors+" Errors!");
+            System.out.println("Optimized! Saved time: "+Tools.formatDuration((long)(maxTime-c.secounds)) +"! \nCommands now have "+warings+" Warnings and "+errors+" Errors!");
 
             //Process new comands
             System.out.println("Export comands ...");
