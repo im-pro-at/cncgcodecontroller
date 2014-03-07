@@ -184,8 +184,8 @@ public class AutoLevelSystem {
         
         if(Double.isNaN(d))
         {
-            //this schould never happens!
-            (new MyException("Autolefeling Problems!")).printStackTrace();
+            //this should never happen!
+            (new MyException("Autoleveling Error!")).printStackTrace();
             d=maxz()-Database.ALZERO.getsaved(); 
         }
         
