@@ -718,7 +718,7 @@ public class CNCCommand {
                         continue;
                     
                     //Feedrate
-                    if(cin.lastMovetype!=type && !feedRateSet)
+                    if((cin.lastMovetype!=type || (!Double.isNaN(cin.axes[3]) && !Double.isNaN(cout.axes[3]) && cin.axes[3]!=cout.axes[3])) && !feedRateSet)
                     {
                         if(type==Type.G0)
                             cmd+=" "+CommandParsing.axesName[3]+Database.GOFEEDRATE.get();
