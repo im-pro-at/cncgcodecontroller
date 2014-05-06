@@ -168,6 +168,16 @@ public class CommandParsing {
         return parameters.contains(new Parameter(letter));
     }
     
+    public boolean insert(int i, char letter, double value, boolean isint){
+        Parameter p = new Parameter(letter, value, isint);
+        if (parameters.contains(p)){
+            return false;
+        } else {
+            parameters.add(i, p);
+        }
+        return true;
+    }
+    
     public Parameter get(int index)
     {
         return parameters.get(index);

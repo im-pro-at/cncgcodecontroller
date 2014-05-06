@@ -269,6 +269,22 @@ public class CNCCommand {
         }
         else
         {
+            switch(p.get(0).letter)
+            {
+                case 'G':
+                case 'M':
+                    break;
+                default:
+                    if(p.contains('X') || p.contains('Y') || p.contains('Z'))
+                    {
+                        if(c.lastMovetype==Type.G1){
+                            p.insert(0, 'G', 1, true);
+                            message+="Using modal G1! ";
+                        }
+                    }
+                    break;
+            }
+            
             if(!p.get(0).isint)
             {
                 state=State.ERROR;
