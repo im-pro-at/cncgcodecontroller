@@ -269,20 +269,23 @@ public class CNCCommand {
         }
         else
         {
-            switch(p.get(0).letter)
-            {
-                case 'G':
-                case 'M':
-                    break;
-                default:
-                    if(p.contains('X') || p.contains('Y') || p.contains('Z'))
-                    {
-                        if(c.lastMovetype==Type.G1){
-                            p.insert(0, 'G', 1, true);
-                            message+="Using modal G1! ";
+            //Support Modal G1: X00 Y00 Z00
+            if(Database.G1MODAL.get().equals("1")){
+                switch(p.get(0).letter)
+                {
+                    case 'G':
+                    case 'M':
+                        break;
+                    default:
+                        if(p.contains('X') || p.contains('Y') || p.contains('Z'))
+                        {
+                            if(c.lastMovetype==Type.G1){
+                                p.insert(0, 'G', 1, true);
+                                message+="Using modal G1! ";
+                            }
                         }
-                    }
-                    break;
+                        break;
+                }
             }
             
             if(!p.get(0).isint)

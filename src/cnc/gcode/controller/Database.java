@@ -63,6 +63,9 @@ public enum Database {
     BL1(Tools.dtostr(0.0)),
     BL2(Tools.dtostr(0.0)),
     
+    //Modal G1
+    G1MODAL("0"), //"0" == off, "1"==on
+    
     ;
 
     private final String defaultValue;
