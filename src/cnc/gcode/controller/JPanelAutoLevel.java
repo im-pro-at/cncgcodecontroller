@@ -4,6 +4,10 @@
  */
 package cnc.gcode.controller;
 
+import cnc.gcode.controller.communication.ComInterruptException;
+import cnc.gcode.controller.communication.Communication;
+import cnc.gcode.controller.communication.IEndstopHit;
+import cnc.gcode.controller.communication.IResivedLines;
 import de.unikassel.ann.util.ColorHelper;
 import java.awt.Color;
 import java.awt.Font;
@@ -16,6 +20,13 @@ import java.awt.geom.NoninvertibleTransformException;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.ObjectInput;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutput;
+import java.io.ObjectOutputStream;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -23,8 +34,10 @@ import java.util.List;
 import java.util.Random;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
 import javax.swing.SwingUtilities;
+import javax.swing.filechooser.FileFilter;
 
 /**
  *
@@ -50,8 +63,8 @@ public class JPanelAutoLevel extends javax.swing.JPanel implements IGUIEvent {
     private PMySwingWorker worker=null;
     private BufferedImage image;
     private AffineTransform trans=new AffineTransform();
-    boolean hit=false;
-    double hitvalue=0;
+    private boolean hit=false;
+    private double hitvalue=0;
     
     private final TriggertSwingWorker<BufferedImage> painter =new TriggertSwingWorker<BufferedImage>() {
             class GetDataSyncedHelper
@@ -289,35 +302,16 @@ public class JPanelAutoLevel extends javax.swing.JPanel implements IGUIEvent {
             }
         });
         
-       Communication.getInstance().addResiveEvent(new Communication.IResivedLines() {
+        Communication.addZEndstopHitEvent(new IEndstopHit() {
+
             @Override
-            public void resived(String[] lines) {
-                for(String line: lines)
-                {
-                    //echo:endstops hit:  Z:0.00
-                    if(Communication.getInstance().isSimulation())
-                    {
-                        hitvalue=(new Random()).nextDouble();
-                        hit=true;  
-                        if(worker!=null)
-                            worker.trigger();
-                    }
-                    else if(line.contains("endstops") && line.contains("hit") && line.contains("Z:"))
-                    {
-                        try {
-                            hitvalue=Tools.strtod(line.substring(line.indexOf("Z:")+2));
-                            hit=true;  
-                            if(worker!=null)
-                                worker.trigger();
-                        } catch (ParseException ex) {
-                            Logger.getLogger(JPanelAutoLevel.class.getName()).log(Level.SEVERE, null, ex);
-                        }
-                    }
-                    
-                }
+            public void endStopHit(double value) {
+                hitvalue=value;
+                hit=true;  
+                if(worker!=null)
+                    worker.trigger();
             }
-        });
-        
+        });        
         
     }
 
@@ -333,7 +327,8 @@ public class JPanelAutoLevel extends javax.swing.JPanel implements IGUIEvent {
         jTFEndX.setEnabled(!isWorking() && !al.isLeveled());
         jTFEndY.setEnabled(!isWorking() && !al.isLeveled());
 
-        jBAction.setEnabled((!isworking && serial) || isWorking() || isLeveled());
+                             //START                  ABROT           CLEAR
+        jBAction.setEnabled((!isworking && serial) || isWorking() || (isLeveled()&&!isworking));
         if(isLeveled())
             jBAction.setText("Clear");
         else if(isWorking())
@@ -349,6 +344,9 @@ public class JPanelAutoLevel extends javax.swing.JPanel implements IGUIEvent {
             jPBar.setValue(0);
             jPBar.setString("");
         }
+        
+        jBImport.setEnabled(!isworking);
+        jBExport.setEnabled(isLeveled());
         
         painter.trigger();
     }
@@ -411,6 +409,9 @@ public class JPanelAutoLevel extends javax.swing.JPanel implements IGUIEvent {
         jBPause = new javax.swing.JButton();
         jPanel3 = new javax.swing.JPanel();
         jPPaint = new cnc.gcode.controller.JPPaintable();
+        jPanel4 = new javax.swing.JPanel();
+        jBImport = new javax.swing.JButton();
+        jBExport = new javax.swing.JButton();
 
         jPanel2.setBorder(javax.swing.BorderFactory.createTitledBorder("Positions"));
 
@@ -485,7 +486,7 @@ public class JPanelAutoLevel extends javax.swing.JPanel implements IGUIEvent {
         jPanel1.setLayout(jPanel1Layout);
         jPanel1Layout.setHorizontalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jPBar, javax.swing.GroupLayout.DEFAULT_SIZE, 258, Short.MAX_VALUE)
+            .addComponent(jPBar, javax.swing.GroupLayout.DEFAULT_SIZE, 202, Short.MAX_VALUE)
             .addGroup(jPanel1Layout.createSequentialGroup()
                 .addContainerGap()
                 .addComponent(jBAction)
@@ -525,7 +526,7 @@ public class JPanelAutoLevel extends javax.swing.JPanel implements IGUIEvent {
         );
         jPPaintLayout.setVerticalGroup(
             jPPaintLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 129, Short.MAX_VALUE)
+            .addGap(0, 106, Short.MAX_VALUE)
         );
 
         javax.swing.GroupLayout jPanel3Layout = new javax.swing.GroupLayout(jPanel3);
@@ -539,6 +540,40 @@ public class JPanelAutoLevel extends javax.swing.JPanel implements IGUIEvent {
             .addComponent(jPPaint, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
         );
 
+        jPanel4.setBorder(javax.swing.BorderFactory.createTitledBorder("Save Measurement"));
+
+        jBImport.setText("Import");
+        jBImport.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jBImportActionPerformed(evt);
+            }
+        });
+
+        jBExport.setText("Export");
+        jBExport.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jBExportActionPerformed(evt);
+            }
+        });
+
+        javax.swing.GroupLayout jPanel4Layout = new javax.swing.GroupLayout(jPanel4);
+        jPanel4.setLayout(jPanel4Layout);
+        jPanel4Layout.setHorizontalGroup(
+            jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel4Layout.createSequentialGroup()
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addComponent(jBImport)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addComponent(jBExport)
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+        );
+        jPanel4Layout.setVerticalGroup(
+            jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                .addComponent(jBImport)
+                .addComponent(jBExport))
+        );
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
         layout.setHorizontalGroup(
@@ -546,7 +581,8 @@ public class JPanelAutoLevel extends javax.swing.JPanel implements IGUIEvent {
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jPanel3, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(jPanel4, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(jPanel3, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addGroup(layout.createSequentialGroup()
                         .addComponent(jPanel2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
@@ -560,7 +596,9 @@ public class JPanelAutoLevel extends javax.swing.JPanel implements IGUIEvent {
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                     .addComponent(jPanel2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jPanel4, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jPanel3, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addContainerGap())
         );
@@ -607,7 +645,7 @@ public class JPanelAutoLevel extends javax.swing.JPanel implements IGUIEvent {
 
                 private boolean waitfornexdSend() throws Exception {
                     //Set Pos back
-                    while (Communication.getInstance().isbussy()) {
+                    while (Communication.isbussy()) {
                         if (this.isCancelled()) {
                             throw new Exception();
                         }
@@ -723,31 +761,61 @@ public class JPanelAutoLevel extends javax.swing.JPanel implements IGUIEvent {
 
                         for(String execute:cmd.execute(new CNCCommand.Transform(0, 0, false, false),false))
                         {
-                            waitfornexdSend();
-                            hit=false;
-                            Communication.getInstance().send(execute);
-                            
+                            while(true){
+                                waitfornexdSend();
+                                hit=false;
+                                try{
+                                    Communication.send(execute);
+                                }
+                                catch(ComInterruptException ex){
+                                    continue;
+                                }
+                                break;
+                            }                            
                         }
                         
                         if(Arrays.asList(cmdpropeindex).contains(i))
                         {
                             //Proping Done waiting for hit:
-                            waitfortrigger(1000*60*10);
+                            if(!Communication.isSimulation()){
+                                waitfortrigger(1000*60*10);
+                            }
+                            else{
+                                waitfortrigger(100);
+                                hitvalue=(new Random()).nextDouble();
+                                hit=true;  
+                            }
                             
                             if(hit==false)
                                 throw new MyException("Timeout: No End Stop Hit!");
-                            
-                            waitfornexdSend();
+                            double thitValue=hitvalue;
                             
                             //Save pos
-                            points[Arrays.asList(cmdpropeindex).indexOf(i)].setValue(hitvalue);
+                            points[Arrays.asList(cmdpropeindex).indexOf(i)].setValue(thitValue);
 
                             //Reset Z position
-                            Communication.getInstance().send("G92 Z"+Tools.dtostr(hitvalue));
+                            while(true){
+                                waitfornexdSend();
+                                try{
+                                    Communication.send("G92 Z"+Tools.dtostr(thitValue));
+                                }
+                                catch(ComInterruptException ex){
+                                    continue;
+                                }
+                                break;
+                            }                            
 
                             //Clearence
-                            waitfornexdSend();
-                            Communication.getInstance().send("G0 Z"+Tools.dtostr(hitvalue+Database.ALCLEARENCE.getsaved())+" F"+Database.GOFEEDRATE);
+                            while(true){
+                                waitfornexdSend();
+                                try{
+                                    Communication.send("G0 Z"+Tools.dtostr(thitValue+Database.ALCLEARENCE.getsaved())+" F"+Database.GOFEEDRATE);
+                                }
+                                catch(ComInterruptException ex){
+                                    continue;
+                                }
+                                break;
+                            }                            
 
                             publish(null);                            
 
@@ -832,8 +900,83 @@ public class JPanelAutoLevel extends javax.swing.JPanel implements IGUIEvent {
         fireupdateGUI();
     }//GEN-LAST:event_jBPauseActionPerformed
 
+    private void jBImportActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jBImportActionPerformed
+        JFileChooser fc= Database.getFileChooser();
+        fc.setFileFilter(new FileFilter() {
+            @Override
+            public boolean accept(File f) {
+                return f.getName().toLowerCase().endsWith(".alf")||f.isDirectory();
+            }
+
+            @Override
+            public String getDescription() {
+                return "Autoleveling files (*.alf)";
+            }
+        });
+        fc.setFileSelectionMode(JFileChooser.FILES_ONLY);
+        fc.setMultiSelectionEnabled(false);
+
+        if(fc.showOpenDialog(this)!=JFileChooser.APPROVE_OPTION)
+            return;
+        
+        try{
+            try (ObjectInput in = new ObjectInputStream(new FileInputStream(fc.getSelectedFile()))) {
+                al= (AutoLevelSystem)in.readObject();
+            }
+        }
+        catch(Exception e){
+            JOptionPane.showMessageDialog(this, "Cannot import File! ("+e.getMessage()+")");
+        }
+
+        AutoLevelSystem.publish(al);
+        
+        fireupdateGUI();
+
+    }//GEN-LAST:event_jBImportActionPerformed
+
+    
+    private void jBExportActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jBExportActionPerformed
+        JFileChooser fc= Database.getFileChooser();
+        fc.setFileFilter(new FileFilter() {
+            @Override
+            public boolean accept(File f) {
+                return f.getName().toLowerCase().endsWith(".alf")||f.isDirectory();
+            }
+
+            @Override
+            public String getDescription() {
+                return "Autoleveling files (*.alf)";
+            }
+        });
+        fc.setFileSelectionMode(JFileChooser.FILES_ONLY);
+        fc.setMultiSelectionEnabled(false);
+
+        if(fc.showSaveDialog(this)!=JFileChooser.APPROVE_OPTION)
+            return;
+        
+        File f=fc.getSelectedFile();
+        if(f.getName().lastIndexOf('.')==-1)
+            f=new File(f.getPath()+".alf");
+
+        
+        try{
+            if(!f.exists())
+                f.createNewFile();            
+            try (ObjectOutput out = new ObjectOutputStream(new FileOutputStream(f))) {
+                out.writeObject(al);
+            }
+        }
+        catch(Exception e){
+            JOptionPane.showMessageDialog(this, "Cannot export File! ("+e.getMessage()+")");
+        }
+        
+
+    }//GEN-LAST:event_jBExportActionPerformed
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton jBAction;
+    private javax.swing.JButton jBExport;
+    private javax.swing.JButton jBImport;
     private javax.swing.JButton jBPause;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
@@ -844,6 +987,7 @@ public class JPanelAutoLevel extends javax.swing.JPanel implements IGUIEvent {
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel2;
     private javax.swing.JPanel jPanel3;
+    private javax.swing.JPanel jPanel4;
     private javax.swing.JTextField jTFEndX;
     private javax.swing.JTextField jTFEndY;
     private javax.swing.JTextField jTFStartX;

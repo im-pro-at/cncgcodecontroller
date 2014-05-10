@@ -4,8 +4,14 @@
  */
 package cnc.gcode.controller;
 
+import cnc.gcode.controller.communication.ComInterruptException;
+import cnc.gcode.controller.communication.Communication;
+import cnc.gcode.controller.communication.IResivedLines;
+import cnc.gcode.controller.communication.ISend;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.JOptionPane;
 import javax.swing.SwingUtilities;
@@ -25,7 +31,7 @@ public class JPanelCommunication extends javax.swing.JPanel implements IGUIEvent
     public JPanelCommunication() {
         initComponents();
         
-        Communication.getInstance().addResiveEvent(new Communication.IResivedLines() {
+        Communication.addResiveEvent(new IResivedLines() {
             @Override
             public void resived(String[] lines) {
                 for(String line: lines)
@@ -48,7 +54,7 @@ public class JPanelCommunication extends javax.swing.JPanel implements IGUIEvent
             }
         });
         
-        Communication.getInstance().addSendEvent(new Communication.ISend() {
+        Communication.addSendEvent(new ISend() {
             @Override
             public void send(String cmd) {
                 //Add to list 
@@ -159,14 +165,18 @@ public class JPanelCommunication extends javax.swing.JPanel implements IGUIEvent
     }//GEN-LAST:event_jTFSendKeyReleased
 
     private void jBSendActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jBSendActionPerformed
-        if(!jTFSend.getText().equals("") && Communication.getInstance().isConnect())
+        if(!jTFSend.getText().equals("") && Communication.isConnected())
         {
-            if(Communication.getInstance().isbussy())
+            if(Communication.isbussy())
             {
                 JOptionPane.showMessageDialog(this, "An other command is in Progress!");
                 return;
             }
-            Communication.getInstance().send(jTFSend.getText());
+            try {
+                Communication.send(jTFSend.getText());
+            } catch (ComInterruptException ex) {
+                Logger.getLogger(JPanelCommunication.class.getName()).log(Level.SEVERE, null, ex);
+            }
         }
     }//GEN-LAST:event_jBSendActionPerformed
 

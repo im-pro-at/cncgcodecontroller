@@ -98,7 +98,7 @@
             </Constraint>
           </Constraints>
         </Component>
-        <Container class="javax.swing.JScrollPane" name="jScrollPane">
+        <Container class="javax.swing.JScrollPane" name="jSscrollPaneSettings">
           <Constraints>
             <Constraint layoutClass="org.netbeans.modules.form.compat2.layouts.support.JTabbedPaneSupportLayout" value="org.netbeans.modules.form.compat2.layouts.support.JTabbedPaneSupportLayout$JTabbedPaneConstraintsDescription">
               <JTabbedPaneConstraints tabName="Settings">
@@ -125,7 +125,7 @@
     </Component>
     <Component class="javax.swing.JLabel" name="jLStatus">
       <Properties>
-        <Property name="text" type="java.lang.String" value="Not connected"/>
+        <Property name="text" type="java.lang.String" value="Loading..."/>
       </Properties>
     </Component>
     <Component class="javax.swing.JComboBox" name="jCBPort">
@@ -143,19 +143,7 @@
     <Component class="javax.swing.JComboBox" name="jCBSpeed">
       <Properties>
         <Property name="model" type="javax.swing.ComboBoxModel" editor="org.netbeans.modules.form.editors2.ComboBoxModelEditor">
-          <StringArray count="11">
-            <StringItem index="0" value="2400"/>
-            <StringItem index="1" value="4800"/>
-            <StringItem index="2" value="9600"/>
-            <StringItem index="3" value="14400"/>
-            <StringItem index="4" value="19200"/>
-            <StringItem index="5" value="28800"/>
-            <StringItem index="6" value="38400"/>
-            <StringItem index="7" value="57600"/>
-            <StringItem index="8" value="76800"/>
-            <StringItem index="9" value="115200"/>
-            <StringItem index="10" value="230400"/>
-          </StringArray>
+          <StringArray count="0"/>
         </Property>
       </Properties>
     </Component>

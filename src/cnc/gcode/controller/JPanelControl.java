@@ -4,6 +4,9 @@
  */
 package cnc.gcode.controller;
 
+import cnc.gcode.controller.communication.ComInterruptException;
+import cnc.gcode.controller.communication.Communication;
+import cnc.gcode.controller.communication.IResivedLines;
 import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Graphics;
@@ -15,6 +18,8 @@ import java.awt.event.KeyEvent;
 import java.awt.geom.GeneralPath;
 import java.text.ParseException;
 import java.util.ArrayList;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.JButton;
 import javax.swing.JOptionPane;
@@ -161,7 +166,7 @@ public class JPanelControl extends javax.swing.JPanel implements IGUIEvent{
         axes[5][0].set(Database.MAXFEEDRATE.getsaved()/10);
 
         
-       Communication.getInstance().addResiveEvent(new Communication.IResivedLines() {
+       Communication.addResiveEvent(new IResivedLines() {
             @Override
             public void resived(String[] lines) {
                 for(String line: lines)
@@ -1142,12 +1147,17 @@ public class JPanelControl extends javax.swing.JPanel implements IGUIEvent{
     }// </editor-fold>//GEN-END:initComponents
 
     private void jBHomingActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jBHomingActionPerformed
-        if(Communication.getInstance().isbussy())
+        if(Communication.isbussy())
         {
             JOptionPane.showMessageDialog(this, "An other command is in Progress!");
             return;
         }
-        Communication.getInstance().send("G28 X Y Z");
+        try {
+            Communication.send("G28 X Y Z");
+        } catch (ComInterruptException ex) {
+            Logger.getLogger(JPanelControl.class.getName()).log(Level.SEVERE, null, ex);
+            return;
+        }
         jPPaint.setRepaintEnable(false);
         for(int i=0;i<3;i++)
         {
@@ -1158,25 +1168,33 @@ public class JPanelControl extends javax.swing.JPanel implements IGUIEvent{
     }//GEN-LAST:event_jBHomingActionPerformed
 
     private void jBPowerONActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jBPowerONActionPerformed
-        if(Communication.getInstance().isbussy())
+        if(Communication.isbussy())
         {
             JOptionPane.showMessageDialog(this, "An other command is in Progress!");
             return;
         }
-        Communication.getInstance().send("M80");
+        try {
+            Communication.send("M80");
+        } catch (ComInterruptException ex) {
+            Logger.getLogger(JPanelControl.class.getName()).log(Level.SEVERE, null, ex);
+        }
     }//GEN-LAST:event_jBPowerONActionPerformed
 
     private void jBPowerOFFActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jBPowerOFFActionPerformed
-        if(Communication.getInstance().isbussy())
+        if(Communication.isbussy())
         {
             JOptionPane.showMessageDialog(this, "An other command is in Progress!");
             return;
         }
-        Communication.getInstance().send("M81");
+        try {
+            Communication.send("M81");
+        } catch (ComInterruptException ex) {
+            Logger.getLogger(JPanelControl.class.getName()).log(Level.SEVERE, null, ex);
+        }
     }//GEN-LAST:event_jBPowerOFFActionPerformed
 
     private void jBSetPosActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jBSetPosActionPerformed
-        if(Communication.getInstance().isbussy())
+        if(Communication.isbussy())
         {
             JOptionPane.showMessageDialog(this, "An other command is in Progress!");
             return;
@@ -1203,20 +1221,28 @@ public class JPanelControl extends javax.swing.JPanel implements IGUIEvent{
                 axes[i][0].dispatchEvent();
                 cmd+=" "+CommandParsing.axesName[i]+Tools.dtostr(values[i]);
             }
-            Communication.getInstance().send(cmd);
+            try {
+                Communication.send(cmd);
+            } catch (ComInterruptException ex) {
+                Logger.getLogger(JPanelControl.class.getName()).log(Level.SEVERE, null, ex);
+            }
             jPPaint.setRepaintEnable(true);
         }
 
     }//GEN-LAST:event_jBSetPosActionPerformed
 
     private void jBGetPosActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jBGetPosActionPerformed
-        if(Communication.getInstance().isbussy())
+        if(Communication.isbussy())
         {
             JOptionPane.showMessageDialog(this, "An other command is in Progress!");
             return;
         }
         pharsnextserial=true;
-        Communication.getInstance().send("M114");
+        try {
+            Communication.send("M114");
+        } catch (ComInterruptException ex) {
+            Logger.getLogger(JPanelControl.class.getName()).log(Level.SEVERE, null, ex);
+        }
     }//GEN-LAST:event_jBGetPosActionPerformed
 
     private void jLSaveMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jLSaveMouseClicked
@@ -1330,7 +1356,7 @@ public class JPanelControl extends javax.swing.JPanel implements IGUIEvent{
     }//GEN-LAST:event_jCBFastModeActionPerformed
 
     private void jBMoveActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jBMoveActionPerformed
-        if(Communication.getInstance().isbussy())
+        if(Communication.isbussy())
         {
             JOptionPane.showMessageDialog(this, "An other command is in Progress!");
             return;
@@ -1347,6 +1373,7 @@ public class JPanelControl extends javax.swing.JPanel implements IGUIEvent{
             if(!temp.equals(a.get()))
             {
                 JOptionPane.showMessageDialog(this, "Not all Parameters in range!");
+                jPPaint.setRepaintEnable(true);
                 return;
             }
         }
@@ -1356,6 +1383,7 @@ public class JPanelControl extends javax.swing.JPanel implements IGUIEvent{
         if(mxy && mz)
         {
             JOptionPane.showMessageDialog(this, "Only XY move or Z move allowed .. but not both!");
+            jPPaint.setRepaintEnable(true);
             return;
         }
 
@@ -1371,6 +1399,7 @@ public class JPanelControl extends javax.swing.JPanel implements IGUIEvent{
             if(!Geometrics.doubleequals(d1, d2, 0.001))
             {
                 JOptionPane.showMessageDialog(this, "Center of ARC is not equi-distant!");
+                jPPaint.setRepaintEnable(true);
                 return;
             }
 
@@ -1392,7 +1421,7 @@ public class JPanelControl extends javax.swing.JPanel implements IGUIEvent{
 
         //Load Axes
         for(int i=0;i<3;i++)
-        cmd+=" "+CommandParsing.axesName[i]+Tools.dtostr(axes[i][2].getdsave());
+            cmd+=" "+CommandParsing.axesName[i]+Tools.dtostr(axes[i][2].getdsave());
 
         if(jCBarc.isSelected())
         {
@@ -1407,9 +1436,16 @@ public class JPanelControl extends javax.swing.JPanel implements IGUIEvent{
         else
             feedrate=axes[5][0].getdsave();
         cmd+=" F"+Tools.dtostr(feedrate);
-
+        
         //Execute
-        Communication.getInstance().send(cmd);
+        try {
+            Communication.send(cmd);
+        } catch (ComInterruptException ex) {
+            Logger.getLogger(JPanelControl.class.getName()).log(Level.SEVERE, null, ex);
+            JOptionPane.showMessageDialog(this, "Cannot send Command to the Printer! ("+ex.getMessage()+")");
+            jPPaint.setRepaintEnable(true);
+            return;
+        }
 
         //Save Move
         printList.add(new PrintableElement());

@@ -15,9 +15,9 @@ import java.util.List;
  *
  * @author patrick
  */
-public class AutoLevelSystem {
+public class AutoLevelSystem implements java.io.Serializable{
 
-    public static class Point
+    public static class Point implements java.io.Serializable
     {
         private Point2D.Double p;
         private double value;

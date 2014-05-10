@@ -4,11 +4,14 @@
  */
 package cnc.gcode.controller;
 
-import gnu.io.NRSerialPort;
+import cnc.gcode.controller.communication.ComInterruptException;
+import cnc.gcode.controller.communication.Communication;
 import java.util.ArrayList;
-import java.util.Set;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.JOptionPane;
+import javax.swing.SwingUtilities;
 
 /**
  *
@@ -29,54 +32,79 @@ public final class MainForm extends javax.swing.JFrame implements IGUIEvent{
         
         initComponents();
         
+        //Settings scroll speed
+        jSscrollPaneSettings.getVerticalScrollBar().setUnitIncrement(14);
         //GuiUpdateHandler
         final IGUIEvent[] panels= new IGUIEvent[]{this,jPanelControl,jPanelAutoLevel,jPanelCNCMilling,jPanelCommunication,jPanelSettings};
         IEvent updateGUI= new IEvent() {
             @Override
             public void fired() {
                 for(IGUIEvent panel:panels)
-                    panel.updateGUI(Communication.getInstance().isConnect(), jPanelCNCMilling.isRunning() || jPanelAutoLevel.isWorking());
+                    panel.updateGUI(Communication.isConnected(), jPanelCNCMilling.isRunning() || jPanelAutoLevel.isWorking());
             }
         };
         for(IGUIEvent panel:panels)
             panel.setGUIEvent(updateGUI);
         
         
-        //Load last Speed   
-        jCBSpeed.setSelectedIndex(
-                Integer.parseInt(
-                Database.SPEED.get()));
-
-        //Show Comports avilable
-        ArrayList<String> ports=Communication.getPortsNames();
-        if(ports.isEmpty())
-        {
-            ports.add("No Serialport found!");
-        }
-
-        jCBPort.setModel(new DefaultComboBoxModel(ports.toArray(new String[0])));
-        int index=0;
-        for (String port:ports) {
-            if(port.equals(Database.PORT.get()))
-            {
-                jCBPort.setSelectedIndex(index);
-                break;
-            }
-            index++;
-        }
         
-        Communication.getInstance().addChangedEvent(new IEvent() {
+        //Show Comports/Speeds avilable (Can take secounds to load!)
+        (new Thread(new Runnable() {
+            @Override
+            public void run() {
+                final ArrayList<String> ports=Communication.getPortsNames();
+                if(ports.isEmpty())
+                {
+                    ports.add("No Serialport found!");
+                }
+                
+                final ArrayList<Integer> speeds= Communication.getPortsSpeeds();
+                SwingUtilities.invokeLater(new Runnable() {
+                    @Override
+                    public void run() {
+                        jCBPort.setModel(new DefaultComboBoxModel(ports.toArray(new String[0])));
+                        jCBSpeed.setModel(new DefaultComboBoxModel(speeds.toArray(new Integer[0])));
+
+                        int index=0;
+                        //Load last Comport   
+                        for (String port:ports) {
+                            if(port.equals(Database.PORT.get()))
+                            {
+                                jCBPort.setSelectedIndex(index);
+                                break;
+                            }
+                            index++;
+                        }
+                        
+                        //Load last Speed   
+                        index=0;
+                        for (Integer speed:speeds) {
+                            if(speed.toString().equals(Database.SPEED.get()))
+                            {
+                                jCBSpeed.setSelectedIndex(index);
+                                break;
+                            }
+                            index++;
+                        }
+                        
+                        jLStatus.setText(Communication.getStatus());
+                    }
+                });
+            }
+        })).start();
+        
+        Communication.addChangedEvent(new IEvent() {
             @Override
             public void fired() {
-                jLStatus.setText(Communication.getInstance().getStatus());
+                jLStatus.setText(Communication.getStatus());
 
                 fireupdateGUI();
             }
         });
        
-        //Update Comport Status
-        Communication.getInstance().disconnect();
-        
+        //First GUI update
+        fireupdateGUI();
+
     }
     
     @Override
@@ -89,7 +117,7 @@ public final class MainForm extends javax.swing.JFrame implements IGUIEvent{
         //Controll      
         jCBPort.setEnabled(!serial);
         jCBSpeed.setEnabled(!serial);
-        jBConnect.setEnabled(!isworking);
+        jBConnect.setEnabled(!isworking || !serial);
         jBConnect.setText(serial?"Disconnect":"Connect");
     }
     
@@ -116,7 +144,7 @@ public final class MainForm extends javax.swing.JFrame implements IGUIEvent{
         jPanelAutoLevel = new cnc.gcode.controller.JPanelAutoLevel();
         jPanelCNCMilling = new cnc.gcode.controller.JPanelCNCMilling();
         jPanelCommunication = new cnc.gcode.controller.JPanelCommunication();
-        jScrollPane = new javax.swing.JScrollPane();
+        jSscrollPaneSettings = new javax.swing.JScrollPane();
         jPanelSettings = new cnc.gcode.controller.JPanelSettings();
         jBConnect = new javax.swing.JButton();
         jLStatus = new javax.swing.JLabel();
@@ -138,9 +166,9 @@ public final class MainForm extends javax.swing.JFrame implements IGUIEvent{
         jTabbedPane2.addTab("CNC Milling", jPanelCNCMilling);
         jTabbedPane2.addTab("Communication", jPanelCommunication);
 
-        jScrollPane.setViewportView(jPanelSettings);
+        jSscrollPaneSettings.setViewportView(jPanelSettings);
 
-        jTabbedPane2.addTab("Settings", jScrollPane);
+        jTabbedPane2.addTab("Settings", jSscrollPaneSettings);
 
         jBConnect.setText("Connect");
         jBConnect.addActionListener(new java.awt.event.ActionListener() {
@@ -149,11 +177,9 @@ public final class MainForm extends javax.swing.JFrame implements IGUIEvent{
             }
         });
 
-        jLStatus.setText("Not connected");
+        jLStatus.setText("Loading...");
 
         jLabel6.setText("@");
-
-        jCBSpeed.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "2400", "4800", "9600", "14400", "19200", "28800", "38400", "57600", "76800", "115200", "230400" }));
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
@@ -189,8 +215,8 @@ public final class MainForm extends javax.swing.JFrame implements IGUIEvent{
 
     private void formWindowClosing(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowClosing
         //close Connection
-        if(Communication.getInstance().isConnect())
-            Communication.getInstance().disconnect();
+        if(Communication.isConnected())
+            Communication.disconnect();
         
         //Save Database
         if(!Database.save(null))
@@ -200,25 +226,17 @@ public final class MainForm extends javax.swing.JFrame implements IGUIEvent{
     }//GEN-LAST:event_formWindowClosing
 
     private void jBConnectActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jBConnectActionPerformed
-        if(Communication.getInstance().isConnect())
+        if(Communication.isConnected())
         {
-            Communication.getInstance().disconnect();
+            Communication.disconnect();
         }
         else
         {
-            Communication.getInstance().connect((String)jCBPort.getModel().getSelectedItem(), Integer.parseInt((String)jCBSpeed.getSelectedItem()));
-            if(Communication.getInstance().isConnect())
-            {
-                //Save config
-                Database.PORT.set((String)jCBPort.getModel().getSelectedItem());
-                Database.SPEED.set(((Integer)jCBSpeed.getSelectedIndex()).toString());
+            Communication.connect((String)jCBPort.getModel().getSelectedItem(), (Integer)jCBSpeed.getSelectedItem());
 
-                Communication.getInstance().send("G90");
-            }
-            else
-            {
-                jLStatus.setText(Communication.getInstance().getStatus());
-            }
+            Database.PORT.set((String)jCBPort.getModel().getSelectedItem());
+            Database.SPEED.set(((Integer)jCBSpeed.getSelectedItem()).toString());
+                
         }
     }//GEN-LAST:event_jBConnectActionPerformed
    
@@ -235,7 +253,7 @@ public final class MainForm extends javax.swing.JFrame implements IGUIEvent{
     private cnc.gcode.controller.JPanelCommunication jPanelCommunication;
     private cnc.gcode.controller.JPanelControl jPanelControl;
     private cnc.gcode.controller.JPanelSettings jPanelSettings;
-    private javax.swing.JScrollPane jScrollPane;
+    private javax.swing.JScrollPane jSscrollPaneSettings;
     private javax.swing.JTabbedPane jTabbedPane2;
     // End of variables declaration//GEN-END:variables
 

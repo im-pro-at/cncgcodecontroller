@@ -4,6 +4,8 @@
  */
 package cnc.gcode.controller;
 
+import cnc.gcode.controller.communication.ComInterruptException;
+import cnc.gcode.controller.communication.Communication;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Graphics2D;
@@ -785,7 +787,7 @@ public class JPanelCNCMilling extends javax.swing.JPanel implements IGUIEvent{
     }//GEN-LAST:event_jPPaintMouseClicked
 
     private void jBMillingActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jBMillingActionPerformed
-        final boolean serial=Communication.getInstance().isConnect();
+        final boolean serial=Communication.isConnected();
         final CNCCommand[] cmds= new CNCCommand[jLCNCCommands.getModel().getSize()];
         ((DefaultListModel<CNCCommand>)jLCNCCommands.getModel()).copyInto(cmds);
 
@@ -843,31 +845,43 @@ public class JPanelCNCMilling extends javax.swing.JPanel implements IGUIEvent{
                     
                     for(String execute:cmd.execute(t,jCBAutoLeveling.isSelected()))
                     {
-                        if(this.isCancelled())
-                            return null;
-
-                        while(Communication.getInstance().isbussy())
+                        while(true)
                         {
                             if(this.isCancelled())
                                 return null;
-                            try
+
+                            while(Communication.isbussy())
                             {
-                                if(serial)
-                                    Thread.sleep(1);
-                                dopause();
+                                if(this.isCancelled())
+                                    return null;
+                                try
+                                {
+                                    if(serial)
+                                        Thread.sleep(1);
+                                    dopause();
+                                }
+                                catch(InterruptedException ex)
+                                {
+                                    return null;
+                                }
+
+                                if(!serial) break;
                             }
-                            catch(InterruptedException ex)
-                            {
-                                return null;
+
+                            if(serial){
+                                try{
+                                    Communication.send(execute);
+                                }
+                                catch(ComInterruptException ex){
+                                    continue;
+                                }
+                                break;
                             }
-                            
-                            if(!serial) break;
+                            else{
+                                export.println(execute);
+                                break;
+                            }
                         }
-                        
-                        if(serial)
-                            Communication.getInstance().send(execute);
-                        else
-                            export.println(execute);
                     }
                     
                 }

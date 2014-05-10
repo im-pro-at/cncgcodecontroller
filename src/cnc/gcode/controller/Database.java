@@ -4,6 +4,7 @@
  */
 package cnc.gcode.controller;
 
+import cnc.gcode.controller.communication.Communication;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.io.File;
@@ -65,6 +66,10 @@ public enum Database {
     
     //Modal G1
     G1MODAL("0"), //"0" == off, "1"==on
+    
+    //Communication Type
+    COMTYPE(Communication.MARLIN.toString()),   
+    
     
     ;
 
