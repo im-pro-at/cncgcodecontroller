@@ -759,7 +759,7 @@ public class JPanelAutoLevel extends javax.swing.JPanel implements IGUIEvent {
 
                         setProgress(100*i/cmds.size(), "~"+Tools.formatDuration(maxTime-cmd.getSecounds()));
 
-                        for(String execute:cmd.execute(new CNCCommand.Transform(0, 0, false, false),false))
+                        for(String execute:cmd.execute(new CNCCommand.Transform(0, 0, false, false),false,false))
                         {
                             while(true){
                                 waitfornexdSend();

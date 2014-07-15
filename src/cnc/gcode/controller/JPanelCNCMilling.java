@@ -12,6 +12,8 @@ import java.awt.Graphics2D;
 import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.RenderingHints;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.NoninvertibleTransformException;
 import java.awt.geom.Point2D;
@@ -204,7 +206,15 @@ public class JPanelCNCMilling extends javax.swing.JPanel implements IGUIEvent{
         initComponents();
 
         jLCNCCommands.setModel(new DefaultListModel());
-        
+        jLCNCCommands.addMouseListener(new MouseAdapter() {
+            public void mousePressed(MouseEvent e)
+            {
+                    if ( SwingUtilities.isRightMouseButton(e) )
+                    {
+                            jLCNCCommands.setSelectedIndex(jLCNCCommands.locationToIndex(e.getPoint()));
+                    }
+            }        
+        });
         NumberFildManipulator.IAxesEvent numberevent= new NumberFildManipulator.IAxesEvent() {
             @Override
             public void fired(NumberFildManipulator axis) {
@@ -273,11 +283,17 @@ public class JPanelCNCMilling extends javax.swing.JPanel implements IGUIEvent{
         jLoadFile.setEnabled(!isRunning());
         jBOptimise.setEnabled(cncloadedfile && !isRunning());
         jBMilling.setEnabled(!isworking && cncloadedfile);
+        jMIStart.setEnabled(!isworking && cncloadedfile);
         
-        if(serial)
-            jBMilling.setText("Milling");
+        if(serial){
+            jBMilling.setText("Milling");            
+            jMIStart.setText("Milling from here");            
+        }
         else
+        {
             jBMilling.setText("Export");
+            jMIStart.setText("Export form here");
+        }
         
         jBAbrote.setEnabled(isRunning());
         if(!isRunning()) 
@@ -320,6 +336,9 @@ public class JPanelCNCMilling extends javax.swing.JPanel implements IGUIEvent{
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
+        jMPcommand = new javax.swing.JPopupMenu();
+        jMIInfo = new javax.swing.JMenuItem();
+        jMIStart = new javax.swing.JMenuItem();
         jPPaint = new cnc.gcode.controller.JPPaintable();
         jPanel3 = new javax.swing.JPanel();
         jPanel5 = new javax.swing.JPanel();
@@ -353,6 +372,22 @@ public class JPanelCNCMilling extends javax.swing.JPanel implements IGUIEvent{
         jBPause = new javax.swing.JButton();
         jScrollPane5 = new javax.swing.JScrollPane();
         jLCNCCommands = new javax.swing.JList();
+
+        jMIInfo.setText("Info");
+        jMIInfo.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jMIInfoActionPerformed(evt);
+            }
+        });
+        jMPcommand.add(jMIInfo);
+
+        jMIStart.setText("Start here");
+        jMIStart.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jMIStartActionPerformed(evt);
+            }
+        });
+        jMPcommand.add(jMIStart);
 
         jPPaint.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseClicked(java.awt.event.MouseEvent evt) {
@@ -686,6 +721,8 @@ public class JPanelCNCMilling extends javax.swing.JPanel implements IGUIEvent{
             public int getSize() { return strings.length; }
             public Object getElementAt(int i) { return strings[i]; }
         });
+        jLCNCCommands.setComponentPopupMenu(jMPcommand);
+        jLCNCCommands.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
         jLCNCCommands.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseClicked(java.awt.event.MouseEvent evt) {
                 jLCNCCommandsMouseClicked(evt);
@@ -733,21 +770,22 @@ public class JPanelCNCMilling extends javax.swing.JPanel implements IGUIEvent{
         fireupdateGUI();
     }//GEN-LAST:event_jBAbroteActionPerformed
 
+    private void showInfors(int index){
+        if(index!=-1)
+        {
+            String[] lines=((CNCCommand)jLCNCCommands.getModel().getElementAt(index)).getInfos(new CNCCommand.Transform(positioningmove[0].getdsave(), positioningmove[1].getdsave(), jCBmirroX.isSelected(), jCBmirroY.isSelected()),jCBAutoLeveling.isSelected()).split("\n");
+
+            JList<String> list= new JList<>(lines);
+            JScrollPane sp= new JScrollPane(list);
+
+            JOptionPane.showMessageDialog(this,sp);
+        }
+    }
+    
     private void jLCNCCommandsMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jLCNCCommandsMouseClicked
         if(evt.getClickCount()==2)
         {
-            int index=jLCNCCommands.locationToIndex(evt.getPoint());
-            if(index!=-1)
-            {
-                String[] lines=((CNCCommand)jLCNCCommands.getModel().getElementAt(index)).getInfos(new CNCCommand.Transform(positioningmove[0].getdsave(), positioningmove[1].getdsave(), jCBmirroX.isSelected(), jCBmirroY.isSelected()),jCBAutoLeveling.isSelected()).split("\n");
-                
-                JList<String> list= new JList<>(lines);
-                JScrollPane sp= new JScrollPane(list);
-                
-                JOptionPane.showMessageDialog(this,sp);
-                
-                
-            }
+            showInfors(jLCNCCommands.locationToIndex(evt.getPoint()));
         }
     }//GEN-LAST:event_jLCNCCommandsMouseClicked
 
@@ -786,10 +824,26 @@ public class JPanelCNCMilling extends javax.swing.JPanel implements IGUIEvent{
         jLCNCCommands.ensureIndexIsVisible(jLCNCCommands.getSelectedIndex());
     }//GEN-LAST:event_jPPaintMouseClicked
 
-    private void jBMillingActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jBMillingActionPerformed
+    private void executeCNC(int istart){
+        
         final boolean serial=Communication.isConnected();
-        final CNCCommand[] cmds= new CNCCommand[jLCNCCommands.getModel().getSize()];
-        ((DefaultListModel<CNCCommand>)jLCNCCommands.getModel()).copyInto(cmds);
+        final CNCCommand[] cmds;
+        
+        CNCCommand[] cmds_= new CNCCommand[jLCNCCommands.getModel().getSize()];
+        ((DefaultListModel<CNCCommand>)jLCNCCommands.getModel()).copyInto(cmds_);
+        if(istart>0)
+        {
+            //Skipp all to istart (expect start command (index 0)
+             cmds=new CNCCommand[cmds_.length-istart+1];
+             cmds[0]=cmds_[0]; //Compy home
+             for(int i=1;i<cmds.length;i++){
+                 cmds[i]=cmds_[i+istart-1];
+             }
+        }
+        else
+        {
+             cmds= cmds_;
+        }
 
         PrintWriter temp=null;
         if (!serial)
@@ -843,7 +897,7 @@ public class JPanelCNCMilling extends javax.swing.JPanel implements IGUIEvent{
                     if(!serial)
                         export.println(";"+cmd.toString());
                     
-                    for(String execute:cmd.execute(t,jCBAutoLeveling.isSelected()))
+                    for(String execute:cmd.execute(t,jCBAutoLeveling.isSelected(),i==1))
                     {
                         while(true)
                         {
@@ -911,8 +965,9 @@ public class JPanelCNCMilling extends javax.swing.JPanel implements IGUIEvent{
 
                 if(jCBScroll.isSelected())
                 {
-                    jLCNCCommands.setSelectedValue(cmd,false);
- 
+                    layers.blocknextIndexSet();
+                    jLCNCCommands.setSelectedValue(cmd,false); 
+                    
                     int index=jLCNCCommands.getSelectedIndex();
                     layers.setSelectedRange(0, index);                
                 
@@ -932,6 +987,11 @@ public class JPanelCNCMilling extends javax.swing.JPanel implements IGUIEvent{
         worker.execute();
 
         fireupdateGUI();
+    }
+    
+    
+    private void jBMillingActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jBMillingActionPerformed
+        executeCNC(0);
     }//GEN-LAST:event_jBMillingActionPerformed
     
     private void jLoadFileActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jLoadFileActionPerformed
@@ -1161,6 +1221,18 @@ public class JPanelCNCMilling extends javax.swing.JPanel implements IGUIEvent{
         painter.trigger();
     }//GEN-LAST:event_jPPaintMouseDragged
 
+    private void jMIInfoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMIInfoActionPerformed
+        showInfors(jLCNCCommands.getSelectedIndex());
+    }//GEN-LAST:event_jMIInfoActionPerformed
+
+    private void jMIStartActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMIStartActionPerformed
+        int index =jLCNCCommands.getSelectedIndex();
+        if(index==-1)
+            JOptionPane.showMessageDialog(this, "No position Selected");
+        else
+            executeCNC(index);
+    }//GEN-LAST:event_jMIStartActionPerformed
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton jBAbrote;
     private javax.swing.JButton jBMilling;
@@ -1184,6 +1256,9 @@ public class JPanelCNCMilling extends javax.swing.JPanel implements IGUIEvent{
     private javax.swing.JLabel jLabel8;
     private javax.swing.JLabel jLabel9;
     private javax.swing.JButton jLoadFile;
+    private javax.swing.JMenuItem jMIInfo;
+    private javax.swing.JMenuItem jMIStart;
+    private javax.swing.JPopupMenu jMPcommand;
     private javax.swing.JProgressBar jPBar;
     private cnc.gcode.controller.JPPaintable jPPaint;
     private javax.swing.JPanel jPanel1;

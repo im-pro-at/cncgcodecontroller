@@ -27,16 +27,16 @@ public enum Communication {
 
         @Override
         protected void internal_connect() throws MyException,InterruptedException{
-            //try 2 times to get answare:
-            for (int t=0;t<2;t++){
+            //try 3 times to get answare:
+            for (int t=0;t<3;t++){
                 internal_reset();
 
                 //Send M110 to reset checksum
                 internal_send("M110");
                 doSendEvent("M110");
 
-                //2 secound Timout for answer
-                for (int i=0;i<20;i++){
+                //5 secound Timout for answer
+                for (int i=0;i<50;i++){
                     Communication.class.wait(100);       //give data the possibility  to enter internal_receive!
                     if(!core.isConnected())
                         throw new MyException("Lost connection! ("+status+")");

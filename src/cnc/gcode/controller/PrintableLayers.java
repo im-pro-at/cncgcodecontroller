@@ -90,6 +90,7 @@ public class PrintableLayers {
     private Double[] keys = new Double[0];
     private HashSet<Integer> sindex = new HashSet<>();
     private int smin=-1,smax=-1;
+    boolean isblocked=false;
 
     public void processMoves(int index, CNCCommand.Move[] moves) {
         for (CNCCommand.Move move : moves) {
@@ -142,7 +143,15 @@ public class PrintableLayers {
         return slayers;
     }
 
+    public void blocknextIndexSet(){
+        isblocked=true;
+    }
+    
     public void setSelectedIndexs(int[] selectedIndices) {
+        if(isblocked){
+            isblocked=false;
+            return;
+        }
         HashSet<Integer> hashmap = new HashSet<>(selectedIndices.length);
         for (int i : selectedIndices) 
             hashmap.add(i);
@@ -152,6 +161,10 @@ public class PrintableLayers {
     
     public void setSelectedRange(int start, int stop)
     {
+        if(isblocked){
+            isblocked=false;
+            return;
+        }
         this.sindex=null;
         this.smin=start;
         this.smax=stop;

@@ -149,7 +149,7 @@ public class CNCGCodeController {
                 CNCCommand cmd=cmds.get(i);
                 export.println(";"+cmd.toString());
 
-                for(String execute:cmd.execute(t,false))
+                for(String execute:cmd.execute(t,false,false))
                 {
                     export.println(execute);
                 }

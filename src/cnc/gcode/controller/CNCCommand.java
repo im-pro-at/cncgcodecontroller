@@ -630,7 +630,7 @@ public class CNCCommand {
         return moves.toArray(new Move[0]);
     }
 
-    String[] execute(Transform t, boolean autoleveling) {
+    String[] execute(Transform t, boolean autoleveling, boolean noshort) {
         ArrayList<String> cmds= new ArrayList<>();
         String cmd;
         switch(type)
@@ -644,7 +644,7 @@ public class CNCCommand {
                 //Do Repositoning
                 for(Move move:moves)
                 {
-                    for(int i=0;i<2;i++)
+                    for(int i=0;i<2;i++) //X,Y,Z
                     {
                         move.s[i]=t.t(i,move.s[i]);
                         move.e[i]=t.t(i,move.e[i]);
@@ -727,7 +727,7 @@ public class CNCCommand {
                     boolean domove=false;
                     //Cordinates
                     for(int i=0;i<3;i++)
-                        if(move.s[i]!=move.e[i] && !Double.isNaN(move.e[i]))
+                        if((move.s[i]!=move.e[i] || noshort) && !Double.isNaN(move.e[i]))
                         {
                             //Normal Axis
                             cmd+=" "+CommandParsing.axesName[i]+Tools.dtostr(move.e[i]);
@@ -737,7 +737,7 @@ public class CNCCommand {
                         continue;
                     
                     //Feedrate
-                    if((cin.lastMovetype!=type || (!Double.isNaN(cin.axes[3]) && !Double.isNaN(cout.axes[3]) && cin.axes[3]!=cout.axes[3])) && !feedRateSet)
+                    if((noshort || cin.lastMovetype!=type || (!Double.isNaN(cin.axes[3]) && !Double.isNaN(cout.axes[3]) && cin.axes[3]!=cout.axes[3])) && !feedRateSet)
                     {
                         if(type==Type.G0)
                             cmd+=" "+CommandParsing.axesName[3]+Database.GOFEEDRATE.get();
@@ -817,7 +817,7 @@ public class CNCCommand {
                 "  Parser:  "+p+"\n"+
                 "  Contex:  "+cin+"\n"+
                 "  Execute: ";
-        for(String cmd:execute(t,autoleveling))
+        for(String cmd:execute(t,autoleveling,false))
             s+="\n            --> "+cmd;
         
         return s;
