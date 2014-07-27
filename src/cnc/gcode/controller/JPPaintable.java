@@ -35,9 +35,11 @@ public class JPPaintable extends javax.swing.JPanel {
     
     void firePaintEvent(JPPaintableEvent evt) {
         Object[] listeners = listenerList.getListenerList();
-        for (int i = 0; i < listeners.length; i = i+2) {
-            if (listeners[i] == JPPaintableListener.class) {
-                ((JPPaintableListener) listeners[i+1]).paintComponent(evt);
+        for (int i = 0; i < listeners.length; i = i + 2) 
+        {
+            if (listeners[i] == JPPaintableListener.class) 
+            {
+                ((JPPaintableListener) listeners[i + 1]).paintComponent(evt);
             }
         }
     }
@@ -54,12 +56,14 @@ public class JPPaintable extends javax.swing.JPanel {
     @Override
     public void repaint(){
         if(repaintEnable)
+        {
             super.repaint();
+        }
     }
     
     /**Stops the repaint for this element (When value is ture a repaint is triggered!) */
     public void setRepaintEnable(boolean value){
-        repaintEnable=value;
+        repaintEnable = value;
         repaint();
     }
     

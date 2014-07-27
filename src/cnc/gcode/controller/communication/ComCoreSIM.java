@@ -12,7 +12,7 @@ import javax.swing.SwingUtilities;
  */
 public class ComCoreSIM extends AComCore{
     
-    public ComCoreSIM(IResivedLines resivedlines, IDisconnect disconnect) {
+    public ComCoreSIM(IReceivedLines resivedlines, IDisconnect disconnect) {
         super(resivedlines, disconnect);
     }
 
@@ -26,7 +26,7 @@ public class ComCoreSIM extends AComCore{
         SwingUtilities.invokeLater(new Runnable() {
             @Override
             public void run() {
-                internal_receivedEvent(new String[]{"ok command: "+line});
+                internal_receivedEvent(new String[]{"ok command: " + line});
             }
         });
     }

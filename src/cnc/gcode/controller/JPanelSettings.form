@@ -41,7 +41,7 @@
                       <Group type="103" groupAlignment="0" attributes="0">
                           <Component id="jBSWorkSpace" alignment="0" min="-2" max="-2" attributes="0"/>
                           <Component id="jBSFastFeedrate" alignment="0" min="-2" max="-2" attributes="0"/>
-                          <Component id="jBSHomeing" alignment="0" min="-2" max="-2" attributes="0"/>
+                          <Component id="jBSHoming" alignment="0" min="-2" max="-2" attributes="0"/>
                           <Component id="jBSCNCStart" alignment="0" min="-2" max="-2" attributes="0"/>
                           <Component id="jBSCNCToolChange" alignment="0" min="-2" max="-2" attributes="0"/>
                           <Component id="jBSCNCSpindleON" alignment="0" min="-2" max="-2" attributes="0"/>
@@ -102,7 +102,7 @@
           <Group type="102" alignment="0" attributes="0">
               <EmptySpace min="-2" pref="10" max="-2" attributes="0"/>
               <Group type="103" groupAlignment="3" attributes="0">
-                  <Component id="jBSHomeing" alignment="3" min="-2" max="-2" attributes="0"/>
+                  <Component id="jBSHoming" alignment="3" min="-2" max="-2" attributes="0"/>
                   <Component id="jLabel2" alignment="3" min="-2" max="-2" attributes="0"/>
                   <Component id="jLSHomeing" alignment="3" min="-2" max="-2" attributes="0"/>
               </Group>
@@ -215,10 +215,10 @@
   <SubComponents>
     <Component class="javax.swing.JLabel" name="jLabel2">
       <Properties>
-        <Property name="text" type="java.lang.String" value="Homeing:"/>
+        <Property name="text" type="java.lang.String" value="Homing:"/>
       </Properties>
     </Component>
-    <Component class="javax.swing.JButton" name="jBSHomeing">
+    <Component class="javax.swing.JButton" name="jBSHoming">
       <Properties>
         <Property name="text" type="java.lang.String" value="Change"/>
       </Properties>
@@ -377,7 +377,7 @@
     </Component>
     <Component class="javax.swing.JLabel" name="jLabel39">
       <Properties>
-        <Property name="text" type="java.lang.String" value="CNC/Optimise Time:"/>
+        <Property name="text" type="java.lang.String" value="CNC/Optimize Time:"/>
       </Properties>
     </Component>
     <Component class="javax.swing.JButton" name="jBSCNCOptimiserTime">
@@ -449,7 +449,7 @@
     </Component>
     <Component class="javax.swing.JLabel" name="jLabel40">
       <Properties>
-        <Property name="text" type="java.lang.String" value="ARC/ Max Sigment Length:"/>
+        <Property name="text" type="java.lang.String" value="ARC/ Max Segment Length:"/>
       </Properties>
     </Component>
     <Component class="javax.swing.JButton" name="jBSARC">

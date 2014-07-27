@@ -37,8 +37,8 @@ class NumberFildManipulator {
     private final IAxesEvent event;
 
     public NumberFildManipulator(JComponent element, IAxesEvent event) {
-        this.element = element;
-        this.event = event;
+        this.element    = element;
+        this.event      = event;
         FocusAdapter f = new FocusAdapter() {
             @Override
             public void focusLost(FocusEvent e) {
@@ -47,10 +47,12 @@ class NumberFildManipulator {
 
             @Override
             public void focusGained(FocusEvent e) {
-                if (e.getSource() instanceof JComboBox) {
+                if (e.getSource() instanceof JComboBox) 
+                {
                     ((JComboBox) e.getSource()).getEditor().selectAll();
                 }
-                if (e.getSource() instanceof JTextField) {
+                if (e.getSource() instanceof JTextField) 
+                {
                     ((JTextField) e.getSource()).selectAll();
                 }
             }
@@ -58,44 +60,59 @@ class NumberFildManipulator {
         KeyListener k = new KeyAdapter() {
             @Override
             public void keyReleased(KeyEvent e) {
-                if (e.getKeyCode() == KeyEvent.VK_ENTER) {
+                if (e.getKeyCode() == KeyEvent.VK_ENTER) 
+                {
                     NumberFildManipulator.this.event.fired(NumberFildManipulator.this);
                 }
             }
         };
-        if (element instanceof JComboBox) {
+        if (element instanceof JComboBox) 
+        {
             ((JComboBox) element).getEditor().getEditorComponent().addFocusListener(f);
             ((JComboBox) element).getEditor().getEditorComponent().addKeyListener(k);
-        } else {
+        } else 
+        {
             element.addFocusListener(f);
             element.addKeyListener(k);
         }
     }
 
-    public void setFocus() {
+    public void setFocus() 
+    {
         element.requestFocusInWindow();
     }
 
-    public void dispatchEvent() {
+    public void dispatchEvent() 
+    {
         event.fired(this);
     }
 
     public void set(String text) {
-        if (element instanceof JTextField) {
+        if (element instanceof JTextField) 
+        {
             ((JTextField) element).setText(text);
-        } else if (element instanceof JComboBox) {
+        } 
+        else if (element instanceof JComboBox) 
+        {
             ((JComboBox) element).setSelectedItem(text);
-        } else {
+        } 
+        else 
+        {
             throw new UnsupportedOperationException("Not yet implemented");
         }
     }
 
     public String get() {
-        if (element instanceof JTextField) {
+        if (element instanceof JTextField) 
+        {
             return ((JTextField) element).getText();
-        } else if (element instanceof JComboBox) {
+        } 
+        else if (element instanceof JComboBox) 
+        {
             return ((JComboBox) element).getSelectedItem().toString();
-        } else {
+        } 
+        else 
+        {
             throw new UnsupportedOperationException("Not yet implemented");
         }
     }
@@ -114,7 +131,9 @@ class NumberFildManipulator {
     public Double getdsave() {
         try {
             return Tools.strtod(get());
-        } catch (ParseException ex) {
+        } 
+        catch (ParseException ex) 
+        {
             return 0.0;
         }
     }

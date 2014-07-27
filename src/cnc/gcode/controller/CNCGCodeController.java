@@ -49,48 +49,48 @@ public class CNCGCodeController {
 
             //Load data:
             File fin= new File(args[1]);
-            if(!fin.exists())
+            if(fin.exists() == false)
             {
                 System.out.println("inout file does not exist!");
                 System.exit(1);
             }
-            if(!fin.canRead())
+            if(fin.canRead() == false)
             {
                 System.out.println("inout file not readable!");
                 System.exit(1);
             }
-            File fout= new File(args[2]);
+            File fout = new File(args[2]);
             Database.OPTIMISATIONTIMEOUT.set(""+Integer.parseInt(args[3]));
             double movex = Double.parseDouble(args[4]);
             double movey = Double.parseDouble(args[5]);
             boolean mirrorx = Boolean.parseBoolean(args[6]);
             boolean mirrory = Boolean.parseBoolean(args[7]);
-            Database.BL0.set(""+Double.parseDouble(args[8]));
-            Database.BL1.set(""+Double.parseDouble(args[9]));
-            Database.BL2.set(""+Double.parseDouble(args[10]));
+            Database.BL0.set("" + Double.parseDouble(args[8]));
+            Database.BL1.set("" + Double.parseDouble(args[9]));
+            Database.BL2.set("" + Double.parseDouble(args[10]));
 
             //Load File
             System.out.println("Loading file ...");
-            CNCCommand.Calchelper c= new CNCCommand.Calchelper();
-            ArrayList<CNCCommand> cmds= new ArrayList<>();
+            CNCCommand.Calchelper c = new CNCCommand.Calchelper();
+            ArrayList<CNCCommand> cmds = new ArrayList<>();
 
             String line;
-            int warings=0;
-            int errors=0;
-            int linenumber=0;
+            int warings     = 0;
+            int errors      = 0;
+            int linenumber  = 0;
             
             try (BufferedReader br = new BufferedReader(new FileReader(fin))) {
                 while((line = br.readLine() )!=null)
                 {
                     linenumber++;
-                    CNCCommand command= new CNCCommand(line);
-                    CNCCommand.State t=command.calcCommand(c);
-                    if(t==CNCCommand.State.WARNING)
+                    CNCCommand command  = new CNCCommand(line);
+                    CNCCommand.State t  = command.calcCommand(c);
+                    if(t == CNCCommand.State.WARNING)
                     {
-                        System.out.println(args[1] + ":" + linenumber + ":  WARING: "+command.getMessage());
+                        System.out.println(args[1] + ":" + linenumber + ":  WARNING: "+command.getMessage());
                         warings++;
                     }
-                    if(t==CNCCommand.State.ERROR)
+                    if(t == CNCCommand.State.ERROR)
                     {
                         System.out.println(args[1] + ":" + linenumber + ":  ERROR: "+command.getMessage());
                         errors++;
@@ -98,17 +98,17 @@ public class CNCGCodeController {
                     cmds.add(command);
                 }
             }
-            double maxTime=c.secounds;
-            System.out.println("File loaded with "+warings+" Warnings and "+errors+" Errors!");
+            double maxTime = c.seconds;
+            System.out.println("File loaded with "+warings+" Warnings and " + errors + " Errors!");
             
             //Optimize
-            CNCCommand.Optimiser o= new CNCCommand.Optimiser(new CNCCommand.Optimiser.IProgress() {
-                    String lastmessage="";
+            CNCCommand.Optimiser o = new CNCCommand.Optimiser(new CNCCommand.Optimiser.IProgress() {
+                    String lastmessage = "";
                     @Override
                     public void publish(String message, int progess) throws MyException {
-                        if(!lastmessage.equals(message))
+                        if(lastmessage.equals(message) == false)
                         {
-                            lastmessage=message;
+                            lastmessage = message;
                             System.out.println(message);
                         }
                     }
@@ -116,38 +116,42 @@ public class CNCGCodeController {
 
             try {
                 //Not much to do the CNCOpimiser does all the work :-)
-                cmds=o.execute(cmds);
+                cmds  = o.execute(cmds);
             } catch (MyException ex) {
                 System.out.println(ex.getMessage());
                 System.exit(1);
             }
 
             //Process new comands
-            System.out.println("Process new comands ...");
-            c= new CNCCommand.Calchelper();
-            warings=0;
-            errors=0;
-            for(int i=0;i<cmds.size();i++)
+            System.out.println("Processing new comands ...");
+            c = new CNCCommand.Calchelper();
+            warings = 0;
+            errors  = 0;
+            for(int i = 0;i < cmds.size();i++)
             {
-                CNCCommand command=cmds.get(i);
-                CNCCommand.State t=command.calcCommand(c);
-                if(t==CNCCommand.State.WARNING)
+                CNCCommand command  = cmds.get(i);
+                CNCCommand.State t  = command.calcCommand(c);
+                if(t == CNCCommand.State.WARNING)
+                {
                     warings++;
-                if(t==CNCCommand.State.ERROR)
+                }
+                if(t == CNCCommand.State.ERROR)
+                {
                     errors++;
+                }
             }
             
-            System.out.println("Optimized! Saved time: "+Tools.formatDuration((long)(maxTime-c.secounds)) +"! \nCommands now have "+warings+" Warnings and "+errors+" Errors!");
+            System.out.println("Optimized! Saved time: " + Tools.formatDuration((long)(maxTime-c.seconds)) + "! \nCommands now have " + warings + " Warnings and " + errors + " Errors!");
 
             //Process new comands
-            System.out.println("Export comands ...");
-            PrintWriter export=new PrintWriter(fout);
-            CNCCommand.Transform t= new CNCCommand.Transform(movex, movey, mirrorx, mirrory);            
+            System.out.println("Export commands ...");
+            PrintWriter export = new PrintWriter(fout);
+            CNCCommand.Transform t = new CNCCommand.Transform(movex, movey, mirrorx, mirrory);            
 
-            for(int i=0;i<cmds.size();i++)
+            for(int i = 0;i < cmds.size();i++)
             {
-                CNCCommand cmd=cmds.get(i);
-                export.println(";"+cmd.toString());
+                CNCCommand cmd = cmds.get(i);
+                export.println(";" + cmd.toString());
 
                 for(String execute:cmd.execute(t,false,false))
                 {

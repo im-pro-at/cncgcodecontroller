@@ -17,25 +17,30 @@ import java.util.logging.Logger;
 //Core for kommunikation
 
 class ComCoreNRSerialPort extends AComCore {
-    private final NRSerialPort sp;
-    private final InputStream is;
-    private final OutputStream os;
-    private final Timer resivetimer;
+    private final NRSerialPort serialPort;
+    private final InputStream inputStream;
+    private final OutputStream outputStream;
+    private final Timer receiveTimer;
 
-    private String lastserialstring="";
+    private String lastSerialString = "";
     
-    public ComCoreNRSerialPort(IResivedLines resivedlines, IDisconnect disconnect, String port, int speed) throws Exception {
-        super(resivedlines, disconnect);
+    public ComCoreNRSerialPort(IReceivedLines received_lines,
+                                IDisconnect disconnect,
+                                String port,
+                                int speed) throws Exception 
+    {
+        super(received_lines, disconnect);
         
-        sp = new NRSerialPort(port, speed);
+        serialPort = new NRSerialPort(port, speed);
         
-        if (sp.connect() == false) {
+        if (serialPort.connect() == false) 
+        {
             throw new Exception("Cannot connect to selected port!");
         }
-        is = sp.getInputStream();
-        os = sp.getOutputStream();
+        inputStream     = serialPort.getInputStream();
+        outputStream    = serialPort.getOutputStream();
         
-        resivetimer = new Timer() {
+        receiveTimer = new Timer() {
             {
                 this.schedule(new TimerTask() {
                     @Override
@@ -52,7 +57,7 @@ class ComCoreNRSerialPort extends AComCore {
             String input = "";
 
             while (true) {
-                int c = is.read();
+                int c = inputStream.read();
                 if (c != -1) {
                     input = input + ((char) c);
                 } else {
@@ -60,23 +65,30 @@ class ComCoreNRSerialPort extends AComCore {
                 }
             }
 
-            ArrayList<String> inputs= new ArrayList<>();
+            ArrayList<String> inputs = new ArrayList<>();
             inputs.add("");
             for(char c:input.toCharArray())
             {
-                if ((c=='\n')||(c=='\r'))
+                if ((c == '\n')||(c == '\r'))
+                {
                     inputs.add("");
+                }
                 else
-                    inputs.set(inputs.size()-1, inputs.get(inputs.size()-1)+c);
+                {
+                    inputs.set(inputs.size() - 1, inputs.get(inputs.size() - 1) + c);
+                }
             }
 
-            inputs.set(0,lastserialstring+inputs.get(0));
-            lastserialstring= inputs.get(inputs.size()-1);  
+            inputs.set(0,lastSerialString+inputs.get(0));
+            lastSerialString = inputs.get(inputs.size()-1);  
             
-            if(inputs.size()>1){
-                final String[] lines= new String[inputs.size()-1];
-                for(int i=0; i < inputs.size()-1;i++)
-                    lines[i]=inputs.get(i);
+            if(inputs.size()>1)
+            {
+                final String[] lines = new String[inputs.size()-1];
+                for(int i = 0; i < inputs.size() - 1;i++)
+                {
+                    lines[i] = inputs.get(i);
+                }
                 internal_receivedEvent(lines);
             }
         } catch (Exception ex) {
@@ -89,9 +101,11 @@ class ComCoreNRSerialPort extends AComCore {
     @Override
     public void send(String line) {
         if(!line.endsWith("\n"))
-            line+="\n";
+        {
+            line += "\n";
+        }
         try {
-            os.write((line).getBytes());
+            outputStream.write((line).getBytes());
         } catch (Exception ex) {
             internal_disconnectedEvent("Communication Error! (" + ex + ")");
             internal_discharge();
@@ -107,10 +121,12 @@ class ComCoreNRSerialPort extends AComCore {
 
     @Override
     public void internal_discharge() {
-        resivetimer.cancel();
+        receiveTimer.cancel();
         try {
-            if(sp.isConnected())
-                sp.disconnect();
+            if(serialPort.isConnected())
+            {
+                serialPort.disconnect();
+            }
         } catch (Exception ex) {
             Logger.getLogger(ComCoreNRSerialPort.class.getName()).log(Level.SEVERE, null, ex);
         }

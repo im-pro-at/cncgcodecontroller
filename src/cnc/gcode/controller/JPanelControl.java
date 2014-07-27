@@ -6,7 +6,7 @@ package cnc.gcode.controller;
 
 import cnc.gcode.controller.communication.ComInterruptException;
 import cnc.gcode.controller.communication.Communication;
-import cnc.gcode.controller.communication.IResivedLines;
+import cnc.gcode.controller.communication.IReceivedLines;
 import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Graphics;
@@ -38,16 +38,16 @@ public class JPanelControl extends javax.swing.JPanel implements IGUIEvent{
         double axes[][] = new double[4][2];
 
         public PrintableElement() {
-            arc=JPanelControl.this.jCBarc.isSelected();
-            ccw=JPanelControl.this.jCBarcCCW.isSelected();
+            arc = JPanelControl.this.jCBarc.isSelected();
+            ccw = JPanelControl.this.jCBarcCCW.isSelected();
             diameter=JPanelControl.this.axes[4][0].getdsave();
-            for(int i=0;i<2;i++)
+            for(int i = 0;i < 2;i++)
             {
-                axes[i][0]=JPanelControl.this.axes[i][0].getdsave();
-                axes[i][1]=JPanelControl.this.axes[i][2].getdsave();
+                axes[i][0] = JPanelControl.this.axes[i][0].getdsave();
+                axes[i][1] = JPanelControl.this.axes[i][2].getdsave();
             }
-            axes[2][0]=JPanelControl.this.axes[3][0].getdsave();
-            axes[2][1]=JPanelControl.this.axes[3][1].getdsave();
+            axes[2][0] = JPanelControl.this.axes[3][0].getdsave();
+            axes[2][1] = JPanelControl.this.axes[3][1].getdsave();
         }
 
         public void print(Graphics2D g, Point point, double scale) {
@@ -55,37 +55,41 @@ public class JPanelControl extends javax.swing.JPanel implements IGUIEvent{
             if(arc)
             {
                 //arc
-                double r= Math.hypot(axes[2][0], axes[2][1]);
-                double xc= axes[0][0]+axes[2][0];
-                double yc= axes[1][0]+axes[2][1];
+                double r    = Math.hypot(axes[2][0], axes[2][1]);
+                double xc   = axes[0][0]+axes[2][0];
+                double yc   = axes[1][0]+axes[2][1];
                 
                 //Check equi-distant
-                double d1=Geometrics.getdistance(xc, yc, axes[0][0], axes[1][0]);
-                double d2=Geometrics.getdistance(xc, yc, axes[0][1], axes[1][1]);
+                double d1   = Geometrics.getDistance(xc, yc, axes[0][0], axes[1][0]);
+                double d2   = Geometrics.getDistance(xc, yc, axes[0][1], axes[1][1]);
             
-                if(!Geometrics.doubleequals(d1, d2, 0.001))
+                if(!Geometrics.doubleEquals(d1, d2, 0.001))
                 {
                     //Center of ARC is not equi-distant!
                     g.setStroke(new BasicStroke(1));
                     g.setColor(Color.red);
-                    g.drawLine(point.x + (int)(xc*scale), point.y +(int)(yc*scale), point.x +(int)(axes[0][0]*scale), point.y +(int)(axes[1][0]*scale));
-                    g.drawLine(point.x + (int)(xc*scale), point.y +(int)(yc*scale), point.x +(int)(axes[0][1]*scale), point.y +(int)(axes[1][1]*scale));
+                    g.drawLine(point.x + (int)(xc * scale), point.y + (int)(yc * scale), point.x +(int)(axes[0][0] * scale), point.y + (int)(axes[1][0] * scale));
+                    g.drawLine(point.x + (int)(xc * scale), point.y + (int)(yc * scale), point.x +(int)(axes[0][1] * scale), point.y + (int)(axes[1][1] * scale));
                     g.setColor(Color.red);
-                    g.fillArc(point.x + (int)(xc*scale)-4, point.y +(int)(yc*scale)-4, 8, 8, 0, 360);
+                    g.fillArc(point.x + (int)(xc * scale) - 4, point.y +(int)(yc * scale) - 4, 8, 8, 0, 360);
                     g.setColor(Color.black);
-                    g.fillArc(point.x + (int)(axes[0][0]*scale)-2, point.y +(int)(axes[1][0]*scale)-2, 4, 4, 0, 360);
-                    g.fillArc(point.x + (int)(axes[0][1]*scale)-2, point.y +(int)(axes[1][1]*scale)-2, 4, 4, 0, 360);
+                    g.fillArc(point.x + (int)(axes[0][0] * scale) - 2, point.y +(int)(axes[1][0] * scale)-2, 4, 4, 0, 360);
+                    g.fillArc(point.x + (int)(axes[0][1] * scale) - 2, point.y +(int)(axes[1][1] * scale)-2, 4, 4, 0, 360);
                 }
                 else
                 {
-                    int as = (int) (180/Math.PI*Math.atan2(yc-axes[1][0], axes[0][0]-xc));
-                    int ae = (int) (180/Math.PI*Math.atan2(yc-axes[1][1], axes[0][1]-xc));
-//                    int oas=as;
-//                    int oae=ae;
-                    if(as<0)
-                        as=360+as;
-                    if(ae<0)
-                        ae=360+ae;
+                    int as = (int) (180 / Math.PI * Math.atan2(yc - axes[1][0], axes[0][0] - xc));
+                    int ae = (int) (180 / Math.PI * Math.atan2(yc - axes[1][1], axes[0][1] - xc));
+//                    int oas = as;
+//                    int oae = ae;
+                    if(as < 0)
+                    {
+                        as = 360 + as;
+                    }
+                    if(ae < 0)
+                    {
+                        ae = 360 + ae;
+                    }
 /*                
                     g.drawRect(point.x + (int)((xc - r)*scale),point.y +(int)((yc - r)*scale), (int)(2*r*scale), (int)(2*r*scale));
                     g.drawRect(point.x + (int)(xc*scale),point.y +(int)(yc*scale),10,10);
@@ -94,36 +98,42 @@ public class JPanelControl extends javax.swing.JPanel implements IGUIEvent{
                     g.drawRect(point.x + (int)(axes[0][1]*scale),point.y +(int)(axes[1][1]*scale),10,10);
                     g.drawString("e", point.x + (int)(axes[0][1]*scale),point.y +(int)(axes[1][1]*scale));
 */                
-                    int a=as-ae;
-                    if(a<0)
-                        a=360+a;
+                    int a = as - ae;
+                    if(a < 0)
+                    {
+                        a = 360 + a;
+                    }
 //                    int oa=a;
 
                     //Calc mirroring + ccw
-                    switch(Integer.parseInt(Database.get(Database.HOMEING)))
+                    switch(Integer.parseInt(Database.get(Database.HOMING)))
                     {
                         case 0:
                         case 3:
                             if(ccw)
-                                a=a-360;
+                            {
+                                a = a - 360;
+                            }
                             break;
                         default:
                             if(!ccw)
-                                a=a-360;
+                            {
+                                a = a - 360;
+                            }
                             break;
                     }
 
 //                  MainForm.this.setTitle("a="+a+" as="+as+" ae="+ae+" oa="+oa+" oas="+oas+" oae="+oae);
                 
-                    g.drawArc(point.x + (int)((xc - r)*scale),point.y +(int)((yc - r)*scale), (int)(2*r*scale), (int)(2*r*scale), as,0-a);
+                    g.drawArc(point.x + (int)((xc - r) * scale),point.y + (int)((yc - r) * scale), (int)(2 * r * scale), (int)(2 * r * scale), as,0 - a);
                 }
             }
             else
             {
                 //Line
-                GeneralPath line= new GeneralPath();
-                line.moveTo(point.x+axes[0][0]*scale, point.y+axes[1][0]*scale);
-                line.lineTo(point.x+axes[0][1]*scale, point.y+axes[1][1]*scale);
+                GeneralPath line = new GeneralPath();
+                line.moveTo(point.x + axes[0][0] * scale, point.y + axes[1][0] * scale);
+                line.lineTo(point.x + axes[0][1] * scale, point.y + axes[1][1] * scale);
                 g.draw(line);
             }
         }
@@ -132,9 +142,9 @@ public class JPanelControl extends javax.swing.JPanel implements IGUIEvent{
     }
     
     NumberFildManipulator[][] axes;
-    ArrayList<PrintableElement> printList= new ArrayList<>();
+    ArrayList<PrintableElement> printList = new ArrayList<>();
 
-    boolean pharsnextserial=false;
+    boolean parseNextSerial = false;
     
     
     /**
@@ -151,7 +161,7 @@ public class JPanelControl extends javax.swing.JPanel implements IGUIEvent{
             }
         };
 
-        axes= new NumberFildManipulator[][]   {
+        axes = new NumberFildManipulator[][]   {
                                         /*0*/    {new NumberFildManipulator(jTFXa,event),new NumberFildManipulator(jTFXd,event),new NumberFildManipulator(jTFXn,event)},
                                         /*1*/    {new NumberFildManipulator(jTFYa,event),new NumberFildManipulator(jTFYd,event),new NumberFildManipulator(jTFYn,event)},
                                         /*2*/    {new NumberFildManipulator(jTFZa,event),new NumberFildManipulator(jTFZd,event),new NumberFildManipulator(jCBZn,event)},
@@ -160,41 +170,44 @@ public class JPanelControl extends javax.swing.JPanel implements IGUIEvent{
                                         /*5*/    {new NumberFildManipulator(jCBfeedrate,event)} //Feedrate
                                         };
         for(NumberFildManipulator[] axe:axes)
+        {
             for(NumberFildManipulator field:axe)
+            {
                 field.set(0.0);
-        
+            }
+        }
         axes[5][0].set(Database.MAXFEEDRATE.getsaved()/10);
 
         
-       Communication.addResiveEvent(new IResivedLines() {
+       Communication.addResiveEvent(new IReceivedLines() {
             @Override
-            public void resived(String[] lines) {
+            public void received(String[] lines) {
                 for(String line: lines)
                 {
-                    if(pharsnextserial)
+                    if(parseNextSerial)
                     {
-                        pharsnextserial=false;
-                        String in=line;
-                        Double[] values= new Double[3];
-                        for(int j=0;j<3;j++)
+                        parseNextSerial = false;
+                        String in   = line;
+                        Double[] values = new Double[3];
+                        for(int j = 0;j < 3;j++)
                         {
-                            int pos =in.indexOf(""+CommandParsing.axesName[j]+":");
-                            if(pos==-1)
+                            int pos = in.indexOf( "" + CommandParsing.axesName[j] + ":");
+                            if(pos == -1)
                             {
-                                values=null;
+                                values = null;
                                 break;
                             }
                             try {
-                                String temp=in.substring(pos+2);
+                                String temp = in.substring(pos+2);
                                 values[j]= Tools.strtod(temp);
                             } catch (ParseException ex) {
-                                values=null;
+                                values = null;
                                 break;
                             }
                         }
-                        if(values!= null)
+                        if(values != null)
                         {
-                            for(int j=0;j<3;j++)
+                            for(int j = 0;j < 3;j++)
                             {
                                 axes[j][0].set(values[j]);  
                                 axes[j][0].dispatchEvent();
@@ -203,7 +216,7 @@ public class JPanelControl extends javax.swing.JPanel implements IGUIEvent{
                         }
                         else
                         {
-                            JOptionPane.showMessageDialog(JPanelControl.this, "Error reading Position");
+                            JOptionPane.showMessageDialog(JPanelControl.this, "Error reading position");
                        }
                     }
                 }
@@ -224,7 +237,7 @@ public class JPanelControl extends javax.swing.JPanel implements IGUIEvent{
     
     @Override
     public void setGUIEvent(IEvent event) {
-        GUIEvent=event;
+        GUIEvent = event;
     }
 
     @Override
@@ -239,29 +252,37 @@ public class JPanelControl extends javax.swing.JPanel implements IGUIEvent{
     
     private void fireupdateGUI()
     {
-        if(GUIEvent==null)
+        if(GUIEvent == null)
+        {
             throw new RuntimeException("GUI EVENT NOT USED!");
+        }
         GUIEvent.fired();
     }
    
     
     private void axesEvent(NumberFildManipulator axis) {                               
         //Find Position
-        int cat=-1,num=-1;
-        for(int i=0;i<axes.length;i++)
-            for(int j=0;j<axes[i].length;j++)
-                if(axes[i][j]==axis)
+        int cat = -1,num = -1;
+        for(int i = 0;i < axes.length;i++)
+        {
+            for(int j = 0;j < axes[i].length;j++)
+            {
+                if(axes[i][j] == axis)
                 {
-                    cat=i;
-                    num=j;
+                    cat = i;
+                    num = j;
                 }
+            }
+        }
 
-        if(cat==-1)
+        if(cat == -1)
+        {
             throw new UnsupportedOperationException("Element not in Axes array!");
+        }
         
         Double value;
         try {
-           value=axes[cat][num].getd();
+           value = axes[cat][num].getd();
         } catch (ParseException ex) {
             axes[cat][num].popUpToolTip(ex.toString());
             axes[cat][num].setFocus();
@@ -272,54 +293,54 @@ public class JPanelControl extends javax.swing.JPanel implements IGUIEvent{
         axes[cat][num].set(value);
         
         //Test Range
-        Double min= -Double.MAX_VALUE;
-        Double max= Double.MAX_VALUE;
+        Double min  = -Double.MAX_VALUE;
+        Double max  = Double.MAX_VALUE;
         switch(cat)
         {
             case 0: //X
             case 1: //Y
             case 2: //Z
-                if(num!=2)
+                if(num != 2)
                 {
                     //Manipulating a,d
-                    num=1; //only d is manipulatable!
-                    min=-axes[cat][0].getdsave();
-                    max=Database.getWorkspace(cat).getsaved()-axes[cat][0].getdsave();
+                    num = 1; //only d is manipulatable!
+                    min = -axes[cat][0].getdsave();
+                    max = Database.getWorkspace(cat).getsaved() - axes[cat][0].getdsave();
                 }
                 else
                 {
                     //Manipulating n
-                    min=0.0;
-                    max=Database.getWorkspace(cat).getsaved();
+                    min = 0.0;
+                    max = Database.getWorkspace(cat).getsaved();
                 }
                 break;
             case 3: //I,J
-                max=Database.getWorkspace(num).getsaved();
-                min=-max;
+                max = Database.getWorkspace(num).getsaved();
+                min = -max;
                 break;
             case 4: //Diameter
-                min=0.0;
+                min = 0.0;
                 break;
             case 5: //Feedrate
-                min=0.0;
-                max=Database.MAXFEEDRATE.getsaved();
+                min = 0.0;
+                max = Database.MAXFEEDRATE.getsaved();
                 break;
         }
         if(axes[cat][num].getdsave()<min)
         {
-            axes[cat][num].popUpToolTip("Value have to be gater then "+Tools.dtostr(min));
+            axes[cat][num].popUpToolTip("Value has to be grater than " + Tools.dtostr(min));
             axes[cat][num].set(min);
             axes[cat][num].setFocus();
         }
         if(axes[cat][num].getdsave()>max)
         {
-            axes[cat][num].popUpToolTip("Value have to be smaler then "+Tools.dtostr(max));
+            axes[cat][num].popUpToolTip("Value has to be smaller than " + Tools.dtostr(max));
             axes[cat][num].set(max);
             axes[cat][num].setFocus();
         }
 
         //Calc other Fields
-        if(cat<=2)
+        if(cat <= 2)
             switch(num)
             {
                 case 0: //a
@@ -339,19 +360,21 @@ public class JPanelControl extends javax.swing.JPanel implements IGUIEvent{
     
     private void paintAxesAria(Graphics g) {
         //Calc window
-        double ariawidth= Database.WORKSPACE0.getsaved(); //x
-        double ariaheight=Database.WORKSPACE1.getsaved(); //y
-        Rectangle rect=Geometrics.placeRectangle(jPPaint.getWidth(), jPPaint.getHeight(), Geometrics.getRatio(ariawidth,ariaheight));
+        double ariawidth    = Database.WORKSPACE0.getsaved(); //x
+        double ariaheight   = Database.WORKSPACE1.getsaved(); //y
+        Rectangle rect = Geometrics.placeRectangle(jPPaint.getWidth(), jPPaint.getHeight(), Geometrics.getRatio(ariawidth,ariaheight));
         
         if(g instanceof Graphics2D == false)
+        {
             throw new UnsupportedOperationException("Graphics is not 2D!");
-        Graphics2D g2d=(Graphics2D)g;
+        }
+        Graphics2D g2d = (Graphics2D)g;
         
         g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 
         //Scale for homeing position
-        g2d.translate(jPPaint.getWidth()/2, jPPaint.getHeight()/2);
-        switch(Integer.parseInt(Database.HOMEING.get()))
+        g2d.translate(jPPaint.getWidth() / 2, jPPaint.getHeight() / 2);
+        switch(Integer.parseInt(Database.HOMING.get()))
         {
             case 0:
             default:
@@ -367,14 +390,16 @@ public class JPanelControl extends javax.swing.JPanel implements IGUIEvent{
                 g2d.scale(-1,-1);
                 break;
         }
-        g2d.translate(-jPPaint.getWidth()/2, -jPPaint.getHeight()/2);
+        g2d.translate(-jPPaint.getWidth() / 2, -jPPaint.getHeight() / 2);
         
         g2d.setColor(Color.white);
         g2d.fillRect(rect.x, rect.y, rect.width, rect.height);
         
         g2d.setColor(Color.black);
         for(PrintableElement p:printList)
+        {
             p.print(g2d, new Point(rect.x, rect.y), Geometrics.getScale(rect.width, rect.height, ariawidth, ariaheight));
+        }
         
         g2d.setColor(Color.red);
         new PrintableElement().print(g2d, new Point(rect.x, rect.y), Geometrics.getScale(rect.width, rect.height, ariawidth, ariaheight));
@@ -383,7 +408,7 @@ public class JPanelControl extends javax.swing.JPanel implements IGUIEvent{
 
     private void loadformsavelist(int index)
     {
-        if(((SortedComboBoxModel<PositionListElement>)jLSave.getModel()).getElementAt(index)!=null)
+        if(((SortedComboBoxModel<PositionListElement>)jLSave.getModel()).getElementAt(index) != null)
         {
             jPPaint.setRepaintEnable(false);
             axes[0][2].set(((SortedComboBoxModel<PositionListElement>)jLSave.getModel()).getElementAt(index).getX());
@@ -475,7 +500,7 @@ public class JPanelControl extends javax.swing.JPanel implements IGUIEvent{
         jSplitPane1.setDividerLocation(350);
         jSplitPane1.setResizeWeight(0.5);
 
-        jBHoming.setText("Homeing");
+        jBHoming.setText("Homing");
         jBHoming.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jBHomingActionPerformed(evt);
@@ -666,7 +691,7 @@ public class JPanelControl extends javax.swing.JPanel implements IGUIEvent{
         jPZnewLayout.setVerticalGroup(
             jPZnewLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPZnewLayout.createSequentialGroup()
-                .addGap(0, 0, Short.MAX_VALUE)
+                .addGap(0, 2, Short.MAX_VALUE)
                 .addComponent(jCBZn, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
         );
 
@@ -880,7 +905,7 @@ public class JPanelControl extends javax.swing.JPanel implements IGUIEvent{
                     .addComponent(jBTYfp, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(jBTYfm, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(jLabel10))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 8, Short.MAX_VALUE)
                 .addGroup(jPYdiameterLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jBTYhp, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(jBTYhm, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -1059,7 +1084,7 @@ public class JPanelControl extends javax.swing.JPanel implements IGUIEvent{
                         .addComponent(jBPowerON)
                         .addComponent(jBPowerOFF))
                     .addComponent(jLabel18))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 9, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 11, Short.MAX_VALUE)
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(jPanel1Layout.createSequentialGroup()
                         .addGap(3, 3, 3)
@@ -1073,7 +1098,7 @@ public class JPanelControl extends javax.swing.JPanel implements IGUIEvent{
                             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
                                 .addGap(15, 15, 15)
                                 .addComponent(jPXYname, javax.swing.GroupLayout.PREFERRED_SIZE, 54, javax.swing.GroupLayout.PREFERRED_SIZE)))))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 9, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 16, Short.MAX_VALUE)
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(jLabel7)
                     .addGroup(jPanel1Layout.createSequentialGroup()
@@ -1083,7 +1108,7 @@ public class JPanelControl extends javax.swing.JPanel implements IGUIEvent{
                         .addGap(7, 7, 7)
                         .addComponent(jBPosRem))
                     .addComponent(jScrollPane4, javax.swing.GroupLayout.PREFERRED_SIZE, 88, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 9, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 13, Short.MAX_VALUE)
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(jLabel11)
                     .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
@@ -1091,20 +1116,20 @@ public class JPanelControl extends javax.swing.JPanel implements IGUIEvent{
                         .addComponent(jPZname, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, 31, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addComponent(jPZakt, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                     .addComponent(jPZnew, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 10, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 12, Short.MAX_VALUE)
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                         .addComponent(jPYdiameter, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                         .addComponent(jPdiameter, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                         .addComponent(jPXdiameter, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                     .addComponent(jLabel14))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 10, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 12, Short.MAX_VALUE)
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
                         .addComponent(jBMove, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                         .addComponent(jPoptions, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                     .addComponent(jLabel21))
-                .addContainerGap(14, Short.MAX_VALUE))
+                .addContainerGap(16, Short.MAX_VALUE))
         );
 
         jScrollPane2.setViewportView(jPanel1);
@@ -1121,11 +1146,11 @@ public class JPanelControl extends javax.swing.JPanel implements IGUIEvent{
         jPPaint.setLayout(jPPaintLayout);
         jPPaintLayout.setHorizontalGroup(
             jPPaintLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 349, Short.MAX_VALUE)
+            .addGap(0, 450, Short.MAX_VALUE)
         );
         jPPaintLayout.setVerticalGroup(
             jPPaintLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 413, Short.MAX_VALUE)
+            .addGap(0, 555, Short.MAX_VALUE)
         );
 
         jSplitPane1.setLeftComponent(jPPaint);
@@ -1134,22 +1159,22 @@ public class JPanelControl extends javax.swing.JPanel implements IGUIEvent{
         this.setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 729, Short.MAX_VALUE)
+            .addGap(0, 929, Short.MAX_VALUE)
             .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                .addComponent(jSplitPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 729, Short.MAX_VALUE))
+                .addComponent(jSplitPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 929, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 415, Short.MAX_VALUE)
+            .addGap(0, 555, Short.MAX_VALUE)
             .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                .addComponent(jSplitPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 415, Short.MAX_VALUE))
+                .addComponent(jSplitPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 555, Short.MAX_VALUE))
         );
     }// </editor-fold>//GEN-END:initComponents
 
     private void jBHomingActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jBHomingActionPerformed
         if(Communication.isbussy())
         {
-            JOptionPane.showMessageDialog(this, "An other command is in Progress!");
+            JOptionPane.showMessageDialog(this, "Another command is in progress!");
             return;
         }
         try {
@@ -1159,7 +1184,7 @@ public class JPanelControl extends javax.swing.JPanel implements IGUIEvent{
             return;
         }
         jPPaint.setRepaintEnable(false);
-        for(int i=0;i<3;i++)
+        for(int i = 0;i < 3;i++)
         {
             axes[i][0].set(0.0);
             axes[i][0].dispatchEvent();
@@ -1170,7 +1195,7 @@ public class JPanelControl extends javax.swing.JPanel implements IGUIEvent{
     private void jBPowerONActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jBPowerONActionPerformed
         if(Communication.isbussy())
         {
-            JOptionPane.showMessageDialog(this, "An other command is in Progress!");
+            JOptionPane.showMessageDialog(this, "Another command is in progress!");
             return;
         }
         try {
@@ -1183,7 +1208,7 @@ public class JPanelControl extends javax.swing.JPanel implements IGUIEvent{
     private void jBPowerOFFActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jBPowerOFFActionPerformed
         if(Communication.isbussy())
         {
-            JOptionPane.showMessageDialog(this, "An other command is in Progress!");
+            JOptionPane.showMessageDialog(this, "Another command is in progress!");
             return;
         }
         try {
@@ -1196,30 +1221,30 @@ public class JPanelControl extends javax.swing.JPanel implements IGUIEvent{
     private void jBSetPosActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jBSetPosActionPerformed
         if(Communication.isbussy())
         {
-            JOptionPane.showMessageDialog(this, "An other command is in Progress!");
+            JOptionPane.showMessageDialog(this, "Another command is in progress!");
             return;
         }
-        Double[] values=new Double[3];
-        Double[] max=new Double[3];
-        String[] messages= new String[3];
-        for(int i=0;i<3;i++)
+        Double[] values = new Double[3];
+        Double[] max    = new Double[3];
+        String[] messages = new String[3];
+        for(int i = 0;i < 3;i++)
         {
-            messages[i]="Set the Value for the "+CommandParsing.axesName[i]+" Axis";
-            values[i]= axes[i][0].getdsave();
-            max[i]= Database.getWorkspace(i).getsaved();
+            messages[i] = "Set the value for the " + CommandParsing.axesName[i] + " Axis";
+            values[i]   = axes[i][0].getdsave();
+            max[i]      = Database.getWorkspace(i).getsaved();
         }
 
         values = Tools.getValues(messages, values, max, new Double[]{0.0,0.0,0.0});
 
         if(values!= null)
         {
-            String cmd= "G92";
+            String cmd = "G92";
             jPPaint.setRepaintEnable(false);
-            for(int i=0;i<3;i++)
+            for(int i = 0;i < 3;i++)
             {
                 axes[i][0].set(values[i]);
                 axes[i][0].dispatchEvent();
-                cmd+=" "+CommandParsing.axesName[i]+Tools.dtostr(values[i]);
+                cmd+=" " + CommandParsing.axesName[i] + Tools.dtostr(values[i]);
             }
             try {
                 Communication.send(cmd);
@@ -1234,10 +1259,10 @@ public class JPanelControl extends javax.swing.JPanel implements IGUIEvent{
     private void jBGetPosActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jBGetPosActionPerformed
         if(Communication.isbussy())
         {
-            JOptionPane.showMessageDialog(this, "An other command is in Progress!");
+            JOptionPane.showMessageDialog(this, "Another command is in progress!");
             return;
         }
-        pharsnextserial=true;
+        parseNextSerial = true;
         try {
             Communication.send("M114");
         } catch (ComInterruptException ex) {
@@ -1246,20 +1271,20 @@ public class JPanelControl extends javax.swing.JPanel implements IGUIEvent{
     }//GEN-LAST:event_jBGetPosActionPerformed
 
     private void jLSaveMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jLSaveMouseClicked
-        if(evt.getClickCount()==2)
+        if(evt.getClickCount() == 2)
         {
             loadformsavelist(jLSave.locationToIndex(evt.getPoint()));
         }
     }//GEN-LAST:event_jLSaveMouseClicked
 
     private void jLSaveKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_jLSaveKeyPressed
-        if(evt.getKeyCode()==KeyEvent.VK_ENTER)
+        if(evt.getKeyCode() == KeyEvent.VK_ENTER)
         {
             loadformsavelist(jLSave.getSelectedIndex());
         }
-        if(evt.getKeyCode()==KeyEvent.VK_DELETE)
+        if(evt.getKeyCode() == KeyEvent.VK_DELETE)
         {
-            if(jLSave.getSelectedIndex()!=-1)
+            if(jLSave.getSelectedIndex() != -1)
             {
                 ((SortedComboBoxModel<PositionListElement>)jLSave.getModel()).removeElementAt(jLSave.getSelectedIndex());
             }
@@ -1268,11 +1293,13 @@ public class JPanelControl extends javax.swing.JPanel implements IGUIEvent{
     }//GEN-LAST:event_jLSaveKeyPressed
 
     private void jBPosSaveActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jBPosSaveActionPerformed
-        String name = JOptionPane.showInputDialog("Name for the Position");
-        if(name==null)
-        return;
+        String name = JOptionPane.showInputDialog("Name for the position");
+        if(name == null)
+        {
+            return;
+        }
 
-        PositionListElement element= new PositionListElement(name, axes[0][0].getdsave(), axes[1][0].getdsave());
+        PositionListElement element = new PositionListElement(name, axes[0][0].getdsave(), axes[1][0].getdsave());
 
         ((SortedComboBoxModel<PositionListElement>)jLSave.getModel()).addElement(element);
 
@@ -1283,7 +1310,7 @@ public class JPanelControl extends javax.swing.JPanel implements IGUIEvent{
     }//GEN-LAST:event_jBPosLoadActionPerformed
 
     private void jBPosRemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jBPosRemActionPerformed
-        if(jLSave.getSelectedIndex()!=-1)
+        if(jLSave.getSelectedIndex() != -1)
         ((SortedComboBoxModel<PositionListElement>)jLSave.getModel()).removeElementAt(jLSave.getSelectedIndex());
     }//GEN-LAST:event_jBPosRemActionPerformed
 
@@ -1295,33 +1322,43 @@ public class JPanelControl extends javax.swing.JPanel implements IGUIEvent{
         },{ //Y
             {jBTYfp, jBTYfm}, //1
             {jBTYhp, jBTYhm}}};  //1/2
-    int axis=-1,type=-1,sign=-1;
+    int axis = -1,type = -1,sign = -1;
 
-    for(int i=0;i<buttons.length;i++)
-    for(int j=0;j<buttons[i].length;j++)
-    for(int k=0;k<buttons[i][j].length;k++)
-    if(buttons[i][j][k]==evt.getSource())
+    for(int i = 0;i < buttons.length;i++)
     {
-        axis=i;
-        type=j;
-        sign=k;
+        for(int j = 0;j < buttons[i].length;j++)
+        {
+            for(int k = 0;k < buttons[i][j].length;k++)
+            {
+                if(buttons[i][j][k] == evt.getSource())
+                {
+                    axis    = i;
+                    type    = j;
+                    sign    = k;
+                }
+            }
         }
+    }
+            Double d = axes[4][0].getdsave();
 
-        Double d=axes[4][0].getdsave();
+            if(type == 1)
+            {
+                d = d / 2;
+            }
 
-        if(type==1)
-        d=d/2;
+            if(sign == 1)
+            {
+                d = 0.0 - d;
+            }
 
-        if(sign==1)
-        d=0.0-d;
+            axes[axis][1].set(axes[axis][1].getdsave() + d);
+            axes[axis][1].dispatchEvent();
 
-        axes[axis][1].set(axes[axis][1].getdsave()+d);
-        axes[axis][1].dispatchEvent();
-
-        //Save Diameter
-        if(((DefaultComboBoxModel<String>)jCBdiameter.getModel()).getIndexOf(axes[4][0].get())==-1)
-        jCBdiameter.addItem(axes[4][0].get());
-
+            //Save Diameter
+            if(((DefaultComboBoxModel<String>)jCBdiameter.getModel()).getIndexOf(axes[4][0].get()) == -1)
+            {
+                jCBdiameter.addItem(axes[4][0].get());
+            }
     }//GEN-LAST:event_jBTool
 
     private void jCBarcActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jCBarcActionPerformed
@@ -1358,7 +1395,7 @@ public class JPanelControl extends javax.swing.JPanel implements IGUIEvent{
     private void jBMoveActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jBMoveActionPerformed
         if(Communication.isbussy())
         {
-            JOptionPane.showMessageDialog(this, "An other command is in Progress!");
+            JOptionPane.showMessageDialog(this, "Another command is in progress!");
             return;
         }
 
@@ -1368,18 +1405,18 @@ public class JPanelControl extends javax.swing.JPanel implements IGUIEvent{
         for(NumberFildManipulator[] aa:axes)
         for(NumberFildManipulator a:aa)
         {
-            String temp=a.get();
+            String temp = a.get();
             a.dispatchEvent();
             if(!temp.equals(a.get()))
             {
-                JOptionPane.showMessageDialog(this, "Not all Parameters in range!");
+                JOptionPane.showMessageDialog(this, "Not all parameters are in range!");
                 jPPaint.setRepaintEnable(true);
                 return;
             }
         }
         //Z or XY move allowed but not both
-        boolean mxy= !Geometrics.doubleequals(axes[0][0].getdsave(), axes[0][2].getdsave(),0.001) || !Geometrics.doubleequals(axes[1][0].getdsave(), axes[1][2].getdsave(),0.001);
-        boolean mz=!Geometrics.doubleequals(axes[2][0].getdsave(), axes[2][2].getdsave(),0.001);
+        boolean mxy = !Geometrics.doubleEquals(axes[0][0].getdsave(), axes[0][2].getdsave(),0.001) || !Geometrics.doubleEquals(axes[1][0].getdsave(), axes[1][2].getdsave(),0.001);
+        boolean mz  = !Geometrics.doubleEquals(axes[2][0].getdsave(), axes[2][2].getdsave(),0.001);
         if(mxy && mz)
         {
             JOptionPane.showMessageDialog(this, "Only XY move or Z move allowed .. but not both!");
@@ -1391,12 +1428,12 @@ public class JPanelControl extends javax.swing.JPanel implements IGUIEvent{
         {
 
             //Check equi-distant
-            double cx=axes[0][0].getdsave()+axes[3][0].getdsave();
-            double cy=axes[1][0].getdsave()+axes[3][1].getdsave();
-            double d1=Geometrics.getdistance(cx, cy, axes[0][0].getdsave(), axes[1][0].getdsave());
-            double d2=Geometrics.getdistance(cx, cy, axes[0][2].getdsave(), axes[1][2].getdsave());
+            double cx   = axes[0][0].getdsave() + axes[3][0].getdsave();
+            double cy   = axes[1][0].getdsave() + axes[3][1].getdsave();
+            double d1   = Geometrics.getDistance(cx, cy, axes[0][0].getdsave(), axes[1][0].getdsave());
+            double d2   = Geometrics.getDistance(cx, cy, axes[0][2].getdsave(), axes[1][2].getdsave());
 
-            if(!Geometrics.doubleequals(d1, d2, 0.001))
+            if(!Geometrics.doubleEquals(d1, d2, 0.001))
             {
                 JOptionPane.showMessageDialog(this, "Center of ARC is not equi-distant!");
                 jPPaint.setRepaintEnable(true);
@@ -1410,39 +1447,47 @@ public class JPanelControl extends javax.swing.JPanel implements IGUIEvent{
         if(jCBarc.isSelected())
         {
             if(jCBarcCCW.isSelected())
-            cmd="G3"; //Counterclockwise
+            {
+                cmd = "G3";
+            } //Counterclockwise
             else
-            cmd="G2"; //Clockwise
+            {
+                cmd = "G2";
+            } //Clockwise
         }
         else
         {
-            cmd="G1";  //Linear Move
+            cmd = "G1";  //Linear Move
         }
 
         //Load Axes
-        for(int i=0;i<3;i++)
-            cmd+=" "+CommandParsing.axesName[i]+Tools.dtostr(axes[i][2].getdsave());
+        for(int i = 0;i < 3;i++)
+            cmd += " " + CommandParsing.axesName[i] + Tools.dtostr(axes[i][2].getdsave());
 
         if(jCBarc.isSelected())
         {
-            cmd+=" I"+Tools.dtostr(axes[3][0].getdsave());
-            cmd+=" J"+Tools.dtostr(axes[3][1].getdsave());
+            cmd += " I" + Tools.dtostr(axes[3][0].getdsave());
+            cmd += " J" + Tools.dtostr(axes[3][1].getdsave());
         }
 
         //Get feedrate
         Double feedrate;
         if(jCBFastMode.isSelected())
-            feedrate=Database.MAXFEEDRATE.getsaved();
+        {
+            feedrate = Database.MAXFEEDRATE.getsaved();
+        }
         else
-            feedrate=axes[5][0].getdsave();
-        cmd+=" F"+Tools.dtostr(feedrate);
+        {
+            feedrate = axes[5][0].getdsave();
+        }
+        cmd += " F" + Tools.dtostr(feedrate);
         
         //Execute
         try {
             Communication.send(cmd);
         } catch (ComInterruptException ex) {
             Logger.getLogger(JPanelControl.class.getName()).log(Level.SEVERE, null, ex);
-            JOptionPane.showMessageDialog(this, "Cannot send Command to the Printer! ("+ex.getMessage()+")");
+            JOptionPane.showMessageDialog(this, "Cannot send command to the printer! (" + ex.getMessage() + ")");
             jPPaint.setRepaintEnable(true);
             return;
         }
@@ -1451,46 +1496,54 @@ public class JPanelControl extends javax.swing.JPanel implements IGUIEvent{
         printList.add(new PrintableElement());
 
         //Update Values
-        for(int i=0;i<3;i++)
+        for(int i = 0;i < 3;i++)
         {
             axes[i][0].set(axes[i][2].getdsave());
             axes[i][0].dispatchEvent();
         }
 
         //Save Values
-        if(((DefaultComboBoxModel<String>)jCBZn.getModel()).getIndexOf(axes[2][0].get())==-1)
-        jCBZn.addItem(axes[2][0].get());
-        if(((DefaultComboBoxModel<String>)jCBarcI.getModel()).getIndexOf(axes[3][0].get())==-1)
-        jCBarcI.addItem(axes[3][0].get());
-        if(((DefaultComboBoxModel<String>)jCBarcJ.getModel()).getIndexOf(axes[3][1].get())==-1)
-        jCBarcJ.addItem(axes[3][1].get());
-        if(((DefaultComboBoxModel<String>)jCBfeedrate.getModel()).getIndexOf(axes[5][0].get())==-1)
-        jCBfeedrate.addItem(axes[5][0].get());
+        if(((DefaultComboBoxModel<String>)jCBZn.getModel()).getIndexOf(axes[2][0].get()) == -1)
+        {
+            jCBZn.addItem(axes[2][0].get());
+        }
+        if(((DefaultComboBoxModel<String>)jCBarcI.getModel()).getIndexOf(axes[3][0].get()) == -1)
+        {
+            jCBarcI.addItem(axes[3][0].get());
+        }
+        if(((DefaultComboBoxModel<String>)jCBarcJ.getModel()).getIndexOf(axes[3][1].get()) == -1)
+        {
+            jCBarcJ.addItem(axes[3][1].get());
+        }
+        if(((DefaultComboBoxModel<String>)jCBfeedrate.getModel()).getIndexOf(axes[5][0].get()) == -1)
+        {
+            jCBfeedrate.addItem(axes[5][0].get());
+        }
 
         jPPaint.setRepaintEnable(true);
 
     }//GEN-LAST:event_jBMoveActionPerformed
 
     private void jPPaintMouseReleased(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jPPaintMouseReleased
-        double ariawidth= Database.WORKSPACE0.getsaved(); //x
-        double ariaheight=Database.WORKSPACE1.getsaved(); //y
-        Rectangle rect=Geometrics.placeRectangle(jPPaint.getWidth(), jPPaint.getHeight(), Geometrics.getRatio(ariawidth,ariaheight));
+        double areaWidth    = Database.WORKSPACE0.getsaved(); //x
+        double areaHeight   = Database.WORKSPACE1.getsaved(); //y
+        Rectangle rect = Geometrics.placeRectangle(jPPaint.getWidth(), jPPaint.getHeight(), Geometrics.getRatio(areaWidth,areaHeight));
 
         if(Geometrics.pointInRectangle(new Point(evt.getX(),evt.getY()), rect, 0))
         {
-            double x=(evt.getX()-rect.x)*Geometrics.getScale(ariawidth, ariaheight, rect.width, rect.height);
-            double y=(evt.getY()-rect.y)*Geometrics.getScale(ariawidth, ariaheight, rect.width, rect.height);
-            switch(Integer.parseInt(Database.HOMEING.get()))
+            double x    = (evt.getX()-rect.x) * Geometrics.getScale(areaWidth, areaHeight, rect.width, rect.height);
+            double y    = (evt.getY()-rect.y) * Geometrics.getScale(areaWidth, areaHeight, rect.width, rect.height);
+            switch(Integer.parseInt(Database.HOMING.get()))
             {
                 case 1:
-                x=ariawidth-x;
+                x   = areaWidth - x;
                 break;
                 case 2:
-                y=ariaheight-y;
+                y   = areaHeight - y;
                 break;
                 case 3:
-                x=ariawidth-x;
-                y=ariaheight-y;
+                x   = areaWidth - x;
+                y   = areaHeight - y;
                 break;
             }
 
