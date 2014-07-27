@@ -327,12 +327,12 @@ public class JPanelAutoLevel extends javax.swing.JPanel implements IGUIEvent {
         jTFEndX.setEnabled(!isWorking() && !al.isLeveled());
         jTFEndY.setEnabled(!isWorking() && !al.isLeveled());
 
-                             //START                  ABROT           CLEAR
+                             //START                  ABORT           CLEAR
         jBAction.setEnabled((!isworking && serial) || isWorking() || (isLeveled()&&!isworking));
         if(isLeveled())
             jBAction.setText("Clear");
         else if(isWorking())
-            jBAction.setText("Abrot");
+            jBAction.setText("Abort");
         else
             jBAction.setText("Start");
         
@@ -505,7 +505,7 @@ public class JPanelAutoLevel extends javax.swing.JPanel implements IGUIEvent {
                 .addGap(0, 17, Short.MAX_VALUE))
         );
 
-        jPanel3.setBorder(javax.swing.BorderFactory.createTitledBorder("Perview"));
+        jPanel3.setBorder(javax.swing.BorderFactory.createTitledBorder("Preview"));
 
         jPPaint.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseClicked(java.awt.event.MouseEvent evt) {
@@ -526,7 +526,7 @@ public class JPanelAutoLevel extends javax.swing.JPanel implements IGUIEvent {
         );
         jPPaintLayout.setVerticalGroup(
             jPPaintLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 106, Short.MAX_VALUE)
+            .addGap(0, 108, Short.MAX_VALUE)
         );
 
         javax.swing.GroupLayout jPanel3Layout = new javax.swing.GroupLayout(jPanel3);
