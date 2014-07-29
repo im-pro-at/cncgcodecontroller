@@ -7,7 +7,9 @@ package cnc.gcode.controller;
 import cnc.gcode.controller.communication.Communication;
 import java.awt.Dimension;
 import java.io.File;
+import java.util.LinkedList;
 import javax.swing.JFileChooser;
+import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
@@ -17,12 +19,12 @@ import javax.swing.filechooser.FileFilter;
  *
  * @author patrick
  */
-public class JPanelSettings extends javax.swing.JPanel implements IGUIEvent{
+public class JPanelSettings extends javax.swing.JPanel implements IGUIEvent, ISettingsFeedback{
     
     public static final String[] homing = {"upper left","upper right","lower left","lower right" }; //0= upper left; 1= upper right; 2= lower left; 3= lower right;
 
     private IEvent GUIEvent = null;
-    
+    private LinkedList<ISettingFeedback> returnedFeedbackValues = null;
     /**
      * Creates new form JPanelSettings
      */
@@ -663,43 +665,59 @@ public class JPanelSettings extends javax.swing.JPanel implements IGUIEvent{
         //AL Options
         if(evt.getSource()==jBSALOptions)
         {
-            Double[] values = Tools.getValues(
-                new String[]{ //message
-                    /*ALZERO*/          "The absolut position where the Autoleveling is correcting to. \nSo after level correction this Z value will have the probed value. (Normally it is 0)",
-                    /*ALMAXPROBDEPTH*/  "How deep the system try to probe. (You should home you system before Autoleveling.) \nIn absolute position it is \"Zero height\" - this value.",
-                    /*ALSAVEHEIGHT*/    "Absolute height where the CNC can move safely without problems. \nThe first Probing will also start from this position!",
-                    /*ALCLEARANCE*/     "The clearance to the object between two probings.",
-                    /*ALFEEDRATE*/      "The feedrate used for the probing",
-                },
-                new Double[]{ //value
-                    Database.ALZERO.getsaved(),
-                    Database.ALMAXPROBDEPTH.getsaved(),
-                    Database.ALSAVEHEIGHT.getsaved(),
-                    Database.ALCLEARANCE.getsaved(),
-                    Database.ALFEEDRATE.getsaved(),
-                },
-                new Double[]{ //max
-                    /*ALZERO*/          Double.MAX_VALUE,
-                    /*ALMAXPROBDEPTH*/  Database.WORKSPACE2.getsaved(),
-                    /*ALSAVEHEIGHT*/    Database.WORKSPACE2.getsaved(),
-                    /*ALCLEARANCE*/     Database.WORKSPACE2.getsaved(),    
-                    /*ALFEEDRATE*/      Double.MAX_VALUE,
-                },
-                new Double[]{ //min
-                    /*ALZERO*/          -Double.MAX_VALUE,
-                    /*ALMAXPROBDEPTH*/  0.0,
-                    /*ALSAVEHEIGHT*/    0.0-Database.WORKSPACE2.getsaved(),                    
-                    /*ALCLEARANCE*/     0.0,
-                    /*ALFEEDRATE*/      0.0,
-                });
+//            Double[] values = Tools.getValues(
+//                new String[]{ //message
+//                    /*ALZERO*/          "The absolut position where the Autoleveling is correcting to. \nSo after level correction this Z value will have the probed value. (Normally it is 0)",
+//                    /*ALMAXPROBDEPTH*/  "How deep the system try to probe. (You should home you system before Autoleveling.) \nIn absolute position it is \"Zero height\" - this value.",
+//                    /*ALSAVEHEIGHT*/    "Absolute height where the CNC can move safely without problems. \nThe first Probing will also start from this position!",
+//                    /*ALCLEARANCE*/     "The clearance to the object between two probings.",
+//                    /*ALFEEDRATE*/      "The feedrate used for the probing",
+//                },
+//                new Double[]{ //value
+//                    Database.ALZERO.getsaved(),
+//                    Database.ALMAXPROBDEPTH.getsaved(),
+//                    Database.ALSAVEHEIGHT.getsaved(),
+//                    Database.ALCLEARANCE.getsaved(),
+//                    Database.ALFEEDRATE.getsaved(),
+//                },
+//                new Double[]{ //max
+//                    /*ALZERO*/          Double.MAX_VALUE,
+//                    /*ALMAXPROBDEPTH*/  Database.WORKSPACE2.getsaved(),
+//                    /*ALSAVEHEIGHT*/    Database.WORKSPACE2.getsaved(),
+//                    /*ALCLEARANCE*/     Database.WORKSPACE2.getsaved(),    
+//                    /*ALFEEDRATE*/      Double.MAX_VALUE,
+//                },
+//                new Double[]{ //min
+//                    /*ALZERO*/          -Double.MAX_VALUE,
+//                    /*ALMAXPROBDEPTH*/  0.0,
+//                    /*ALSAVEHEIGHT*/    0.0-Database.WORKSPACE2.getsaved(),                    
+//                    /*ALCLEARANCE*/     0.0,
+//                    /*ALFEEDRATE*/      0.0,
+//                });
 
-            if(values!= null)
+            
+            
+            //form.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
+            returnedFeedbackValues = null;
+            LinkedList<ISettingFeedback> settings = new LinkedList<ISettingFeedback>();
+            settings.add(new JSettingFeedback(JSettingEnum.ALZERO,Database.ALZERO.getsaved(), "The absolut position where the Autoleveling is correcting to. \nSo after level correction this Z value will have the probed value. (Normally it is 0)" ));
+            settings.add(new JSettingFeedback(JSettingEnum.ALMAXPROBDEPTH,Database.ALMAXPROBDEPTH.getsaved(), "How deep the system try to probe. (You should home you system before Autoleveling.) \nIn absolute position it is \"Zero height\" - this value." ));
+            settings.add(new JSettingFeedback(JSettingEnum.ALSAVEHEIGHT,Database.ALSAVEHEIGHT.getsaved(), "Absolute height where the CNC can move safely without problems. \nThe first Probing will also start from this position!"));
+            settings.add(new JSettingFeedback(JSettingEnum.ALCLEARANCE,Database.ALCLEARANCE.getsaved(), "The clearance to the object between two probings."));
+            settings.add(new JSettingFeedback(JSettingEnum.ALFEEDRATE,Database.ALFEEDRATE.getsaved(), "The feedrate used for the probing"));
+            JSettingsDialog form = new JSettingsDialog(this, settings);
+            form.setTitle("Auto leveling settings");
+            form.pack();
+            form.setModal(true);
+            form.setVisible(true);
+            
+            if(returnedFeedbackValues != null && returnedFeedbackValues.size() == settings.size())
             {
-                Database.ALZERO.set(Tools.dtostr(values[0]));
-                Database.ALMAXPROBDEPTH.set(Tools.dtostr(values[1]));
-                Database.ALSAVEHEIGHT.set(Tools.dtostr(values[2]));
-                Database.ALCLEARANCE.set(Tools.dtostr(values[3]));
-                Database.ALFEEDRATE.set(Tools.dtostr(values[4]));
+                    Database.ALZERO.set(Tools.dtostr(returnedFeedbackValues.get(0).getSettingValue()));
+                    Database.ALMAXPROBDEPTH.set(Tools.dtostr(returnedFeedbackValues.get(1).getSettingValue()));
+                    Database.ALSAVEHEIGHT.set(Tools.dtostr(returnedFeedbackValues.get(2).getSettingValue()));
+                    Database.ALCLEARANCE.set(Tools.dtostr(returnedFeedbackValues.get(3).getSettingValue()));
+                    Database.ALFEEDRATE.set(Tools.dtostr(returnedFeedbackValues.get(4).getSettingValue()));
             }
         }
 
@@ -922,4 +940,9 @@ public class JPanelSettings extends javax.swing.JPanel implements IGUIEvent{
     private javax.swing.JLabel jLabel43;
     private javax.swing.JLabel jLabel44;
     // End of variables declaration//GEN-END:variables
+
+    @Override
+    public void settingsUpdated(LinkedList<ISettingFeedback> settingValues) {
+        returnedFeedbackValues = settingValues;
+    }
 }

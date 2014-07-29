@@ -135,7 +135,8 @@ public enum Database {
             {
                 file = new File(SETTINGSFILE);
             }
-            try (ObjectInput in = new ObjectInputStream(new FileInputStream(file))) {
+            try (ObjectInput in = new ObjectInputStream(new FileInputStream(file))) 
+            {
                 data = (EnumMap<Database, String>)in.readObject();
                 return true;
             }
