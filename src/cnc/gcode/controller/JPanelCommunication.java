@@ -6,7 +6,7 @@ package cnc.gcode.controller;
 
 import cnc.gcode.controller.communication.ComInterruptException;
 import cnc.gcode.controller.communication.Communication;
-import cnc.gcode.controller.communication.IResivedLines;
+import cnc.gcode.controller.communication.IReceivedLines;
 import cnc.gcode.controller.communication.ISend;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
@@ -22,8 +22,8 @@ import javax.swing.SwingUtilities;
  */
 public class JPanelCommunication extends javax.swing.JPanel implements IGUIEvent{
 
-    private IEvent GUIEvent=null;
-    private static volatile boolean setview=false;
+    private IEvent GUIEvent = null;
+    private static volatile boolean setView = false;
 
     /**
      * Creates new form JPanelCommunication
@@ -31,22 +31,24 @@ public class JPanelCommunication extends javax.swing.JPanel implements IGUIEvent
     public JPanelCommunication() {
         initComponents();
         
-        Communication.addResiveEvent(new IResivedLines() {
+        Communication.addResiveEvent(new IReceivedLines() {
             @Override
-            public void resived(String[] lines) {
+            public void received(String[] lines) {
                 for(String line: lines)
                 {
                     ((DefaultComboBoxModel<SendListElement>)jLCInOut.getModel()).addElement(new SendListElement(line, SendListElement.EType.IN));
                     if(((DefaultComboBoxModel<SendListElement>)jLCInOut.getModel()).getSize()>100)
-                        ((DefaultComboBoxModel<SendListElement>)jLCInOut.getModel()).removeElementAt(0);
-                    if(!setview)
                     {
-                        setview=true;
+                        ((DefaultComboBoxModel<SendListElement>)jLCInOut.getModel()).removeElementAt(0);
+                    }
+                    if(!setView)
+                    {
+                        setView = true;
                         SwingUtilities.invokeLater(new Runnable() {
                             @Override
                             public void run() {
-                                setview=false;
-                                jLCInOut.ensureIndexIsVisible(jLCInOut.getModel().getSize()-1);
+                                setView = false;
+                                jLCInOut.ensureIndexIsVisible(jLCInOut.getModel().getSize() - 1);
                             }
                         });
                     }
@@ -59,15 +61,17 @@ public class JPanelCommunication extends javax.swing.JPanel implements IGUIEvent
             public void send(String cmd) {
                 //Add to list 
                 ((DefaultComboBoxModel<SendListElement>) jLCInOut.getModel()).addElement(new SendListElement(cmd, SendListElement.EType.OUT));
-                if(((DefaultComboBoxModel<SendListElement>)jLCInOut.getModel()).getSize()>100)
-                    ((DefaultComboBoxModel<SendListElement>)jLCInOut.getModel()).removeElementAt(0);
-                if(!setview)
+                if(((DefaultComboBoxModel<SendListElement>)jLCInOut.getModel()).getSize() > 100)
                 {
-                    setview=true;
+                    ((DefaultComboBoxModel<SendListElement>)jLCInOut.getModel()).removeElementAt(0);
+                }
+                if(!setView)
+                {
+                    setView = true;
                     SwingUtilities.invokeLater(new Runnable() {
                         @Override
                         public void run() {
-                            setview=false;
+                            setView = false;
                             jLCInOut.ensureIndexIsVisible(jLCInOut.getModel().getSize() - 1);
                         }
                     });
@@ -80,7 +84,7 @@ public class JPanelCommunication extends javax.swing.JPanel implements IGUIEvent
     @Override
     public void setGUIEvent(IEvent event)
     {
-        GUIEvent=event;
+        GUIEvent = event;
     }
 
     @Override
@@ -91,8 +95,10 @@ public class JPanelCommunication extends javax.swing.JPanel implements IGUIEvent
     
     private void fireupdateGUI()
     {
-        if(GUIEvent==null)
+        if(GUIEvent == null)
+        {
             throw new RuntimeException("GUI EVENT NOT USED!");
+        }
         GUIEvent.fired();
     }
 
@@ -155,12 +161,12 @@ public class JPanelCommunication extends javax.swing.JPanel implements IGUIEvent
     }// </editor-fold>//GEN-END:initComponents
 
     private void jLCInOutValueChanged(javax.swing.event.ListSelectionEvent evt) {//GEN-FIRST:event_jLCInOutValueChanged
-        if(jLCInOut.getSelectedIndex()!=-1)
+        if(jLCInOut.getSelectedIndex() != -1)
             jTFSend.setText(((SendListElement)jLCInOut.getModel().getElementAt(jLCInOut.getSelectedIndex())).getText());
     }//GEN-LAST:event_jLCInOutValueChanged
 
     private void jTFSendKeyReleased(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_jTFSendKeyReleased
-        if(evt.getKeyCode()== KeyEvent.VK_ENTER)
+        if(evt.getKeyCode() == KeyEvent.VK_ENTER)
             jBSendActionPerformed(new ActionEvent(evt.getSource(),evt.getID(),evt.toString()));
     }//GEN-LAST:event_jTFSendKeyReleased
 
@@ -169,7 +175,7 @@ public class JPanelCommunication extends javax.swing.JPanel implements IGUIEvent
         {
             if(Communication.isbussy())
             {
-                JOptionPane.showMessageDialog(this, "An other command is in Progress!");
+                JOptionPane.showMessageDialog(this, "Another command is in progress!");
                 return;
             }
             try {

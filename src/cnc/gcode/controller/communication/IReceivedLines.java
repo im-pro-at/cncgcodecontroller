@@ -8,6 +8,6 @@ package cnc.gcode.controller.communication;
  *
  * @author patrick
  */
-public interface IResivedLines {
-    void resived(String[] lines);
+public interface IReceivedLines {
+    void received(String[] lines);
 }

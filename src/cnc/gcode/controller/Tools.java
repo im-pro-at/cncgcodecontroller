@@ -14,10 +14,11 @@ import javax.swing.JOptionPane;
  * @author patrick
  */
 public class Tools {
-    private static final ThreadLocal<DecimalFormat> df= new ThreadLocal<DecimalFormat>(){
+    private static final ThreadLocal<DecimalFormat> df = new ThreadLocal<DecimalFormat>(){
 
         @Override
-        protected DecimalFormat initialValue() {
+        protected DecimalFormat initialValue() 
+        {
             DecimalFormatSymbols s = new DecimalFormatSymbols();
             s.setDecimalSeparator('.');
             s.setMonetaryDecimalSeparator('.');
@@ -64,19 +65,21 @@ public class Tools {
     
     public static Double[] getValues(String[] messages,Double[] defaults, Double[] max, Double[] min)
     {
-        if(messages.length!=defaults.length || messages.length!=max.length || messages.length!=min.length)
-            throw new IllegalArgumentException("Length of parameter not the same!");
-
-        Double[] values= new Double[messages.length];
-
-        for(int i=0;i<messages.length;i++)
+        if(messages.length != defaults.length || messages.length != max.length || messages.length != min.length)
         {
-            values[i]=defaults[i];
+            throw new IllegalArgumentException("Length of parameters are not the same!");
+        }
+
+        Double[] values = new Double[messages.length];
+
+        for(int i = 0;i < messages.length;i++)
+        {
+            values[i] = defaults[i];
             while(true)
             {
                 try
                 {
-                    values[i]=Tools.strtod(JOptionPane.showInputDialog(messages[i], Tools.dtostr(values[i])));
+                    values[i] = Tools.strtod(JOptionPane.showInputDialog(messages[i], Tools.dtostr(values[i])));
                 }
                 catch(ParseException ex)
                 {
@@ -87,14 +90,14 @@ public class Tools {
                 {
                     return null;
                 }
-                if(values[i]<min[i])
+                if(values[i] < min[i])
                 {
-                    JOptionPane.showMessageDialog(null, "The value should be bigger then "+Tools.dtostr(min[i]) );
+                    JOptionPane.showMessageDialog(null, "The value should be bigger than " + Tools.dtostr(min[i]) );
                     continue;
                 }
-                if(values[i]>max[i])
+                if(values[i] > max[i])
                 {
-                    JOptionPane.showMessageDialog(null, "The value should be less then "+Tools.dtostr(max[i]) );
+                    JOptionPane.showMessageDialog(null, "The value should be smaller than " + Tools.dtostr(max[i]) );
                     continue;
                 }
                 

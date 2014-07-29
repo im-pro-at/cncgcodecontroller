@@ -23,7 +23,7 @@ public class PositionListElement implements Comparable<PositionListElement> {
 
     @Override
     public String toString() {
-        return name+" ( "+Tools.dtostr(x)+" ; "+Tools.dtostr(y)+" )";
+        return name + " ( " + Tools.dtostr(x) + " ; " + Tools.dtostr(y) + " )";
     }
 
     public Double getX() {
@@ -43,21 +43,25 @@ public class PositionListElement implements Comparable<PositionListElement> {
 
     @Override
     public boolean equals(Object obj) {
-        if (obj == null) {
+        if (obj == null) 
+        {
             return false;
         }
-        if (getClass() != obj.getClass()) {
+        if (getClass() != obj.getClass()) 
+        {
             return false;
         }
         final PositionListElement other = (PositionListElement) obj;
-        if (!Objects.equals(this.name, other.name)) {
+        if (!Objects.equals(this.name, other.name)) 
+        {
             return false;
         }
         return true;
     }
 
     @Override
-    public int compareTo(PositionListElement o) {
+    public int compareTo(PositionListElement o) 
+    {
         return name.compareTo(o.name);
     }
 

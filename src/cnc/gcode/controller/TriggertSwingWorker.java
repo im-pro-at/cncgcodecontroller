@@ -15,8 +15,8 @@ public abstract class TriggertSwingWorker<P> {
     protected abstract P doJob() throws Exception;
     protected void process(P chunk){}
     
-    private boolean cancelled=false;
-    private boolean triggered=false;
+    private boolean cancelled   = false;
+    private boolean triggered   = false;
     
     private Thread t= new Thread(new Runnable() {
         @Override
@@ -29,22 +29,30 @@ public abstract class TriggertSwingWorker<P> {
                     {
                         //Wait for trigger
                         if(!triggered)
+                        {
                             TriggertSwingWorker.this.wait();
-                        triggered=false;
+                        }
+                        triggered = false;
                     }
                     try {
-                        p=doJob();
-                    } catch (InterruptedException ex) {
+                        p = doJob();
+                    } 
+                    catch (InterruptedException ex) 
+                    {
                         return;
-                    } catch (Exception ex) {
+                    } 
+                    catch (Exception ex) 
+                    {
                         ex.printStackTrace();
                         continue;
                     }
                     synchronized(TriggertSwingWorker.this)
                     {
                         if(cancelled)
+                        {
                             return;
-                        final P cp=p;
+                        }
+                        final P cp = p;
                     
                         SwingUtilities.invokeLater(new Runnable() {
                             @Override
@@ -75,15 +83,17 @@ public abstract class TriggertSwingWorker<P> {
     {
         if(!cancelled)
         {
-            cancelled=true;
+            cancelled = true;
             if(!Thread.currentThread().equals(t))
+            {
                 t.interrupt();
+            }
         }
     }
     
     public final synchronized void trigger()
     {
-        triggered=true;
+        triggered = true;
         notify();
     }
         

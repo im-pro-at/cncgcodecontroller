@@ -26,11 +26,26 @@ import javax.swing.JFileChooser;
  */
 public enum Database {
     //Port Settings
+//Port Settings
+//Port Settings
+//Port Settings
+//Port Settings
+//Port Settings
+//Port Settings
+//Port Settings
+//Port Settings
+//Port Settings
+//Port Settings
+//Port Settings
+//Port Settings
+//Port Settings
+//Port Settings
+//Port Settings
     PORT,
     SPEED("9"),
     
     //Control
-    HOMEING("0"), //Homing Point 0= upper left; 1= upper right; 2= lower left; 3= lower right;
+    HOMING("0"), //Homing Point 0= upper left; 1= upper right; 2= lower left; 3= lower right;
     MAXFEEDRATE(Tools.dtostr(600.0)), 
     WORKSPACE0(Tools.dtostr(200.0)),
     WORKSPACE1(Tools.dtostr(200.0)),
@@ -48,11 +63,11 @@ public enum Database {
     
     //Autoleveling
     ALZERO(Tools.dtostr(0.0)),
-    ALMAXPROPDEPTH(Tools.dtostr(-1.0)), 
+    ALMAXPROBDEPTH(Tools.dtostr(-1.0)), 
     ALSAVEHEIGHT(Tools.dtostr(10.0)),
-    ALCLEARENCE(Tools.dtostr(10.0)),
+    ALCLEARANCE(Tools.dtostr(10.0)),
     ALFEEDRATE(Tools.dtostr(10.0)),
-    ALDISTANACE(Tools.dtostr(10.0)),
+    ALDISTANCE(Tools.dtostr(10.0)),
     ALMAXMOVELENGTH(Tools.dtostr(1.0)), 
     ALSTARTCODE("G28"), 
     
@@ -74,15 +89,15 @@ public enum Database {
     ;
 
     private final String defaultValue;
-    private final static String SETTINGSFILE=System.getProperty("user.home")+File.separator+".cnccgcodecontroller"+File.separator+"Settings.ois";
+    private final static String SETTINGSFILE = System.getProperty("user.home")+File.separator+".cnccgcodecontroller"+File.separator+"Settings.ois";
 
     private Database(String defaultvalue)
     {
-        this.defaultValue=defaultvalue;
+        this.defaultValue = defaultvalue;
     }
     private Database()
     {
-        this.defaultValue="";
+        this.defaultValue = "";
     }
    
     private static EnumMap<Database, String> data = new EnumMap<>(Database.class);
@@ -116,10 +131,13 @@ public enum Database {
      */
     public static boolean load(File file){
         try {
-            if(file==null)
+            if(file== null)
+            {
                 file = new File(SETTINGSFILE);
-            try (ObjectInput in = new ObjectInputStream(new FileInputStream(file))) {
-                data= (EnumMap<Database, String>)in.readObject();
+            }
+            try (ObjectInput in = new ObjectInputStream(new FileInputStream(file))) 
+            {
+                data = (EnumMap<Database, String>)in.readObject();
                 return true;
             }
         } catch (Exception ex) {
@@ -135,13 +153,20 @@ public enum Database {
      */
     public static boolean save(File file){
         try {
-            if(file==null)
+            if(file == null)
+            {
                 file = new File(SETTINGSFILE);
-            if(!file.getParentFile().exists())
+            }
+            if(file.getParentFile().exists() == false)
+            {
                 file.getParentFile().mkdirs();
-            if(!file.exists())
+            }
+            if(file.exists() == false)
+            {
                 file.createNewFile();
-            try (ObjectOutput out = new ObjectOutputStream(new FileOutputStream(file))) {
+            }
+            try (ObjectOutput out = new ObjectOutputStream(new FileOutputStream(file))) 
+            {
                 out.writeObject(data);
             }
             return true;

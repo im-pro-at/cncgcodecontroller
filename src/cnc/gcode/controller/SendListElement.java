@@ -18,8 +18,8 @@ public class SendListElement {
     String s;
         
     public SendListElement(String s, EType type) {
-        this.s=s;
-        this.type=type;
+        this.s      = s;
+        this.type   = type;
     }
 
     public String getText()
@@ -29,6 +29,6 @@ public class SendListElement {
     
     @Override
     public String toString() {
-        return (this.type== EType.IN?"-->":"<--") +" "+ this.s;
+        return (this.type == EType.IN ? "-->":"<--") + " " + this.s;
     }    
 }

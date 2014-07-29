@@ -19,7 +19,7 @@ import javax.swing.SwingUtilities;
  */
 public final class MainForm extends javax.swing.JFrame implements IGUIEvent{
 
-    private IEvent GUIEvent=null;
+    private IEvent GUIEvent = null;
     
     /**
      * Creates new form MainForm
@@ -28,15 +28,17 @@ public final class MainForm extends javax.swing.JFrame implements IGUIEvent{
         
         //Load Database
         if(!Database.load(null))
-            JOptionPane.showMessageDialog(null,"Could not load Settings!");
+        {
+            JOptionPane.showMessageDialog(null,"Could not load settings!");
+        }
         
         initComponents();
         
         //Settings scroll speed
         jSscrollPaneSettings.getVerticalScrollBar().setUnitIncrement(14);
         //GuiUpdateHandler
-        final IGUIEvent[] panels= new IGUIEvent[]{this,jPanelControl,jPanelAutoLevel,jPanelCNCMilling,jPanelCommunication,jPanelSettings};
-        IEvent updateGUI= new IEvent() {
+        final IGUIEvent[] panels = new IGUIEvent[]{this,jPanelControl,jPanelAutoLevel,jPanelCNCMilling,jPanelCommunication,jPanelSettings};
+        IEvent updateGUI = new IEvent() {
             @Override
             public void fired() {
                 for(IGUIEvent panel:panels)
@@ -44,7 +46,9 @@ public final class MainForm extends javax.swing.JFrame implements IGUIEvent{
             }
         };
         for(IGUIEvent panel:panels)
+        {
             panel.setGUIEvent(updateGUI);
+        }
         
         
         
@@ -55,7 +59,7 @@ public final class MainForm extends javax.swing.JFrame implements IGUIEvent{
                 final ArrayList<String> ports=Communication.getPortsNames();
                 if(ports.isEmpty())
                 {
-                    ports.add("No Serialport found!");
+                    ports.add("No serial port found!");
                 }
                 
                 final ArrayList<Integer> speeds= Communication.getPortsSpeeds();
@@ -65,9 +69,10 @@ public final class MainForm extends javax.swing.JFrame implements IGUIEvent{
                         jCBPort.setModel(new DefaultComboBoxModel(ports.toArray(new String[0])));
                         jCBSpeed.setModel(new DefaultComboBoxModel(speeds.toArray(new Integer[0])));
 
-                        int index=0;
+                        int index = 0;
                         //Load last Comport   
-                        for (String port:ports) {
+                        for (String port:ports) 
+                        {
                             if(port.equals(Database.PORT.get()))
                             {
                                 jCBPort.setSelectedIndex(index);
@@ -77,8 +82,9 @@ public final class MainForm extends javax.swing.JFrame implements IGUIEvent{
                         }
                         
                         //Load last Speed   
-                        index=0;
-                        for (Integer speed:speeds) {
+                        index = 0;
+                        for (Integer speed:speeds) 
+                        {
                             if(speed.toString().equals(Database.SPEED.get()))
                             {
                                 jCBSpeed.setSelectedIndex(index);
@@ -109,7 +115,7 @@ public final class MainForm extends javax.swing.JFrame implements IGUIEvent{
     
     @Override
     public void setGUIEvent(IEvent event) {
-        GUIEvent=event;
+        GUIEvent    = event;
     }
 
     @Override
@@ -123,8 +129,10 @@ public final class MainForm extends javax.swing.JFrame implements IGUIEvent{
     
     private void fireupdateGUI()
     {
-        if(GUIEvent==null)
+        if(GUIEvent == null)
+        {
             throw new RuntimeException("GUI EVENT NOT USED!");
+        }
         GUIEvent.fired();
     }
     
@@ -220,7 +228,9 @@ public final class MainForm extends javax.swing.JFrame implements IGUIEvent{
         
         //Save Database
         if(!Database.save(null))
-            JOptionPane.showMessageDialog(this,"Could not Save Settings!");
+        {
+            JOptionPane.showMessageDialog(this,"Could not save settings!");
+        }
         
         System.exit(0);
     }//GEN-LAST:event_formWindowClosing
