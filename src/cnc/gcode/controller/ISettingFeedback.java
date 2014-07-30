@@ -13,6 +13,8 @@ package cnc.gcode.controller;
 public interface ISettingFeedback {
     JSettingEnum getSettingId();
     double getSettingValue();
+    double getSettingMinValue();
+    double getSettingMaxValue();
     String getSettingDescription();
     void setSettingValue(double value);
 }

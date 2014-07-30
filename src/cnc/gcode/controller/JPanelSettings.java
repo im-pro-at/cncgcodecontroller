@@ -84,6 +84,200 @@ public class JPanelSettings extends javax.swing.JPanel implements IGUIEvent, ISe
         GUIEvent.fired();
     }
     
+    private LinkedList<ISettingFeedback> DisplaySettingPanel(String panelTitle,
+                                                             JSettingEnum[] ids,
+                                                             double[] currentValues,
+                                                             double[] minValues,
+                                                             double[] maxValues,
+                                                             String[] descriptions)
+    {
+        returnedFeedbackValues = null;
+        if(ids.length !=  currentValues.length && currentValues.length!= descriptions.length)
+        {
+            return null;
+        }
+        
+        LinkedList<ISettingFeedback> settings = new LinkedList<ISettingFeedback>();
+        for (int i = 0; i< currentValues.length; i++)
+        {
+            settings.add(new JSettingFeedback(ids[i],
+                                              currentValues[i],
+                                              minValues[i],
+                                              maxValues[i],
+                                              descriptions[i] ));
+        }
+        JSettingsDialog form = new JSettingsDialog(this, settings);
+        form.setTitle(panelTitle);
+        form.pack();
+        form.setModal(true);
+        form.setVisible(true);
+        
+        return returnedFeedbackValues;
+    }
+    
+    private void HandleBacklashSettings()
+    {
+        Double[] values = new Double[3];
+        String[] messages = new String[3];
+
+        for(int i = 0; i < 3;i++ )
+        {
+            messages[i] = "Set the Backlash for the " + CommandParsing.axesName[i] + " axis:";
+        }
+
+        LinkedList<ISettingFeedback> updatedValues = DisplaySettingPanel("Backlash correction",
+                                                                         new JSettingEnum[]{ //value
+                                                                                            JSettingEnum.BL0,
+                                                                                            JSettingEnum.BL1,
+                                                                                            JSettingEnum.BL2
+                                                                        },
+                                                                        new double[]{ //value
+                                                                                        Database.getBacklash(0).getsaved(),
+                                                                                        Database.getBacklash(1).getsaved(),
+                                                                                        Database.getBacklash(2).getsaved()
+                                                                                    },
+                                                                        new double[]{ //min 
+                                                                                    0,
+                                                                                    0,
+                                                                                    0
+                                                                        },
+                                                                        new double[]{ //max
+                                                                                        300,
+                                                                                        300,
+                                                                                        300
+                                                                                    },
+                                                                        new String[]{ //message
+                                                                                    messages[0],
+                                                                                    messages[1],
+                                                                                    messages[2]
+                                                                                });
+        if(updatedValues != null)
+        {
+            for(int i = 0; i < 3;i++ )
+            {
+                Database.getBacklash(i).set(Tools.dtostr(updatedValues.get(i).getSettingValue()));
+            }
+        }
+    }
+    
+    private void HandleWorkingSpaceSettings()
+    {
+        LinkedList<ISettingFeedback> updatedValues = DisplaySettingPanel("Workspace size",
+                                                                             new JSettingEnum[]{ //value
+                                                                                JSettingEnum.WORKSPACE0,
+                                                                                JSettingEnum.WORKSPACE1,
+                                                                                JSettingEnum.WORKSPACE2
+                                                                            },
+                                                                            new double[]{ //value
+                                                                                            Database.getWorkspace(0).getsaved(),
+                                                                                            Database.getWorkspace(1).getsaved(),
+                                                                                            Database.getWorkspace(2).getsaved()
+                                                                                        },
+                                                                            new double[]{ //min 
+                                                                                /*ALZERO*/          0,
+                                                                                /*ALMAXPROBDEPTH*/  0,
+                                                                                /*ALSAVEHEIGHT*/    0
+                                                                            },
+                                                                            new double[]{ //max
+                                                                                            300,
+                                                                                            300,
+                                                                                            300
+                                                                                        },
+                                                                            new String[]{ //message
+                                                                                        "Set Size for the " + CommandParsing.axesName[0] + " axis",
+                                                                                        "Set Size for the " + CommandParsing.axesName[1] + " axis",
+                                                                                        "Set Size for the " + CommandParsing.axesName[2] + " axis"
+                                                                                    });
+            if(updatedValues != null)
+            {
+                for(int i = 0; i < 3;i++ )
+                {
+                    Database.getWorkspace(i).set(Tools.dtostr(updatedValues.get(i).getSettingValue()));
+                }
+            }
+    }
+    
+    private void HandleAutoLevelingSettings()
+    {
+        LinkedList<ISettingFeedback> updatedValues = DisplaySettingPanel("Auto leveling settings",
+                                                                            new JSettingEnum[]{ //value
+                                                                                JSettingEnum.ALZERO,
+                                                                                JSettingEnum.ALMAXPROBDEPTH,
+                                                                                JSettingEnum.ALSAVEHEIGHT,
+                                                                                JSettingEnum.ALCLEARANCE,
+                                                                                JSettingEnum.ALFEEDRATE,
+                                                                            },
+                                                                            new double[]{ //value
+                                                                                            Database.ALZERO.getsaved(),
+                                                                                            Database.ALMAXPROBDEPTH.getsaved(),
+                                                                                            Database.ALSAVEHEIGHT.getsaved(),
+                                                                                            Database.ALCLEARANCE.getsaved(),
+                                                                                            Database.ALFEEDRATE.getsaved(),
+                                                                                        },
+                                                                            new double[]{ //min 
+                                                                                /*ALZERO*/          -Double.MAX_VALUE,
+                                                                                /*ALMAXPROBDEPTH*/  -1.0,
+                                                                                /*ALSAVEHEIGHT*/    0.0-Database.WORKSPACE2.getsaved(),                    
+                                                                                /*ALCLEARANCE*/     0.0,
+                                                                                /*ALFEEDRATE*/      0.0,
+                                                                            },
+                                                                            new double[]{ //max
+                                                                                            /*ALZERO*/          Double.MAX_VALUE,
+                                                                                            /*ALMAXPROBDEPTH*/  Database.WORKSPACE2.getsaved(),
+                                                                                            /*ALSAVEHEIGHT*/    Database.WORKSPACE2.getsaved(),
+                                                                                            /*ALCLEARANCE*/     Database.WORKSPACE2.getsaved(),    
+                                                                                            /*ALFEEDRATE*/      Double.MAX_VALUE,
+                                                                                        },
+                                                                            new String[]{ //message
+                                                                                        /*ALZERO*/          "The absolute position where the Autoleveling is correcting. \nSo after level correction, this Z value will have the probed value. (Normally it is 0)",
+                                                                                        /*ALMAXPROBDEPTH*/  "How deep the system tries to probe. (You should home your system before Autoleveling.) \nIn absolute position it is \"Zero height\" - this value.",
+                                                                                        /*ALSAVEHEIGHT*/    "Absolute height where the CNC can move safely without problems. \nThe first probing will also start from this position!",
+                                                                                        /*ALCLEARANCE*/     "The clearance to the object between two probes.",
+                                                                                        /*ALFEEDRATE*/      "The feedrate used for the probing",
+                                                                                    });
+                                                                                            
+
+            
+            if(updatedValues != null)
+            {
+                    Database.ALZERO.set(Tools.dtostr(updatedValues.get(0).getSettingValue()));
+                    Database.ALMAXPROBDEPTH.set(Tools.dtostr(updatedValues.get(1).getSettingValue()));
+                    Database.ALSAVEHEIGHT.set(Tools.dtostr(updatedValues.get(2).getSettingValue()));
+                    Database.ALCLEARANCE.set(Tools.dtostr(updatedValues.get(3).getSettingValue()));
+                    Database.ALFEEDRATE.set(Tools.dtostr(updatedValues.get(4).getSettingValue()));
+            }
+    }
+    
+    
+    private void HandleAutoLevelingDistanceSettings()
+    {
+        LinkedList<ISettingFeedback> updatedValues = DisplaySettingPanel("Workspace size",
+                                                                             new JSettingEnum[]{ //value
+                                                                                JSettingEnum.ALDISTANCE,
+                                                                                JSettingEnum.ALMAXMOVELENGTH
+                                                                            },
+                                                                            new double[]{ //value
+                                                                                Database.ALDISTANCE.getsaved(),
+                                                                                Database.ALMAXMOVELENGTH.getsaved(),
+                                                                            },
+                                                                            new double[]{ //min 
+                                                                                Double.MIN_VALUE,
+                                                                                Double.MIN_VALUE
+                                                                            },
+                                                                            new double[]{ //max
+                                                                                            300,
+                                                                                            300
+                                                                                        },
+                                                                            new String[]{ //message
+                                                                                          "The maximum distance between two probs",
+                                                                                          "The maximum Length of a XY move before it gets split",
+                                                                                        });
+            if(updatedValues != null)
+            {
+                Database.ALDISTANCE.set(Tools.dtostr(updatedValues.get(0).getSettingValue()));
+                Database.ALMAXMOVELENGTH.set(Tools.dtostr(updatedValues.get(1).getSettingValue()));
+            }
+    }
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always
@@ -522,9 +716,16 @@ public class JPanelSettings extends javax.swing.JPanel implements IGUIEvent, ISe
     private void jBSettingsActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jBSettingsActionPerformed
 
         //HOMING
-        if(evt.getSource()==jBSHoming)
+        if(evt.getSource() == jBSHoming)
         {
-            int options = JOptionPane.showOptionDialog(this, "Select homing corner", "Homing", JOptionPane.YES_NO_CANCEL_OPTION, JOptionPane.INFORMATION_MESSAGE, null, homing,0);
+            int options = JOptionPane.showOptionDialog(this,
+                                                       "Select homing corner",
+                                                       "Homing",
+                                                       JOptionPane.YES_NO_CANCEL_OPTION,
+                                                       JOptionPane.INFORMATION_MESSAGE,
+                                                       null,
+                                                       homing,
+                                                       0);
             if(options != JOptionPane.CLOSED_OPTION)
             {
                 Database.HOMING.set(""+options);
@@ -534,7 +735,10 @@ public class JPanelSettings extends javax.swing.JPanel implements IGUIEvent, ISe
         //MAXFEEDRATE
         if(evt.getSource() == jBSFastFeedrate)
         {
-            Double[] d = Tools.getValues(new String[]{"Set the Feedrate for the fast move:"}, new Double[]{Database.MAXFEEDRATE.getsaved()}, new Double[]{Double.MAX_VALUE}, new Double[]{0.0});
+            Double[] d = Tools.getValues(new String[]{"Set the feedrate for the fast move:"},
+                                        new Double[]{Database.MAXFEEDRATE.getsaved()},
+                                        new Double[]{Double.MAX_VALUE},
+                                        new Double[]{0.0});
             if(d != null)
             {
                 Database.MAXFEEDRATE.set(Tools.dtostr(d[0]));
@@ -544,90 +748,83 @@ public class JPanelSettings extends javax.swing.JPanel implements IGUIEvent, ISe
         //WORKINGSPACE
         if(evt.getSource() == jBSWorkSpace)
         {
-            Double[] values = new Double[3];
-            String[] messages = new String[3];
-
-            for(int i = 0; i < 3;i++ )
-            {
-                values[i] = Database.getWorkspace(i).getsaved();
-                messages[i] = "Set Size for the " + CommandParsing.axesName[i] + " axis";
-            }
-            values = Tools.getValues(messages, values, new Double[]{Double.MAX_VALUE, Double.MAX_VALUE, Double.MAX_VALUE}, new Double[]{0.0,0.0,0.0});
-
-            if(values != null)
-            for(int i = 0; i < 3;i++ )
-                Database.getWorkspace(i).set(Tools.dtostr(values[i]));
+            HandleWorkingSpaceSettings();
         }
         
         //StartCode
         if(evt.getSource() == jBSCNCStart)
         {
-            JTextArea textArea = new JTextArea(Database.STARTCODE.get()); 
-            JScrollPane scrollArea = new JScrollPane(textArea); 
+            JTextArea textArea      = new JTextArea(Database.STARTCODE.get()); 
+            JScrollPane scrollArea  = new JScrollPane(textArea); 
             scrollArea.setPreferredSize(new Dimension(100, 100));
 
             if(JOptionPane.showConfirmDialog
-                    (
-                    this,
-                    new Object[]{"Enter the commands which will be executed when milling is started:", scrollArea},
-                    "Tool change:",
-                    JOptionPane.OK_CANCEL_OPTION
-                    )
-                    == JOptionPane.OK_OPTION)
+                                            (
+                                            this,
+                                            new Object[]{"Enter the command which will be executed when milling is started:",
+                                                        scrollArea},
+                                            "Tool change:",
+                                            JOptionPane.OK_CANCEL_OPTION
+                                            )
+                                            == JOptionPane.OK_OPTION)
                 Database.STARTCODE.set(textArea.getText().trim());
         }
 
         //Toolchange
         if(evt.getSource() == jBSCNCToolChange)
         {
-            JTextArea textArea = new JTextArea(Database.TOOLCHANGE.get()); 
-            JScrollPane scrollArea = new JScrollPane(textArea); 
+            JTextArea textArea      = new JTextArea(Database.TOOLCHANGE.get()); 
+            JScrollPane scrollArea  = new JScrollPane(textArea); 
             scrollArea.setPreferredSize(new Dimension(100, 100));
 
             if(JOptionPane.showConfirmDialog
-                    (
-                    this,
-                    new Object[]{"Enter the commands to change the Tool:", scrollArea,"Hint: '?' will be replaced with the Tool Number"},
-                    "Tool change:",
-                    JOptionPane.OK_CANCEL_OPTION
-                    )
-                    == JOptionPane.OK_OPTION)
+                                            (
+                                            this,
+                                            new Object[]{"Enter the command to change the tool:",
+                                                        scrollArea,
+                                                        "Hint: '?' will be replaced with the tool number"},
+                                            "Tool change:",
+                                            JOptionPane.OK_CANCEL_OPTION
+                                            )
+                                            == JOptionPane.OK_OPTION)
                 Database.TOOLCHANGE.set(textArea.getText().trim());
         }
         
         //Spindle ON
         if(evt.getSource() == jBSCNCSpindleON)
         {
-            JTextArea textArea = new JTextArea(Database.SPINDLEON.get()); 
-            JScrollPane scrollArea = new JScrollPane(textArea); 
+            JTextArea textArea      = new JTextArea(Database.SPINDLEON.get()); 
+            JScrollPane scrollArea  = new JScrollPane(textArea); 
             scrollArea.setPreferredSize(new Dimension(100, 100));
 
             if(JOptionPane.showConfirmDialog
-                    (
-                    this,
-                    new Object[]{"Enter the commands to turn the spindle on:", scrollArea,"Hint: '?' will be replaced with the Original Command Number!"},
-                    "Spindle ON:",
-                    JOptionPane.OK_CANCEL_OPTION
-                    )
-                    == JOptionPane.OK_OPTION)
+                                            (
+                                            this,
+                                            new Object[]{"Enter the command to turn the spindle on:",
+                                                        scrollArea,
+                                                        "Hint: '?' will be replaced with the original command number!"},
+                                            "Spindle ON:",
+                                            JOptionPane.OK_CANCEL_OPTION
+                                            )
+                                            == JOptionPane.OK_OPTION)
                 Database.SPINDLEON.set(textArea.getText().trim());
         }
 
         //Spindle OFF
         if(evt.getSource() == jBSCNCSpindleOFF)
         {
-            JTextArea textArea = new JTextArea(Database.SPINDLEOFF.get()); 
-            JScrollPane scrollArea = new JScrollPane(textArea); 
+            JTextArea textArea          = new JTextArea(Database.SPINDLEOFF.get()); 
+            JScrollPane scrollArea      = new JScrollPane(textArea); 
             scrollArea.setPreferredSize(new Dimension(100, 100));
 
             if(JOptionPane.showConfirmDialog
-                    (
-                    this,
-                    new Object[]{"Enter the commands to turn the spindle off:", scrollArea},
-                    "Spindle OFF:",
-                    JOptionPane.OK_CANCEL_OPTION
-                    )
-                    == JOptionPane.OK_OPTION)
+                                            (
+                                            this,
+                                            new Object[]{"Enter the command to turn the spindle off:", scrollArea},
+                                            "Spindle OFF:",
+                                            JOptionPane.OK_CANCEL_OPTION
+                                            )
+                                            == JOptionPane.OK_OPTION)
                 Database.SPINDLEOFF.set(textArea.getText().trim());
         }
         
@@ -635,7 +832,10 @@ public class JPanelSettings extends javax.swing.JPanel implements IGUIEvent, ISe
         //G0Feedrate
         if(evt.getSource() == jBSCNCG0Feedrate)
         {
-            Double[] d=Tools.getValues(new String[]{"Set the Feedrate for the G0 move:"}, new Double[]{Database.GOFEEDRATE.getsaved()}, new Double[]{Database.MAXFEEDRATE.getsaved()}, new Double[]{0.0});
+            Double[] d = Tools.getValues(new String[]{"Set the feedrate for the G0 move:"},
+                                        new Double[]{Database.GOFEEDRATE.getsaved()},
+                                        new Double[]{Database.MAXFEEDRATE.getsaved()},
+                                        new Double[]{0.0});
             if(d != null) 
             {
                 Database.GOFEEDRATE.set(Tools.dtostr(d[0]));
@@ -645,7 +845,10 @@ public class JPanelSettings extends javax.swing.JPanel implements IGUIEvent, ISe
         //Tooldiameter
         if(evt.getSource() == jBSCNCToolSize)
         {
-            Double[] d=Tools.getValues(new String[]{"Set the Toolsize for CNC Milling Simulation:"}, new Double[]{Database.TOOLSIZE.getsaved()}, new Double[]{Double.MAX_VALUE}, new Double[]{0.0});
+            Double[] d = Tools.getValues(new String[]{"Set the toolsize for CNC milling simulation:"},
+                                        new Double[]{Database.TOOLSIZE.getsaved()},
+                                        new Double[]{Double.MAX_VALUE},
+                                        new Double[]{0.0});
             if(d != null) 
             {
                 Database.TOOLSIZE.set(Tools.dtostr(d[0]));
@@ -653,9 +856,12 @@ public class JPanelSettings extends javax.swing.JPanel implements IGUIEvent, ISe
         }
         
         //Tooldiameter
-        if(evt.getSource()==jBSCNCOptimiserTime)
+        if(evt.getSource() == jBSCNCOptimiserTime)
         {
-            Double[] d=Tools.getValues(new String[]{"Set the Timeout in Seconds for Optimizing:"}, new Double[]{Database.OPTIMISATIONTIMEOUT.getsaved()}, new Double[]{Double.MAX_VALUE}, new Double[]{0.0});
+            Double[] d = Tools.getValues(new String[]{"Set the timeout in seconds for optimizing:"},
+                                        new Double[]{Database.OPTIMISATIONTIMEOUT.getsaved()},
+                                        new Double[]{Double.MAX_VALUE},
+                                        new Double[]{0.0});
             if(d != null)
             {
                 Database.OPTIMISATIONTIMEOUT.set(Tools.dtostr(d[0]));
@@ -663,105 +869,30 @@ public class JPanelSettings extends javax.swing.JPanel implements IGUIEvent, ISe
         }
         
         //AL Options
-        if(evt.getSource()==jBSALOptions)
+        if(evt.getSource() == jBSALOptions)
         {
-//            Double[] values = Tools.getValues(
-//                new String[]{ //message
-//                    /*ALZERO*/          "The absolut position where the Autoleveling is correcting to. \nSo after level correction this Z value will have the probed value. (Normally it is 0)",
-//                    /*ALMAXPROBDEPTH*/  "How deep the system try to probe. (You should home you system before Autoleveling.) \nIn absolute position it is \"Zero height\" - this value.",
-//                    /*ALSAVEHEIGHT*/    "Absolute height where the CNC can move safely without problems. \nThe first Probing will also start from this position!",
-//                    /*ALCLEARANCE*/     "The clearance to the object between two probings.",
-//                    /*ALFEEDRATE*/      "The feedrate used for the probing",
-//                },
-//                new Double[]{ //value
-//                    Database.ALZERO.getsaved(),
-//                    Database.ALMAXPROBDEPTH.getsaved(),
-//                    Database.ALSAVEHEIGHT.getsaved(),
-//                    Database.ALCLEARANCE.getsaved(),
-//                    Database.ALFEEDRATE.getsaved(),
-//                },
-//                new Double[]{ //max
-//                    /*ALZERO*/          Double.MAX_VALUE,
-//                    /*ALMAXPROBDEPTH*/  Database.WORKSPACE2.getsaved(),
-//                    /*ALSAVEHEIGHT*/    Database.WORKSPACE2.getsaved(),
-//                    /*ALCLEARANCE*/     Database.WORKSPACE2.getsaved(),    
-//                    /*ALFEEDRATE*/      Double.MAX_VALUE,
-//                },
-//                new Double[]{ //min
-//                    /*ALZERO*/          -Double.MAX_VALUE,
-//                    /*ALMAXPROBDEPTH*/  0.0,
-//                    /*ALSAVEHEIGHT*/    0.0-Database.WORKSPACE2.getsaved(),                    
-//                    /*ALCLEARANCE*/     0.0,
-//                    /*ALFEEDRATE*/      0.0,
-//                });
-
-            
-            
-            //form.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
-            returnedFeedbackValues = null;
-            LinkedList<ISettingFeedback> settings = new LinkedList<ISettingFeedback>();
-            settings.add(new JSettingFeedback(JSettingEnum.ALZERO,Database.ALZERO.getsaved(), "The absolut position where the Autoleveling is correcting to. \nSo after level correction this Z value will have the probed value. (Normally it is 0)" ));
-            settings.add(new JSettingFeedback(JSettingEnum.ALMAXPROBDEPTH,Database.ALMAXPROBDEPTH.getsaved(), "How deep the system try to probe. (You should home you system before Autoleveling.) \nIn absolute position it is \"Zero height\" - this value." ));
-            settings.add(new JSettingFeedback(JSettingEnum.ALSAVEHEIGHT,Database.ALSAVEHEIGHT.getsaved(), "Absolute height where the CNC can move safely without problems. \nThe first Probing will also start from this position!"));
-            settings.add(new JSettingFeedback(JSettingEnum.ALCLEARANCE,Database.ALCLEARANCE.getsaved(), "The clearance to the object between two probings."));
-            settings.add(new JSettingFeedback(JSettingEnum.ALFEEDRATE,Database.ALFEEDRATE.getsaved(), "The feedrate used for the probing"));
-            JSettingsDialog form = new JSettingsDialog(this, settings);
-            form.setTitle("Auto leveling settings");
-            form.pack();
-            form.setModal(true);
-            form.setVisible(true);
-            
-            if(returnedFeedbackValues != null && returnedFeedbackValues.size() == settings.size())
-            {
-                    Database.ALZERO.set(Tools.dtostr(returnedFeedbackValues.get(0).getSettingValue()));
-                    Database.ALMAXPROBDEPTH.set(Tools.dtostr(returnedFeedbackValues.get(1).getSettingValue()));
-                    Database.ALSAVEHEIGHT.set(Tools.dtostr(returnedFeedbackValues.get(2).getSettingValue()));
-                    Database.ALCLEARANCE.set(Tools.dtostr(returnedFeedbackValues.get(3).getSettingValue()));
-                    Database.ALFEEDRATE.set(Tools.dtostr(returnedFeedbackValues.get(4).getSettingValue()));
-            }
+            HandleAutoLevelingSettings();
         }
 
-        
         //AL Distance
         if(evt.getSource() == jBSALDistance)
         {
-            Double[] values= Tools.getValues(
-                new String[]{ //message
-                    /*ALDISTANCE*/         "The maximum distance between two probs",
-                    /*ALMAXMOVELENGTH*/     "The maximum Length of a XY move before it gets split",
-                },
-                new Double[]{ //value
-                    Database.ALDISTANCE.getsaved(),
-                    Database.ALMAXMOVELENGTH.getsaved(),
-                },
-                new Double[]{ //max
-                    /*ALDISTANCE*/         Double.MAX_VALUE,
-                    /*ALMAXMOVELENGTH*/     Double.MAX_VALUE,
-                },
-                new Double[]{ //min
-                    /*ALDISTANCE*/         Double.MIN_VALUE, //Not 0 
-                    /*ALMAXMOVELENGTH*/     Double.MIN_VALUE, //Not 0 
-                });
-
-            if(values != null)
-            {
-                Database.ALDISTANCE.set(Tools.dtostr(values[0]));
-                Database.ALMAXMOVELENGTH.set(Tools.dtostr(values[1]));
-            }
+            HandleAutoLevelingDistanceSettings();
         }
         
         
         //AutoLavel StartCode
-        if(evt.getSource()==jBSALStart)
+        if(evt.getSource( )== jBSALStart)
         {
-            JTextArea textArea = new JTextArea(Database.ALSTARTCODE.get()); 
-            JScrollPane scrollArea = new JScrollPane(textArea); 
+            JTextArea textArea      = new JTextArea(Database.ALSTARTCODE.get()); 
+            JScrollPane scrollArea  = new JScrollPane(textArea); 
             scrollArea.setPreferredSize(new Dimension(100, 100));
 
             if(JOptionPane.showConfirmDialog
                     (
                     this,
-                    new Object[]{"Enter the commands that will be executed when autoleveling starts:", scrollArea},
+                    new Object[]{"Enter the commands that will be executed when autoleveling starts:",
+                                scrollArea},
                     "Tool change:",
                     JOptionPane.OK_CANCEL_OPTION
                     )
@@ -772,7 +903,10 @@ public class JPanelSettings extends javax.swing.JPanel implements IGUIEvent, ISe
         //ARC
         if(evt.getSource() == jBSARC)
         {
-            Double[] d = Tools.getValues(new String[]{"Set the Maximum Segment length for ARC to linear move conversion \n The lower the value the more communication is nessesarry:"}, new Double[]{Database.ARCSEGMENTLENGTH.getsaved()}, new Double[]{Double.MAX_VALUE}, new Double[]{Double.MIN_VALUE});
+            Double[] d = Tools.getValues(new String[]{"Set the maximum segment length for ARC to linear move conversion \n The lower the value the more communication is needed:"},
+                                        new Double[]{Database.ARCSEGMENTLENGTH.getsaved()},
+                                        new Double[]{Double.MAX_VALUE},
+                                        new Double[]{Double.MIN_VALUE});
             if(d != null)
             {
                 Database.ARCSEGMENTLENGTH.set(Tools.dtostr(d[0]));
@@ -782,37 +916,37 @@ public class JPanelSettings extends javax.swing.JPanel implements IGUIEvent, ISe
         //Backlash
         if(evt.getSource() == jBSBacklash)
         {
-            Double[] values = new Double[3];
-            String[] messages = new String[3];
-
-            for(int i = 0; i < 3;i++ )
-            {
-                values[i] = Database.getBacklash(i).getsaved();
-                messages[i] = "Set the Backlash for the " + CommandParsing.axesName[i] + " axis:";
-            }
-            values = Tools.getValues(messages, values, new Double[]{Double.MAX_VALUE, Double.MAX_VALUE, Double.MAX_VALUE}, new Double[]{0.0,0.0,0.0});
-
-            if(values != null)
-            for(int i = 0; i < 3; i++ )
-            {
-                Database.getBacklash(i).set(Tools.dtostr(values[i]));
-            }
+            HandleBacklashSettings();
         }
 
         //Modal G1
         if(evt.getSource() == jBSmodalG1)
         {
-            int options = JOptionPane.showOptionDialog(this, "Select G1 Modal Mode:", "Modal G1", JOptionPane.YES_NO_CANCEL_OPTION, JOptionPane.INFORMATION_MESSAGE, null, new String[] {"OFF", "ON"},0);
+            int options = JOptionPane.showOptionDialog(this,
+                                                       "Select G1 modal mode:",
+                                                       "Modal G1",
+                                                       JOptionPane.YES_NO_CANCEL_OPTION,
+                                                       JOptionPane.INFORMATION_MESSAGE,
+                                                       null,
+                                                       new String[] {"OFF", "ON"},
+                                                       0);
             if(options != JOptionPane.CLOSED_OPTION)
             {
-                Database.G1MODAL.set(""+options);
+                Database.G1MODAL.set("" + options);
             }
         }
         
         //ComType
         if(evt.getSource() == jBSComType)
         {
-            int options = JOptionPane.showOptionDialog(this, "Select Type of communication", "Device Type", JOptionPane.YES_NO_CANCEL_OPTION, JOptionPane.INFORMATION_MESSAGE, null, Communication.values(),0);
+            int options = JOptionPane.showOptionDialog(this,
+                                                        "Select type of communication",
+                                                        "Device Type",
+                                                        JOptionPane.YES_NO_CANCEL_OPTION,
+                                                        JOptionPane.INFORMATION_MESSAGE,
+                                                        null,
+                                                        Communication.values(),
+                                                        0);
             if(options != JOptionPane.CLOSED_OPTION)
             {
                 Database.COMTYPE.set(Communication.values()[options].toString());
@@ -823,10 +957,12 @@ public class JPanelSettings extends javax.swing.JPanel implements IGUIEvent, ISe
     }//GEN-LAST:event_jBSettingsActionPerformed
 
     private void jBexportActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jBexportActionPerformed
-        JFileChooser fc= Database.getFileChooser();
-        fc.setFileFilter(new FileFilter() {
+        JFileChooser fc = Database.getFileChooser();
+        fc.setFileFilter(new FileFilter() 
+        {
             @Override
-            public boolean accept(File f) {
+            public boolean accept(File f) 
+            {
                 return f.getName().toLowerCase().endsWith(".ois")||f.isDirectory();
             }
 
@@ -857,14 +993,17 @@ public class JPanelSettings extends javax.swing.JPanel implements IGUIEvent, ISe
 
     private void jBImportActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jBImportActionPerformed
         JFileChooser fc = Database.getFileChooser();
-        fc.setFileFilter(new FileFilter() {
+        fc.setFileFilter(new FileFilter() 
+        {
             @Override
-            public boolean accept(File f) {
+            public boolean accept(File f) 
+            {
                 return f.getName().toLowerCase().endsWith(".ois")||f.isDirectory();
             }
 
             @Override
-            public String getDescription() {
+            public String getDescription() 
+            {
                 return "Settings files (*.ois)";
             }
         });
@@ -878,7 +1017,7 @@ public class JPanelSettings extends javax.swing.JPanel implements IGUIEvent, ISe
         
         if(Database.load(fc.getSelectedFile()) == false)
         {
-            JOptionPane.showMessageDialog(this, "Cannot import Settings!");
+            JOptionPane.showMessageDialog(this, "Cannot import settings!");
         }
         
         fireupdateGUI();
