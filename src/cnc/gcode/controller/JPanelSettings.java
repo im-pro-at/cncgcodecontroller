@@ -77,7 +77,7 @@ public class JPanelSettings extends javax.swing.JPanel implements IGUIEvent, ISe
     
     private void fireupdateGUI()
     {
-        if(GUIEvent==null)
+        if(GUIEvent == null)
         {
             throw new RuntimeException("GUI EVENT NOT USED!");
         }
@@ -122,7 +122,7 @@ public class JPanelSettings extends javax.swing.JPanel implements IGUIEvent, ISe
 
         for(int i = 0; i < 3;i++ )
         {
-            messages[i] = "Set the Backlash for the " + CommandParsing.axesName[i] + " axis:";
+            messages[i] = "Set the backlash for the " + CommandParsing.axesName[i] + " axis:";
         }
 
         LinkedList<ISettingFeedback> updatedValues = DisplaySettingPanel("Backlash correction",
@@ -728,20 +728,20 @@ public class JPanelSettings extends javax.swing.JPanel implements IGUIEvent, ISe
                                                        0);
             if(options != JOptionPane.CLOSED_OPTION)
             {
-                Database.HOMING.set(""+options);
+                Database.HOMING.set("" + options);
             }
         }
 
         //MAXFEEDRATE
         if(evt.getSource() == jBSFastFeedrate)
         {
-            Double[] d = Tools.getValues(new String[]{"Set the feedrate for the fast move:"},
+            Double[] feedrates = Tools.getValues(new String[]{"Set the feedrate for the fast move:"},
                                         new Double[]{Database.MAXFEEDRATE.getsaved()},
                                         new Double[]{Double.MAX_VALUE},
                                         new Double[]{0.0});
-            if(d != null)
+            if(feedrates != null)
             {
-                Database.MAXFEEDRATE.set(Tools.dtostr(d[0]));
+                Database.MAXFEEDRATE.set(Tools.dtostr(feedrates[0]));
             }
         }
 
@@ -761,7 +761,7 @@ public class JPanelSettings extends javax.swing.JPanel implements IGUIEvent, ISe
             if(JOptionPane.showConfirmDialog
                                             (
                                             this,
-                                            new Object[]{"Enter the command which will be executed when milling is started:",
+                                            new Object[]{"Enter the command that will be executed when milling starts:",
                                                         scrollArea},
                                             "Tool change:",
                                             JOptionPane.OK_CANCEL_OPTION
@@ -781,7 +781,7 @@ public class JPanelSettings extends javax.swing.JPanel implements IGUIEvent, ISe
                                             (
                                             this,
                                             new Object[]{"Enter the command to change the tool:",
-                                                        scrollArea,
+                                                        new JScrollPane(textArea),
                                                         "Hint: '?' will be replaced with the tool number"},
                                             "Tool change:",
                                             JOptionPane.OK_CANCEL_OPTION

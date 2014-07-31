@@ -60,7 +60,7 @@ public class JPanelCNCMilling extends javax.swing.JPanel implements IGUIEvent{
     }
     
     
-    private NumberFildManipulator[] positioningMove;
+    private NumberFieldManipulator[] positioningMove;
     private PMySwingWorker worker   = null;
     private boolean cncLoadedFile   = false;
     private PrintableLayers layers  = new PrintableLayers();
@@ -92,7 +92,7 @@ public class JPanelCNCMilling extends javax.swing.JPanel implements IGUIEvent{
             protected BufferedImage doJob() throws Exception {
                 
                 //Load Parameter:
-                final GetDataSyncedHelper data= new GetDataSyncedHelper();
+                final GetDataSyncedHelper data = new GetDataSyncedHelper();
                 SwingUtilities.invokeAndWait(new Runnable() {
                     @Override
                     public void run() {
@@ -108,11 +108,11 @@ public class JPanelCNCMilling extends javax.swing.JPanel implements IGUIEvent{
                     }
                 });        
                 
-                if(data.jpw <= 0)
+                if(data.jpw < 1)
                 {
                     data.jpw = 1;
                 }
-                if(data.jph <= 0)
+                if(data.jph < 1)
                 {
                     data.jph = 1;
                 }
@@ -184,7 +184,8 @@ public class JPanelCNCMilling extends javax.swing.JPanel implements IGUIEvent{
                                 
                 //Positioning
                 g2.translate(data.movex, data.movey);
-                g2.scale(data.mirrorx ? -1:1, data.mirrory ? -1:1);
+                g2.scale(data.mirrorx ? -1:1,
+                         data.mirrory ? -1:1);
                 
                 try {
                     AffineTransform t = g2.getTransform();
@@ -217,6 +218,7 @@ public class JPanelCNCMilling extends javax.swing.JPanel implements IGUIEvent{
 
         jLCNCCommands.setModel(new DefaultListModel());
         jLCNCCommands.addMouseListener(new MouseAdapter() {
+            @Override
             public void mousePressed(MouseEvent e)
             {
                     if ( SwingUtilities.isRightMouseButton(e) )
@@ -225,9 +227,9 @@ public class JPanelCNCMilling extends javax.swing.JPanel implements IGUIEvent{
                     }
             }        
         });
-        NumberFildManipulator.IAxesEvent numberevent= new NumberFildManipulator.IAxesEvent() {
+        NumberFieldManipulator.IAxesEvent numberevent= new NumberFieldManipulator.IAxesEvent() {
             @Override
-            public void fired(NumberFildManipulator axis) {
+            public void fired(NumberFieldManipulator axis) {
                 Double value;
                 try {
                    value = axis.getd();
@@ -244,9 +246,9 @@ public class JPanelCNCMilling extends javax.swing.JPanel implements IGUIEvent{
             }
         };
         
-        positioningMove = new NumberFildManipulator[] {new NumberFildManipulator(jTFmoveX, numberevent), new NumberFildManipulator(jTFmoveY, numberevent)};
+        positioningMove = new NumberFieldManipulator[] {new NumberFieldManipulator(jTFmoveX, numberevent), new NumberFieldManipulator(jTFmoveY, numberevent)};
         
-        for(NumberFildManipulator fild:positioningMove)
+        for(NumberFieldManipulator fild:positioningMove)
         {
             fild.set(0.0);
         }
@@ -943,7 +945,7 @@ public class JPanelCNCMilling extends javax.swing.JPanel implements IGUIEvent{
                                 return null;
                             }
 
-                            while(Communication.isbussy())
+                            while(Communication.isBussy())
                             {
                                 if(this.isCancelled())
                                 {

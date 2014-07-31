@@ -7,7 +7,6 @@ package cnc.gcode.controller;
 import cnc.gcode.controller.communication.ComInterruptException;
 import cnc.gcode.controller.communication.Communication;
 import cnc.gcode.controller.communication.IEndstopHit;
-import cnc.gcode.controller.communication.IReceivedLines;
 import de.unikassel.ann.util.ColorHelper;
 import java.awt.Color;
 import java.awt.Font;
@@ -32,8 +31,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Random;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
 import javax.swing.SwingUtilities;
@@ -50,7 +47,8 @@ public class JPanelAutoLevel extends javax.swing.JPanel implements IGUIEvent {
     private abstract class PMySwingWorker<R, P> extends MySwingWorker<R, P>
     {
         @Override
-        protected final void progress(int progress, String message) {
+        protected final void progress(int progress, String message) 
+        {
             jPBar.setValue(progress);
             jPBar.setString(message);
         }
@@ -59,14 +57,15 @@ public class JPanelAutoLevel extends javax.swing.JPanel implements IGUIEvent {
     public AutoLevelSystem al = new AutoLevelSystem();
     
     
-    NumberFildManipulator[][] axes;
+    NumberFieldManipulator[][] axes;
     private PMySwingWorker worker   = null;
     private BufferedImage image;
     private AffineTransform trans   = new AffineTransform();
     private boolean         hit     = false;
     private double          hitvalue= 0;
     
-    private final TriggertSwingWorker<BufferedImage> painter =new TriggertSwingWorker<BufferedImage>() {
+    
+    private final TriggertSwingWorker<BufferedImage> painter = new TriggertSwingWorker<BufferedImage>() {
             class GetDataSyncedHelper
             {
                 private int jpw;
@@ -88,14 +87,8 @@ public class JPanelAutoLevel extends javax.swing.JPanel implements IGUIEvent {
                     }
                 });        
                 
-                if(data.jpw <= 0)
-                {
-                    data.jpw = 1;
-                }
-                if(data.jph <= 0)
-                {
-                    data.jph = 1;
-                }
+                data.jpw = Tools.adjustInt(data.jpw, 1, Integer.MAX_VALUE);
+                data.jph = Tools.adjustInt(data.jph, 1, Integer.MAX_VALUE);
                     
                 BufferedImage image = new BufferedImage(data.jpw, data.jph, BufferedImage.TYPE_4BYTE_ABGR);
                 
@@ -179,18 +172,12 @@ public class JPanelAutoLevel extends javax.swing.JPanel implements IGUIEvent {
                         for(int y = 0;y < cy;y++)
                         {
                             Point2D p = trans.transform(new Point2D.Double((double)rect.x + (x + 0.5) * w,
-                                                                            (double)rect.y+ (y+0.5) * h),
+                                                                           (double)rect.y + (y+0.5) * h),
                                                                             null);
                             double z        =   data.al.getdZ(p);
                             double relative =   (z-min)/delta;
-                            if(relative > 1) 
-                            {
-                                relative = 1;
-                            }
-                            if(relative < 0)
-                            {
-                                relative = 0;
-                            }
+                            relative = Tools.adjustDouble(relative, 0, 1);
+                            
                             g2.setColor(ColorHelper.numberToColorPercentage(relative));
                             g2.fillRect((int)Math.floor(rect.x + x * w),
                                         (int)Math.floor(rect.y + y * h),
@@ -208,21 +195,21 @@ public class JPanelAutoLevel extends javax.swing.JPanel implements IGUIEvent {
                     {
                         double z = max - i * (delta / (elements - 1));
                         double relative = (z - min) / delta;
-                        if(relative > 1) 
-                        {
-                            relative = 1;
-                        }
-                        if(relative < 0)
-                        {
-                            relative = 0;
-                        }
+                        relative = Tools.adjustDouble(relative, 0, 1);
+ 
                         Color c = ColorHelper.numberToColorPercentage(relative);
                         g2.setColor(c);
-                        g2.fillRect(data.jpw + 5, dy + zh * i, 90, zh - 4);
-                        g2.setColor((299 * c.getRed() + 587 * c.getGreen() + 114 * c.getBlue( )> 128000) ? Color.black:Color.white);
+                        g2.fillRect(data.jpw + 5,
+                                    dy + zh * i,
+                                    90,
+                                    zh - 4);
+                        g2.setColor(((299 * c.getRed() + 587 * c.getGreen() + 114 * c.getBlue())> 128000) ? Color.black:Color.white);
                         g2.drawString(Tools.dtostr(z), data.jpw + 10, dy + zh * i + zh - 10);
                         g2.setColor(Color.black);
-                        g2.drawRect(data.jpw + 5, dy + zh * i, 90, zh - 4);
+                        g2.drawRect(data.jpw + 5,
+                                    dy + zh * i,
+                                    90,
+                                    zh - 4);
                     }
                 }
                 else
@@ -262,9 +249,9 @@ public class JPanelAutoLevel extends javax.swing.JPanel implements IGUIEvent {
     public JPanelAutoLevel() {
         initComponents();
         
-        NumberFildManipulator.IAxesEvent axesevent = new NumberFildManipulator.IAxesEvent() {
+        NumberFieldManipulator.IAxesEvent axesevent = new NumberFieldManipulator.IAxesEvent() {
             @Override
-            public void fired(NumberFildManipulator axis) {
+            public void fired(NumberFieldManipulator axis) {
                 double value;
                 try {
                    value = axis.getd();
@@ -280,7 +267,7 @@ public class JPanelAutoLevel extends javax.swing.JPanel implements IGUIEvent {
                 //Check Values
                 for(int i = 0;i < 2;i++)
                 {
-                    for(NumberFildManipulator n:axes[i])
+                    for(NumberFieldManipulator n:axes[i])
                     {
                         double v = n.getdsave();
                         if(v < 0)
@@ -293,7 +280,7 @@ public class JPanelAutoLevel extends javax.swing.JPanel implements IGUIEvent {
                         {
                             n.set(Database.getWorkspace(i).getsaved());
                             n.setFocus();
-                            n.popUpToolTip("Value must be smaller than "+Database.getWorkspace(i));
+                            n.popUpToolTip("Value must be smaller than " + Database.getWorkspace(i));
                         }
                     }
                     if(axes[i][0].getdsave()>axes[i][1].getdsave())
@@ -309,10 +296,10 @@ public class JPanelAutoLevel extends javax.swing.JPanel implements IGUIEvent {
 
         };
         
-        axes = new NumberFildManipulator[][]{
+        axes = new NumberFieldManipulator[][]{
                                     /*0 START*/                                             /*0 END*/
-                /*0 X*/ { new NumberFildManipulator(jTFStartX, axesevent), new NumberFildManipulator(jTFEndX, axesevent), },
-                /*1 Y*/ { new NumberFildManipulator(jTFStartY, axesevent), new NumberFildManipulator(jTFEndY, axesevent), },
+                /*0 X*/ { new NumberFieldManipulator(jTFStartX, axesevent), new NumberFieldManipulator(jTFEndX, axesevent), },
+                /*1 Y*/ { new NumberFieldManipulator(jTFStartY, axesevent), new NumberFieldManipulator(jTFEndY, axesevent), },
             };
         
         for(int i = 0;i < 2;i++)
@@ -354,7 +341,8 @@ public class JPanelAutoLevel extends javax.swing.JPanel implements IGUIEvent {
     }
 
     @Override
-    public void updateGUI(boolean serial, boolean isworking) {
+    public void updateGUI(boolean serial, boolean isworking) 
+    {
         jTFStartX.setEnabled(!isWorking() && !al.isLeveled());
         jTFStartY.setEnabled(!isWorking() && !al.isLeveled());
         jTFEndX.setEnabled(!isWorking() && !al.isLeveled());
@@ -667,11 +655,13 @@ public class JPanelAutoLevel extends javax.swing.JPanel implements IGUIEvent {
             AutoLevelSystem.Point sp = null;
             double d = Double.MAX_VALUE;
             for(AutoLevelSystem.Point p:al.getPoints())
+            {
                 if(d > p.getPoint().distance(pos))
                 {
                     sp  = p;
                     d   = p.getPoint().distance(pos);
                 }
+            }
             if(sp != null)
             {
                 JOptionPane.showMessageDialog(this, sp.toString());
@@ -693,9 +683,10 @@ public class JPanelAutoLevel extends javax.swing.JPanel implements IGUIEvent {
         {
             worker = new PMySwingWorker<String,Object>() {
 
-                private boolean waitfornexdSend() throws Exception {
+                private boolean waitForNextSend() throws Exception {
                     //Set Pos back
-                    while (Communication.isbussy()) {
+                    while (Communication.isBussy()) 
+                    {
                         if (this.isCancelled()) 
                         {
                             throw new Exception();
@@ -714,10 +705,10 @@ public class JPanelAutoLevel extends javax.swing.JPanel implements IGUIEvent {
                     final AutoLevelSystem al = JPanelAutoLevel.this.al;
                     if(al.getPoints().length == 0)
                     {
-                        throw new MyException("No Points to level");
+                        throw new MyException("No points to level");
                     }
-                    //Marlin makes an error (looks like rosunding problem with G92 stepcound it much more resulution ...)
-                    //so proping 1 point two times
+                    //Marlin makes an error (looks like rounding problem with G92 stepcount it much more resulution ...)
+                    //so probing 1 point twice
                     AutoLevelSystem.Point[] points = (new ArrayList<AutoLevelSystem.Point>(){
                         {
                             AutoLevelSystem.Point[] ps = al.getPoints();
@@ -727,7 +718,7 @@ public class JPanelAutoLevel extends javax.swing.JPanel implements IGUIEvent {
                     }).toArray(new AutoLevelSystem.Point[0]);
                     
                     
-                    progress(0, "Processing Commands");
+                    progress(0, "Processing commands");
                     Thread.sleep(1000);
                     
                     //--------------Generate GCODES------------------------
@@ -738,7 +729,7 @@ public class JPanelAutoLevel extends javax.swing.JPanel implements IGUIEvent {
                     cmds.add(CNCCommand.getALStartCommand());
                     
                     //go to save hight
-                    cmds.add(new CNCCommand("G0 Z"+Database.ALSAVEHEIGHT));
+                    cmds.add(new CNCCommand("G0 Z" + Database.ALSAVEHEIGHT));
 
                     AutoLevelSystem.Point aktpoint = points[0];
                     Point2D lastpos = null;
@@ -751,7 +742,7 @@ public class JPanelAutoLevel extends javax.swing.JPanel implements IGUIEvent {
                         }
                         
                         //go to Point
-                        if(lastpos==null || !lastpos.equals(aktpoint.getPoint()))
+                        if(lastpos == null || !lastpos.equals(aktpoint.getPoint()))
                         {
                             cmds.add(new CNCCommand("G0 X" + Tools.dtostr(aktpoint.getPoint().getX()) + " Y" + Tools.dtostr(aktpoint.getPoint().getY())));
                         }
@@ -799,10 +790,10 @@ public class JPanelAutoLevel extends javax.swing.JPanel implements IGUIEvent {
 
                         cmds.get(i).calcCommand(c);
                         
-                        //secound command go to save hight so no x and y are known => waring can be ignored! 
+                        //second command go to save high so no x and y are known => warning can be ignored! 
                         if((cmds.get(i).getState() == CNCCommand.State.ERROR || cmds.get(i).getState() == CNCCommand.State.WARNING) && i > 1 ) 
                         {
-                            throw new MyException("Should not happen :-(");
+                            throw new MyException("Error or warning state reported. Should not happen :-(");
                         }
                         
                         //Simulate Clearancemove
@@ -826,8 +817,9 @@ public class JPanelAutoLevel extends javax.swing.JPanel implements IGUIEvent {
 
                         for(String execute:cmd.execute(new CNCCommand.Transform(0, 0, false, false),false,false))
                         {
-                            while(true){
-                                waitfornexdSend();
+                            while(true)
+                            {
+                                waitForNextSend();
                                 hit = false;
                                 try{
                                     Communication.send(execute);
@@ -842,7 +834,8 @@ public class JPanelAutoLevel extends javax.swing.JPanel implements IGUIEvent {
                         if(Arrays.asList(cmdpropeindex).contains(i))
                         {
                             //Proping Done waiting for hit:
-                            if(Communication.isSimulation() == false){
+                            if(Communication.isSimulation() == false)
+                            {
                                 waitForTrigger(1000 * 60 * 10);
                             }
                             else{
@@ -853,7 +846,7 @@ public class JPanelAutoLevel extends javax.swing.JPanel implements IGUIEvent {
                             
                             if(hit == false)
                             {
-                                throw new MyException("Timeout: No End Stop Hit!");
+                                throw new MyException("Timeout: No end stop hit!");
                             }
                             double thitValue = hitvalue;
                             
@@ -861,10 +854,11 @@ public class JPanelAutoLevel extends javax.swing.JPanel implements IGUIEvent {
                             points[Arrays.asList(cmdpropeindex).indexOf(i)].setValue(thitValue);
 
                             //Reset Z position
-                            while(true){
-                                waitfornexdSend();
+                            while(true)
+                            {
+                                waitForNextSend();
                                 try{
-                                    Communication.send("G92 Z"+Tools.dtostr(thitValue));
+                                    Communication.send("G92 Z" + Tools.dtostr(thitValue));
                                 }
                                 catch(ComInterruptException ex){
                                     continue;
@@ -874,11 +868,12 @@ public class JPanelAutoLevel extends javax.swing.JPanel implements IGUIEvent {
 
                             //Clearence
                             while(true){
-                                waitfornexdSend();
+                                waitForNextSend();
                                 try{
-                                    Communication.send("G0 Z"+Tools.dtostr(thitValue+Database.ALCLEARANCE.getsaved())+" F"+Database.GOFEEDRATE);
+                                    Communication.send("G0 Z" + Tools.dtostr(thitValue+Database.ALCLEARANCE.getsaved()) + " F" + Database.GOFEEDRATE);
                                 }
-                                catch(ComInterruptException ex){
+                                catch(ComInterruptException ex)
+                                {
                                     continue;
                                 }
                                 break;
@@ -890,7 +885,7 @@ public class JPanelAutoLevel extends javax.swing.JPanel implements IGUIEvent {
                     
                     }
                     
-                    double error    = points[0].getValue()-points[points.length-1].getValue();
+                    double error    = points[0].getValue()-points[points.length - 1].getValue();
                     double max      = -Double.MAX_VALUE;
                     double min      = Double.MAX_VALUE;
                     double sum      = 0;
@@ -923,10 +918,10 @@ public class JPanelAutoLevel extends javax.swing.JPanel implements IGUIEvent {
                     }
                     
                     String message = "Autoleveling Done!"
-                            +"\n    average: " + Tools.dtostr(sum/points.length)
-                            +"\n    max: "  + Tools.dtostr(max)
-                            +"\n    min: "  + Tools.dtostr(min)
-                            +"\n    error: " + Tools.dtostr(error);
+                                    +"\n    average: " + Tools.dtostr(sum/points.length)
+                                    +"\n    max: "  + Tools.dtostr(max)
+                                    +"\n    min: "  + Tools.dtostr(min)
+                                    +"\n    error: " + Tools.dtostr(error);
                     
                     return message;
                 }
@@ -1001,7 +996,7 @@ public class JPanelAutoLevel extends javax.swing.JPanel implements IGUIEvent {
             }
         }
         catch(Exception e){
-            JOptionPane.showMessageDialog(this, "Cannot import File! ("+e.getMessage()+")");
+            JOptionPane.showMessageDialog(this, "Cannot import file! (" + e.getMessage() + ")");
         }
 
         AutoLevelSystem.publish(al);
@@ -1050,7 +1045,7 @@ public class JPanelAutoLevel extends javax.swing.JPanel implements IGUIEvent {
             }
         }
         catch(Exception e){
-            JOptionPane.showMessageDialog(this, "Cannot export File! (" + e.getMessage() + ")");
+            JOptionPane.showMessageDialog(this, "Cannot export file! (" + e.getMessage() + ")");
         }
         
 

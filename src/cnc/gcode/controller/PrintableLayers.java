@@ -58,12 +58,18 @@ public class PrintableLayers {
         {
             double ts = Database.TOOLSIZE.getsaved();
             type.setupGraphicsOptions(g2, selected(getIndex()));
-            g2.fill(new Ellipse2D.Double(point[0] - ts / 2, point[1] - ts / 2, ts, ts));
+            g2.fill(new Ellipse2D.Double(point[0] - ts / 2,
+                                        point[1] - ts / 2,
+                                        ts,
+                                        ts));
         }
 
         @Override
         public boolean isInRange(Point2D p, double size) {
-            return Geometrics.pointInRectangle(p , new Rectangle2D.Double(point[0], point[1], 0.0, 0.0), size);
+            return Geometrics.pointInRectangle(p , new Rectangle2D.Double(point[0],
+                                                                          point[1],
+                                                                          0.0,
+                                                                          0.0), size);
         }
 
     }
@@ -98,7 +104,7 @@ public class PrintableLayers {
     private Double[] keys = new Double[0];
     private HashSet<Integer> sIndex = new HashSet<>();
     private int sMin =-1,sMax=-1;
-    boolean isBlocked=false;
+    boolean isBlocked = false;
 
     public void processMoves(int index, CNCCommand.Move[] moves) {
         for (CNCCommand.Move move : moves) 

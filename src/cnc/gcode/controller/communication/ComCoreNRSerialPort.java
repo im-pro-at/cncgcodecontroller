@@ -58,9 +58,11 @@ class ComCoreNRSerialPort extends AComCore {
 
             while (true) {
                 int c = inputStream.read();
-                if (c != -1) {
+                if (c != -1) 
+                {
                     input = input + ((char) c);
-                } else {
+                } else 
+                {
                     break;
                 }
             }
@@ -82,9 +84,9 @@ class ComCoreNRSerialPort extends AComCore {
             inputs.set(0,lastSerialString+inputs.get(0));
             lastSerialString = inputs.get(inputs.size()-1);  
             
-            if(inputs.size()>1)
+            if(inputs.size() > 1)
             {
-                final String[] lines = new String[inputs.size()-1];
+                final String[] lines = new String[inputs.size() - 1];
                 for(int i = 0; i < inputs.size() - 1;i++)
                 {
                     lines[i] = inputs.get(i);

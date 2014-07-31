@@ -68,13 +68,34 @@ public class JPanelControl extends javax.swing.JPanel implements IGUIEvent{
                     //Center of ARC is not equi-distant!
                     g.setStroke(new BasicStroke(1));
                     g.setColor(Color.red);
-                    g.drawLine(point.x + (int)(xc * scale), point.y + (int)(yc * scale), point.x +(int)(axes[0][0] * scale), point.y + (int)(axes[1][0] * scale));
-                    g.drawLine(point.x + (int)(xc * scale), point.y + (int)(yc * scale), point.x +(int)(axes[0][1] * scale), point.y + (int)(axes[1][1] * scale));
+                    g.drawLine(point.x + (int)(xc * scale),
+                               point.y + (int)(yc * scale),
+                               point.x +(int)(axes[0][0] * scale),
+                               point.y + (int)(axes[1][0] * scale));
+                    g.drawLine(point.x + (int)(xc * scale),
+                               point.y + (int)(yc * scale),
+                               point.x +(int)(axes[0][1] * scale),
+                               point.y + (int)(axes[1][1] * scale));
                     g.setColor(Color.red);
-                    g.fillArc(point.x + (int)(xc * scale) - 4, point.y +(int)(yc * scale) - 4, 8, 8, 0, 360);
+                    g.fillArc(point.x + (int)(xc * scale) - 4,
+                              point.y +(int)(yc * scale) - 4,
+                              8,
+                              8,
+                              0,
+                              360);
                     g.setColor(Color.black);
-                    g.fillArc(point.x + (int)(axes[0][0] * scale) - 2, point.y +(int)(axes[1][0] * scale)-2, 4, 4, 0, 360);
-                    g.fillArc(point.x + (int)(axes[0][1] * scale) - 2, point.y +(int)(axes[1][1] * scale)-2, 4, 4, 0, 360);
+                    g.fillArc(point.x + (int)(axes[0][0] * scale) - 2,
+                              point.y +(int)(axes[1][0] * scale) - 2,
+                              4,
+                              4,
+                              0,
+                              360);
+                    g.fillArc(point.x + (int)(axes[0][1] * scale) - 2,
+                              point.y +(int)(axes[1][1] * scale) - 2,
+                              4,
+                              4,
+                              0,
+                              360);
                 }
                 else
                 {
@@ -125,15 +146,22 @@ public class JPanelControl extends javax.swing.JPanel implements IGUIEvent{
 
 //                  MainForm.this.setTitle("a="+a+" as="+as+" ae="+ae+" oa="+oa+" oas="+oas+" oae="+oae);
                 
-                    g.drawArc(point.x + (int)((xc - r) * scale),point.y + (int)((yc - r) * scale), (int)(2 * r * scale), (int)(2 * r * scale), as,0 - a);
+                    g.drawArc(point.x + (int)((xc - r) * scale),
+                              point.y + (int)((yc - r) * scale),
+                              (int)(2 * r * scale),
+                              (int)(2 * r * scale),
+                              as,
+                              0 - a);
                 }
             }
             else
             {
                 //Line
                 GeneralPath line = new GeneralPath();
-                line.moveTo(point.x + axes[0][0] * scale, point.y + axes[1][0] * scale);
-                line.lineTo(point.x + axes[0][1] * scale, point.y + axes[1][1] * scale);
+                line.moveTo(point.x + axes[0][0] * scale,
+                            point.y + axes[1][0] * scale);
+                line.lineTo(point.x + axes[0][1] * scale,
+                            point.y + axes[1][1] * scale);
                 g.draw(line);
             }
         }
@@ -141,7 +169,7 @@ public class JPanelControl extends javax.swing.JPanel implements IGUIEvent{
         
     }
     
-    NumberFildManipulator[][] axes;
+    NumberFieldManipulator[][] axes;
     ArrayList<PrintableElement> printList = new ArrayList<>();
 
     boolean parseNextSerial = false;
@@ -154,24 +182,24 @@ public class JPanelControl extends javax.swing.JPanel implements IGUIEvent{
         initComponents();
 
         //Init Fileds:
-        NumberFildManipulator.IAxesEvent event= new NumberFildManipulator.IAxesEvent() {
+        NumberFieldManipulator.IAxesEvent event= new NumberFieldManipulator.IAxesEvent() {
             @Override
-            public void fired(NumberFildManipulator axis) {
+            public void fired(NumberFieldManipulator axis) {
                 axesEvent(axis);
             }
         };
 
-        axes = new NumberFildManipulator[][]   {
-                                        /*0*/    {new NumberFildManipulator(jTFXa,event),new NumberFildManipulator(jTFXd,event),new NumberFildManipulator(jTFXn,event)},
-                                        /*1*/    {new NumberFildManipulator(jTFYa,event),new NumberFildManipulator(jTFYd,event),new NumberFildManipulator(jTFYn,event)},
-                                        /*2*/    {new NumberFildManipulator(jTFZa,event),new NumberFildManipulator(jTFZd,event),new NumberFildManipulator(jCBZn,event)},
-                                        /*3*/    {new NumberFildManipulator(jCBarcI,event),new NumberFildManipulator(jCBarcJ,event)}, // I,J
-                                        /*4*/    {new NumberFildManipulator(jCBdiameter,event)}, //Diameter
-                                        /*5*/    {new NumberFildManipulator(jCBfeedrate,event)} //Feedrate
+        axes = new NumberFieldManipulator[][]   {
+                                        /*0*/    {new NumberFieldManipulator(jTFXa,event),new NumberFieldManipulator(jTFXd,event),new NumberFieldManipulator(jTFXn,event)},
+                                        /*1*/    {new NumberFieldManipulator(jTFYa,event),new NumberFieldManipulator(jTFYd,event),new NumberFieldManipulator(jTFYn,event)},
+                                        /*2*/    {new NumberFieldManipulator(jTFZa,event),new NumberFieldManipulator(jTFZd,event),new NumberFieldManipulator(jCBZn,event)},
+                                        /*3*/    {new NumberFieldManipulator(jCBarcI,event),new NumberFieldManipulator(jCBarcJ,event)}, // I,J
+                                        /*4*/    {new NumberFieldManipulator(jCBdiameter,event)}, //Diameter
+                                        /*5*/    {new NumberFieldManipulator(jCBfeedrate,event)} //Feedrate
                                         };
-        for(NumberFildManipulator[] axe:axes)
+        for(NumberFieldManipulator[] axe:axes)
         {
-            for(NumberFildManipulator field:axe)
+            for(NumberFieldManipulator field:axe)
             {
                 field.set(0.0);
             }
@@ -179,7 +207,7 @@ public class JPanelControl extends javax.swing.JPanel implements IGUIEvent{
         axes[5][0].set(Database.MAXFEEDRATE.getsaved()/10);
 
         
-       Communication.addResiveEvent(new IReceivedLines() {
+       Communication.addReceiveEvent(new IReceivedLines() {
             @Override
             public void received(String[] lines) {
                 for(String line: lines)
@@ -199,7 +227,7 @@ public class JPanelControl extends javax.swing.JPanel implements IGUIEvent{
                             }
                             try {
                                 String temp = in.substring(pos+2);
-                                values[j]= Tools.strtod(temp);
+                                values[j] = Tools.strtod(temp);
                             } catch (ParseException ex) {
                                 values = null;
                                 break;
@@ -226,7 +254,7 @@ public class JPanelControl extends javax.swing.JPanel implements IGUIEvent{
         jPPaint.addPaintEventListener(new JPPaintableListener() {
             @Override
             public void paintComponent(JPPaintableEvent evt) {
-                paintAxesAria(evt.g);
+                paintAxesArea(evt.g);
             }
         });
         
@@ -250,7 +278,7 @@ public class JPanelControl extends javax.swing.JPanel implements IGUIEvent{
         jBMove.setEnabled(!isworking && serial);
     }
     
-    private void fireupdateGUI()
+    private void fireUpdateGUI()
     {
         if(GUIEvent == null)
         {
@@ -260,7 +288,7 @@ public class JPanelControl extends javax.swing.JPanel implements IGUIEvent{
     }
    
     
-    private void axesEvent(NumberFildManipulator axis) {                               
+    private void axesEvent(NumberFieldManipulator axis) {                               
         //Find Position
         int cat = -1,num = -1;
         for(int i = 0;i < axes.length;i++)
@@ -328,7 +356,7 @@ public class JPanelControl extends javax.swing.JPanel implements IGUIEvent{
         }
         if(axes[cat][num].getdsave()<min)
         {
-            axes[cat][num].popUpToolTip("Value has to be grater than " + Tools.dtostr(min));
+            axes[cat][num].popUpToolTip("Value has to be greater than " + Tools.dtostr(min));
             axes[cat][num].set(min);
             axes[cat][num].setFocus();
         }
@@ -358,11 +386,13 @@ public class JPanelControl extends javax.swing.JPanel implements IGUIEvent{
     }                              
 
     
-    private void paintAxesAria(Graphics g) {
+    private void paintAxesArea(Graphics g) {
         //Calc window
-        double ariawidth    = Database.WORKSPACE0.getsaved(); //x
-        double ariaheight   = Database.WORKSPACE1.getsaved(); //y
-        Rectangle rect = Geometrics.placeRectangle(jPPaint.getWidth(), jPPaint.getHeight(), Geometrics.getRatio(ariawidth,ariaheight));
+        double areaWidth    = Database.WORKSPACE0.getsaved(); //x
+        double areaHeight   = Database.WORKSPACE1.getsaved(); //y
+        Rectangle rect = Geometrics.placeRectangle(jPPaint.getWidth(),
+                                                    jPPaint.getHeight(),
+                                                    Geometrics.getRatio(areaWidth,areaHeight));
         
         if(g instanceof Graphics2D == false)
         {
@@ -393,20 +423,28 @@ public class JPanelControl extends javax.swing.JPanel implements IGUIEvent{
         g2d.translate(-jPPaint.getWidth() / 2, -jPPaint.getHeight() / 2);
         
         g2d.setColor(Color.white);
-        g2d.fillRect(rect.x, rect.y, rect.width, rect.height);
+        g2d.fillRect(rect.x,
+                     rect.y,
+                     rect.width,
+                     rect.height);
         
         g2d.setColor(Color.black);
         for(PrintableElement p:printList)
         {
-            p.print(g2d, new Point(rect.x, rect.y), Geometrics.getScale(rect.width, rect.height, ariawidth, ariaheight));
+            p.print(g2d, new Point(rect.x, rect.y), Geometrics.getScale(rect.width, rect.height, areaWidth, areaHeight));
         }
         
         g2d.setColor(Color.red);
-        new PrintableElement().print(g2d, new Point(rect.x, rect.y), Geometrics.getScale(rect.width, rect.height, ariawidth, ariaheight));
+        new PrintableElement().print(g2d,
+                                    new Point(rect.x, rect.y),
+                                    Geometrics.getScale(rect.width,
+                                                        rect.height,
+                                                        areaWidth,
+                                                        areaHeight));
         
     }
 
-    private void loadformsavelist(int index)
+    private void loadFormSaveList(int index)
     {
         if(((SortedComboBoxModel<PositionListElement>)jLSave.getModel()).getElementAt(index) != null)
         {
@@ -1172,7 +1210,7 @@ public class JPanelControl extends javax.swing.JPanel implements IGUIEvent{
     }// </editor-fold>//GEN-END:initComponents
 
     private void jBHomingActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jBHomingActionPerformed
-        if(Communication.isbussy())
+        if(Communication.isBussy())
         {
             JOptionPane.showMessageDialog(this, "Another command is in progress!");
             return;
@@ -1193,7 +1231,7 @@ public class JPanelControl extends javax.swing.JPanel implements IGUIEvent{
     }//GEN-LAST:event_jBHomingActionPerformed
 
     private void jBPowerONActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jBPowerONActionPerformed
-        if(Communication.isbussy())
+        if(Communication.isBussy())
         {
             JOptionPane.showMessageDialog(this, "Another command is in progress!");
             return;
@@ -1206,7 +1244,7 @@ public class JPanelControl extends javax.swing.JPanel implements IGUIEvent{
     }//GEN-LAST:event_jBPowerONActionPerformed
 
     private void jBPowerOFFActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jBPowerOFFActionPerformed
-        if(Communication.isbussy())
+        if(Communication.isBussy())
         {
             JOptionPane.showMessageDialog(this, "Another command is in progress!");
             return;
@@ -1219,7 +1257,7 @@ public class JPanelControl extends javax.swing.JPanel implements IGUIEvent{
     }//GEN-LAST:event_jBPowerOFFActionPerformed
 
     private void jBSetPosActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jBSetPosActionPerformed
-        if(Communication.isbussy())
+        if(Communication.isBussy())
         {
             JOptionPane.showMessageDialog(this, "Another command is in progress!");
             return;
@@ -1244,7 +1282,7 @@ public class JPanelControl extends javax.swing.JPanel implements IGUIEvent{
             {
                 axes[i][0].set(values[i]);
                 axes[i][0].dispatchEvent();
-                cmd+=" " + CommandParsing.axesName[i] + Tools.dtostr(values[i]);
+                cmd += " " + CommandParsing.axesName[i] + Tools.dtostr(values[i]);
             }
             try {
                 Communication.send(cmd);
@@ -1257,7 +1295,7 @@ public class JPanelControl extends javax.swing.JPanel implements IGUIEvent{
     }//GEN-LAST:event_jBSetPosActionPerformed
 
     private void jBGetPosActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jBGetPosActionPerformed
-        if(Communication.isbussy())
+        if(Communication.isBussy())
         {
             JOptionPane.showMessageDialog(this, "Another command is in progress!");
             return;
@@ -1273,14 +1311,14 @@ public class JPanelControl extends javax.swing.JPanel implements IGUIEvent{
     private void jLSaveMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jLSaveMouseClicked
         if(evt.getClickCount() == 2)
         {
-            loadformsavelist(jLSave.locationToIndex(evt.getPoint()));
+            loadFormSaveList(jLSave.locationToIndex(evt.getPoint()));
         }
     }//GEN-LAST:event_jLSaveMouseClicked
 
     private void jLSaveKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_jLSaveKeyPressed
         if(evt.getKeyCode() == KeyEvent.VK_ENTER)
         {
-            loadformsavelist(jLSave.getSelectedIndex());
+            loadFormSaveList(jLSave.getSelectedIndex());
         }
         if(evt.getKeyCode() == KeyEvent.VK_DELETE)
         {
@@ -1306,7 +1344,7 @@ public class JPanelControl extends javax.swing.JPanel implements IGUIEvent{
     }//GEN-LAST:event_jBPosSaveActionPerformed
 
     private void jBPosLoadActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jBPosLoadActionPerformed
-        loadformsavelist(jLSave.getSelectedIndex());
+        loadFormSaveList(jLSave.getSelectedIndex());
     }//GEN-LAST:event_jBPosLoadActionPerformed
 
     private void jBPosRemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jBPosRemActionPerformed
@@ -1393,7 +1431,7 @@ public class JPanelControl extends javax.swing.JPanel implements IGUIEvent{
     }//GEN-LAST:event_jCBFastModeActionPerformed
 
     private void jBMoveActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jBMoveActionPerformed
-        if(Communication.isbussy())
+        if(Communication.isBussy())
         {
             JOptionPane.showMessageDialog(this, "Another command is in progress!");
             return;
@@ -1402,21 +1440,30 @@ public class JPanelControl extends javax.swing.JPanel implements IGUIEvent{
         jPPaint.setRepaintEnable(false);
 
         //Test Variables:
-        for(NumberFildManipulator[] aa:axes)
-        for(NumberFildManipulator a:aa)
+        for(NumberFieldManipulator[] aa:axes)
         {
-            String temp = a.get();
-            a.dispatchEvent();
-            if(!temp.equals(a.get()))
+            for(NumberFieldManipulator a:aa)
             {
-                JOptionPane.showMessageDialog(this, "Not all parameters are in range!");
-                jPPaint.setRepaintEnable(true);
-                return;
+                String temp = a.get();
+                a.dispatchEvent();
+                if(!temp.equals(a.get()))
+                {
+                    JOptionPane.showMessageDialog(this, "Not all parameters are in range!");
+                    jPPaint.setRepaintEnable(true);
+                    return;
+                }
             }
         }
         //Z or XY move allowed but not both
-        boolean mxy = !Geometrics.doubleEquals(axes[0][0].getdsave(), axes[0][2].getdsave(),0.001) || !Geometrics.doubleEquals(axes[1][0].getdsave(), axes[1][2].getdsave(),0.001);
-        boolean mz  = !Geometrics.doubleEquals(axes[2][0].getdsave(), axes[2][2].getdsave(),0.001);
+        boolean mxy = !Geometrics.doubleEquals(axes[0][0].getdsave(),
+                                                axes[0][2].getdsave(),
+                                                0.001)
+                        || !Geometrics.doubleEquals(axes[1][0].getdsave(),
+                                                    axes[1][2].getdsave(),
+                                                    0.001);
+        boolean mz  = !Geometrics.doubleEquals(axes[2][0].getdsave(),
+                                               axes[2][2].getdsave(),
+                                               0.001);
         if(mxy && mz)
         {
             JOptionPane.showMessageDialog(this, "Only XY move or Z move allowed .. but not both!");
@@ -1433,7 +1480,7 @@ public class JPanelControl extends javax.swing.JPanel implements IGUIEvent{
             double d1   = Geometrics.getDistance(cx, cy, axes[0][0].getdsave(), axes[1][0].getdsave());
             double d2   = Geometrics.getDistance(cx, cy, axes[0][2].getdsave(), axes[1][2].getdsave());
 
-            if(!Geometrics.doubleEquals(d1, d2, 0.001))
+            if(Geometrics.doubleEquals(d1, d2, 0.001) == false)
             {
                 JOptionPane.showMessageDialog(this, "Center of ARC is not equi-distant!");
                 jPPaint.setRepaintEnable(true);
@@ -1462,7 +1509,9 @@ public class JPanelControl extends javax.swing.JPanel implements IGUIEvent{
 
         //Load Axes
         for(int i = 0;i < 3;i++)
+        {
             cmd += " " + CommandParsing.axesName[i] + Tools.dtostr(axes[i][2].getdsave());
+        }
 
         if(jCBarc.isSelected())
         {
@@ -1527,12 +1576,14 @@ public class JPanelControl extends javax.swing.JPanel implements IGUIEvent{
     private void jPPaintMouseReleased(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jPPaintMouseReleased
         double areaWidth    = Database.WORKSPACE0.getsaved(); //x
         double areaHeight   = Database.WORKSPACE1.getsaved(); //y
-        Rectangle rect = Geometrics.placeRectangle(jPPaint.getWidth(), jPPaint.getHeight(), Geometrics.getRatio(areaWidth,areaHeight));
+        Rectangle rect = Geometrics.placeRectangle(jPPaint.getWidth(),
+                                                   jPPaint.getHeight(),
+                                                   Geometrics.getRatio(areaWidth,areaHeight));
 
         if(Geometrics.pointInRectangle(new Point(evt.getX(),evt.getY()), rect, 0))
         {
-            double x    = (evt.getX()-rect.x) * Geometrics.getScale(areaWidth, areaHeight, rect.width, rect.height);
-            double y    = (evt.getY()-rect.y) * Geometrics.getScale(areaWidth, areaHeight, rect.width, rect.height);
+            double x    = (evt.getX()- rect.x) * Geometrics.getScale(areaWidth, areaHeight, rect.width, rect.height);
+            double y    = (evt.getY()- rect.y) * Geometrics.getScale(areaWidth, areaHeight, rect.width, rect.height);
             switch(Integer.parseInt(Database.HOMING.get()))
             {
                 case 1:

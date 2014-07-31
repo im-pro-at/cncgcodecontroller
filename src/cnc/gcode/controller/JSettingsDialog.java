@@ -9,7 +9,6 @@ package cnc.gcode.controller;
 import java.awt.GridLayout;
 import java.util.LinkedList;
 import javax.swing.JDialog;
-import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
@@ -19,7 +18,7 @@ import javax.swing.JTextField;
  * @author n.rambaud
  */
 //javax.swing.JFrame
-public class JSettingsDialog extends JDialog{
+public final class JSettingsDialog extends JDialog{
     JTextField[] valuesFields;
     LinkedList<ISettingFeedback> feedbackValues  = null;
     ISettingsFeedback iftSettings = null;

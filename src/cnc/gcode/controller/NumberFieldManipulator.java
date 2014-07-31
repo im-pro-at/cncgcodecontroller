@@ -26,27 +26,29 @@ import javax.swing.Timer;
  *
  * @author patrick
  */
-class NumberFildManipulator {
+class NumberFieldManipulator {
 
     public interface IAxesEvent
     {
-        void fired(NumberFildManipulator axis);
+        void fired(NumberFieldManipulator axis);
     }
     
     private final JComponent element;
     private final IAxesEvent event;
 
-    public NumberFildManipulator(JComponent element, IAxesEvent event) {
+    public NumberFieldManipulator(JComponent element, IAxesEvent event) {
         this.element    = element;
         this.event      = event;
         FocusAdapter f = new FocusAdapter() {
             @Override
-            public void focusLost(FocusEvent e) {
-                NumberFildManipulator.this.event.fired(NumberFildManipulator.this);
+            public void focusLost(FocusEvent e) 
+            {
+                NumberFieldManipulator.this.event.fired(NumberFieldManipulator.this);
             }
 
             @Override
-            public void focusGained(FocusEvent e) {
+            public void focusGained(FocusEvent e) 
+            {
                 if (e.getSource() instanceof JComboBox) 
                 {
                     ((JComboBox) e.getSource()).getEditor().selectAll();
@@ -62,7 +64,7 @@ class NumberFildManipulator {
             public void keyReleased(KeyEvent e) {
                 if (e.getKeyCode() == KeyEvent.VK_ENTER) 
                 {
-                    NumberFildManipulator.this.event.fired(NumberFildManipulator.this);
+                    NumberFieldManipulator.this.event.fired(NumberFieldManipulator.this);
                 }
             }
         };
@@ -146,7 +148,10 @@ class NumberFildManipulator {
         toolTip.setTipText(text);
         // get JComponent position
         Point point = element.getLocationOnScreen();
-        final Popup popup = PopupFactory.getSharedInstance().getPopup(element, toolTip, point.x , point.y + element.getHeight());
+        final Popup popup = PopupFactory.getSharedInstance().getPopup(element,
+                                                                      toolTip,
+                                                                      point.x ,
+                                                                      point.y + element.getHeight());
         // show it
         popup.show();
         // and start a thread to remove it 

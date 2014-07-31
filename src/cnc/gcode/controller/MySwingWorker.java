@@ -113,7 +113,7 @@ public abstract class MySwingWorker<R,P> {
                         //Acess Value
                         synchronized(syncProgress)
                         {
-                            MySwingWorker.this.progressState=false;
+                            MySwingWorker.this.progressState = false;
                             value   = MySwingWorker.this.progress;
                             message = MySwingWorker.this.mProgress;
                         }
@@ -126,12 +126,14 @@ public abstract class MySwingWorker<R,P> {
     
     public final synchronized void execute()
     {
-        if(!started)
+        if(started == true)
         {
-            started = true;
-            t.setName("MyWorker p=" + Thread.currentThread().getName());
-            t.start();
+            return;
         }
+        
+        started = true;
+        t.setName("MyWorker p=" + Thread.currentThread().getName());
+        t.start();
     }
     
     public final synchronized boolean isRunning()
@@ -151,7 +153,9 @@ public abstract class MySwingWorker<R,P> {
     
     public final synchronized void cancel()
     {
-        if(started && !cancelled && !done)
+        if(started == true 
+            && cancelled == false 
+            && done == false)
         {
             cancelled = true;
             if(!Thread.currentThread().equals(t))
@@ -170,7 +174,7 @@ public abstract class MySwingWorker<R,P> {
                 return;
             }
             pause = state;
-            if(!pause)
+            if(pause == false)
             {
                 syncPause.notify();
             }
