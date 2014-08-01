@@ -18,7 +18,7 @@ public abstract class TriggertSwingWorker<P> {
     private boolean cancelled   = false;
     private boolean triggered   = false;
     
-    private Thread t= new Thread(new Runnable() {
+    private Thread t = new Thread(new Runnable() {
         @Override
         public void run() {
             try {
@@ -69,7 +69,7 @@ public abstract class TriggertSwingWorker<P> {
     }){
         {
             //Start thread imediatly:
-            setName("TriggerWorker p="+Thread.currentThread().getName());
+            setName("TriggerWorker p=" + Thread.currentThread().getName());
             start();
         }
     };    

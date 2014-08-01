@@ -44,7 +44,8 @@ public class CNCCommand {
             return movey + y * (mirrory ? -1:1);
         }
 
-        private double t(int i, double d) {
+        private double t(int i, double d) 
+        {
             if(Double.isNaN(d))
             {
                 return d;
@@ -89,7 +90,7 @@ public class CNCCommand {
             double dx = s[0] - e[0];
             double dy = s[1] - e[1];
             double dz = s[2] - e[2];
-            return Math.sqrt(dx*dx+dy*dy+dz*dz);
+            return Math.sqrt(dx * dx + dy * dy + dz * dz);
         }
         public double getDistanceXY()
         {
@@ -101,7 +102,10 @@ public class CNCCommand {
    
     public static class Calchelper
     {
-        double[] axes= new double[]{Double.NaN,Double.NaN,Double.NaN,Double.NaN}; //X,Y,Z,F
+        double[] axes= new double[]{Double.NaN,
+                                    Double.NaN,
+                                    Double.NaN,
+                                    Double.NaN}; //X,Y,Z,F
 
         Type lastMovetype = Type.UNKNOWN;
         double seconds = 0;
@@ -118,7 +122,7 @@ public class CNCCommand {
             
             c.axes          = this.axes.clone();
             c.lastMovetype  = this.lastMovetype;
-            c.seconds      = this.seconds;
+            c.seconds       = this.seconds;
             c.lastmovedirection = this.lastmovedirection.clone();
             return c;
         }

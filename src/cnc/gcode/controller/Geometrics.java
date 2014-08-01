@@ -77,9 +77,10 @@ public final class Geometrics {
     
     
     /**
-     * Calces where the Point is located on the rectangle 
+     * Calcs where the point is located on the rectangle 
      * @param point
      * @param rectangle
+     * @param margin
      * @return 
      * -1== out of range
      * 0 == in the window
@@ -120,7 +121,8 @@ public final class Geometrics {
         {
             area = EArea.CENTER;
         }
-        if(x >= (r_x-margin) &&  x <= (r_x + r_w + margin)){
+        if(x >= (r_x-margin) &&  x <= (r_x + r_w + margin))
+        {
             if(Math.abs(y - r_y) <= margin)
             {
                 area = EArea.UPPER_SIDE;
@@ -145,7 +147,7 @@ public final class Geometrics {
         {
             area = EArea.UL_CORNER;
         }
-        if(Math.abs(x - r_x - r_w) <= margin && Math.abs(y - r_y)<=margin)
+        if(Math.abs(x - r_x - r_w) <= margin && Math.abs(y - r_y) <= margin)
         {
             area = EArea.UR_CORNER;
         }
@@ -161,7 +163,11 @@ public final class Geometrics {
         return area;
     }
     
-    /** Returns true if the Point is over the Rectangle within a given margin*/
+    /** Returns true if the Point is over the Rectangle within a
+     * @param point
+     * @param margin
+     * @param rectangle
+     * @return */
     public static boolean pointInRectangle(Point point, Rectangle rectangle, int margin){
         int x   = point.x;
         int y   = point.y;
@@ -170,8 +176,8 @@ public final class Geometrics {
         int r_w = rectangle.width;
         int r_h = rectangle.height;
         if((x + margin) >= r_x && (y + margin) >= r_y 
-        && (x - margin) <= (r_x + r_w) 
-        && (y - margin) <= (r_y + r_h))
+            && (x - margin) <= (r_x + r_w) 
+            && (y - margin) <= (r_y + r_h))
         {
             return true;
         }
@@ -186,8 +192,8 @@ public final class Geometrics {
         double r_w  = rectangle.getWidth();
         double r_h  = rectangle.getHeight();
         if((x + margin) >= r_x 
-        && (y + margin) >= r_y && (x - margin) <= (r_x + r_w)
-        && (y - margin) <= (r_y + r_h))
+            && (y + margin) >= r_y && (x - margin) <= (r_x + r_w)
+            && (y - margin) <= (r_y + r_h))
         {
             return true;
         }
@@ -195,7 +201,10 @@ public final class Geometrics {
     }
 
     
-    /** Returns true if the two Rectangle are overlapping*/
+    /** Returns true if the two Rectangle are overlaping
+     * @param r1
+     * @param r2
+     * @return */
     public static boolean rectangleInRectangle(Rectangle r1, Rectangle r2){
         if(r1.x < (r2.x + r2.width) 
        && (r1.x + r1.width) > r2.x && r1.y < (r2.y + r2.height) 
@@ -216,26 +225,33 @@ public final class Geometrics {
     
     /**
      * Returns a Rectangle placed centered in (0;w,0:h) with the maximum possible size and the given ratio 
+     * @param w
+     * @param h
+     * @param ratio
+     * @return 
      */
     public static Rectangle placeRectangle(int w, int h, double ratio){                
-                int w_neu   = w;
-                int h_neu   = h;
-                
-                if(ratio == NONRATIO)
-                {
-                    ratio = getRatio(w,h);
-                }
-                
-                if(ratio < getRatio(w,h))
-                {
-                    w_neu = (int)(ratio * h);
-                }
-                else
-                {
-                    h_neu = (int)(w / ratio);
-                }                  
-                
-                return new Rectangle((w - w_neu) / 2,(h - h_neu) / 2,w_neu, h_neu);
+        int w_neu   = w;
+        int h_neu   = h;
+
+        if(ratio == NONRATIO)
+        {
+            ratio = getRatio(w,h);
+        }
+
+        if(ratio < getRatio(w,h))
+        {
+            w_neu = (int)(ratio * h);
+        }
+        else
+        {
+            h_neu = (int)(w / ratio);
+        }                  
+
+        return new Rectangle((w - w_neu) / 2,
+                            (h - h_neu) / 2,
+                            w_neu,
+                            h_neu);
     }
     
     /**
@@ -253,20 +269,34 @@ public final class Geometrics {
     }
 
     public static double getScale(int w1, int h1, int w2, int h2){
-        return getScale((double)w1,(double)h1,(double)w2,(double)h2);
+        return getScale((double)w1,
+                        (double)h1,
+                        (double)w2,
+                        (double)h2);
     }
 
     
     /**
      * Manipulate rectangle (old) (defined in Operation) with delta. Allowed area is (0,max.x;0,max.y)
      * returns new rectangle
+     * @param operation
+     * @param oldR
+     * @param delta
+     * @param ratio
+     * @param max
+     * @return 
      */
     @SuppressWarnings("fallthrough")
-    public static Rectangle manipulateRectangle(EArea operation, Rectangle oldR, Point delta, Point max, double ratio){
+    public static Rectangle manipulateRectangle(EArea operation,
+                                                Rectangle oldR,
+                                                Point delta,
+                                                Point max,
+                                                double ratio){
         Rectangle r = new Rectangle(oldR);
 
         //Spacel Case Center:
-        if(operation == EArea.CENTER){
+        if(operation == EArea.CENTER)
+        {
             r.x += delta.x;
             r.y += delta.y;
             if(r.x < 0)
@@ -352,7 +382,8 @@ public final class Geometrics {
         }
         
         //Overflow
-        if(r.width > range.width){
+        if(r.width > range.width)
+        {
             r.width = range.width;
             if(ratio != NONRATIO)
             {
@@ -430,22 +461,9 @@ public final class Geometrics {
      */
     public static Point limitPointInRect(Point t_pos, Rectangle rect){
         Point pos = t_pos.getLocation();
-        if(pos.x < rect.x)
-        {
-            pos.x = rect.x;
-        }
-        if(pos.y < rect.y)
-        {
-            pos.y = rect.y;
-        }
-        if(pos.x > (rect.x + rect.width))
-        {
-            pos.x = rect.x + rect.width;
-        }
-        if(pos.y > (rect.y + rect.height))
-        {
-            pos.y = rect.y + rect.height;
-        }
+        pos.x = Tools.adjustInt(pos.x, rect.x, (rect.x + rect.width));
+        pos.y = Tools.adjustInt(pos.y, rect.y, (rect.y + rect.height));
+
         return pos;
     }
     
@@ -458,17 +476,25 @@ public final class Geometrics {
      */
     public static void drawDashedLine(Graphics g, Rectangle r, Color c1, Color c2){
         g.setColor(c1);
-        g.drawRect(r.x, r.y, r.width, r.height);
+        g.drawRect( r.x,
+                    r.y,
+                    r.width,
+                    r.height);
         if(g instanceof Graphics2D)
         {
             ((Graphics2D)g).setStroke(new BasicStroke(1,BasicStroke.CAP_BUTT, BasicStroke.JOIN_BEVEL,10.0f,new float[]{ 5f }, 0f));
             g.setColor(c2);
-            g.drawRect(r.x, r.y, r.width, r.height);
+            g.drawRect( r.x,
+                        r.y,
+                        r.width,
+                        r.height);
             ((Graphics2D)g).setStroke(new BasicStroke());
         }        
     }
     
-    /**Returns a Rectangle witch contains all rectangles */
+    /**Returns a Rectangle witch contains all rectangles
+     * @param rects
+     * @return  */
     public static Rectangle compRectangles(Rectangle[] rects){
         Rectangle ret = new Rectangle(-1, -1);
         for(Rectangle rect: rects)
@@ -479,13 +505,23 @@ public final class Geometrics {
     }
 
 
-    /**Converts a Dimension to a Point x=width y=height*/
-    public static Point dimensiontoPoint(Dimension d){
+    /**Converts a dimension to a point x=width y=heig
+     * @param d
+     * @return */
+    public static Point dimensiontoPoint(Dimension d)
+    {
         return new Point(d.width, d.height);
     }
     
-    /** Scale the element Rectangle*/
-    public static Rectangle scaleRectangleInRectangle(Rectangle element, Rectangle r_old, Rectangle r_new){
+    /** Scale the element Rectangl
+     * @param element
+     * @param r_old
+     * @param r_new
+     * @param elemente
+     * @return */
+    public static Rectangle scaleRectangleInRectangle(Rectangle element,
+                                                      Rectangle r_old,
+                                                      Rectangle r_new){
         if (r_new == null)
         {
             return element;
@@ -503,19 +539,27 @@ public final class Geometrics {
         int height  = (int)(inner.height * s_y);
         if (width <= 0)
         {
-            width=1;
+            width = 1;
         }
         if (height <= 0)
         {
-            height=1;
+            height = 1;
         }
         
-        inner = new Rectangle((int)(inner.x * s_x),(int)(inner.y * s_y),width,height);
+        inner = new Rectangle((int)(inner.x * s_x),
+                              (int)(inner.y * s_y),
+                               width,
+                               height);
 
-        return new Rectangle(inner.x + r_new.x, inner.y + r_new.y, inner.width, inner.height);
+        return new Rectangle(inner.x + r_new.x,
+                             inner.y + r_new.y,
+                             inner.width,
+                             inner.height);
     }
     
-    public static Rectangle scaleRectangleandPos(Rectangle r, Point center, double scale){
+    public static Rectangle scaleRectangleandPos(Rectangle r,
+                                                 Point center,
+                                                 double scale){
         return new Rectangle((int)(r.x * scale) + center.x,
                              (int)((r.y) * scale) + center.y,
                              (int)(r.width * scale),

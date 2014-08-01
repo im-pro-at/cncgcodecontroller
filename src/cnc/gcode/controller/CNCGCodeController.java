@@ -37,7 +37,7 @@ public class CNCGCodeController {
      */
     public static void main(String[] args) throws IOException {
         
-        if(args.length!=0)
+        if(args.length != 0)
         {
             //Usage:
             if(!args[0].equals("-postprocessor") || args.length!=11)
@@ -60,11 +60,11 @@ public class CNCGCodeController {
                 System.exit(1);
             }
             File fout = new File(args[2]);
-            Database.OPTIMISATIONTIMEOUT.set(""+Integer.parseInt(args[3]));
-            double movex = Double.parseDouble(args[4]);
-            double movey = Double.parseDouble(args[5]);
-            boolean mirrorx = Boolean.parseBoolean(args[6]);
-            boolean mirrory = Boolean.parseBoolean(args[7]);
+            Database.OPTIMISATIONTIMEOUT.set("" + Integer.parseInt(args[3]));
+            double movex        = Double.parseDouble(args[4]);
+            double movey        = Double.parseDouble(args[5]);
+            boolean mirrorx     = Boolean.parseBoolean(args[6]);
+            boolean mirrory     = Boolean.parseBoolean(args[7]);
             Database.BL0.set("" + Double.parseDouble(args[8]));
             Database.BL1.set("" + Double.parseDouble(args[9]));
             Database.BL2.set("" + Double.parseDouble(args[10]));
@@ -75,37 +75,39 @@ public class CNCGCodeController {
             ArrayList<CNCCommand> cmds = new ArrayList<>();
 
             String line;
-            int warings     = 0;
+            int warnings     = 0;
             int errors      = 0;
-            int linenumber  = 0;
+            int lineNumber  = 0;
             
             try (BufferedReader br = new BufferedReader(new FileReader(fin))) {
                 while((line = br.readLine() )!=null)
                 {
-                    linenumber++;
+                    lineNumber++;
                     CNCCommand command  = new CNCCommand(line);
                     CNCCommand.State t  = command.calcCommand(c);
                     if(t == CNCCommand.State.WARNING)
                     {
-                        System.out.println(args[1] + ":" + linenumber + ":  WARNING: "+command.getMessage());
-                        warings++;
+                        System.out.println(args[1] + ":" + lineNumber + ":  WARNING: " + command.getMessage());
+                        warnings++;
                     }
                     if(t == CNCCommand.State.ERROR)
                     {
-                        System.out.println(args[1] + ":" + linenumber + ":  ERROR: "+command.getMessage());
+                        System.out.println(args[1] + ":" + lineNumber + ":  ERROR: " + command.getMessage());
                         errors++;
                     }
                     cmds.add(command);
                 }
             }
             double maxTime = c.seconds;
-            System.out.println("File loaded with "+warings+" Warnings and " + errors + " Errors!");
+            System.out.println("File loaded with " + warnings+  " warnings and " + errors + " errors!");
             
             //Optimize
-            CNCCommand.Optimiser o = new CNCCommand.Optimiser(new CNCCommand.Optimiser.IProgress() {
+            CNCCommand.Optimiser o = new CNCCommand.Optimiser(new CNCCommand.Optimiser.IProgress() 
+            {
                     String lastmessage = "";
                     @Override
-                    public void publish(String message, int progess) throws MyException {
+                    public void publish(String message, int progess) throws MyException 
+                    {
                         if(lastmessage.equals(message) == false)
                         {
                             lastmessage = message;
@@ -115,7 +117,7 @@ public class CNCGCodeController {
                 });
 
             try {
-                //Not much to do the CNCOpimiser does all the work :-)
+                //Not much to do the CNCOptimiser does all the work :-)
                 cmds  = o.execute(cmds);
             } catch (MyException ex) {
                 System.out.println(ex.getMessage());
@@ -125,15 +127,15 @@ public class CNCGCodeController {
             //Process new comands
             System.out.println("Processing new comands ...");
             c = new CNCCommand.Calchelper();
-            warings = 0;
-            errors  = 0;
+            warnings    = 0;
+            errors      = 0;
             for(int i = 0;i < cmds.size();i++)
             {
                 CNCCommand command  = cmds.get(i);
                 CNCCommand.State t  = command.calcCommand(c);
                 if(t == CNCCommand.State.WARNING)
                 {
-                    warings++;
+                    warnings++;
                 }
                 if(t == CNCCommand.State.ERROR)
                 {
@@ -141,7 +143,7 @@ public class CNCGCodeController {
                 }
             }
             
-            System.out.println("Optimized! Saved time: " + Tools.formatDuration((long)(maxTime-c.seconds)) + "! \nCommands now have " + warings + " Warnings and " + errors + " Errors!");
+            System.out.println("Optimized! Saved time: " + Tools.formatDuration((long)(maxTime - c.seconds)) + "! \nCommands now have " + warnings + " warnings and " + errors + " errors!");
 
             //Process new comands
             System.out.println("Export commands ...");

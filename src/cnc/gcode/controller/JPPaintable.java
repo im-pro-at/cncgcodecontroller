@@ -17,7 +17,8 @@ import javax.swing.event.EventListenerList;
  *
  * @author Patrick
  */
-public class JPPaintable extends javax.swing.JPanel {
+public class JPPaintable extends javax.swing.JPanel 
+{
 
     protected EventListenerList jPlistenerList = new EventListenerList();
     
@@ -26,10 +27,12 @@ public class JPPaintable extends javax.swing.JPanel {
         initComponents();
     }
 
-    public void addPaintEventListener(JPPaintableListener listener) {
+    public void addPaintEventListener(JPPaintableListener listener) 
+    {
         listenerList.add(JPPaintableListener.class, listener);
     }
-    public void removePaintEventListener(JPPaintableListener listener) {
+    public void removePaintEventListener(JPPaintableListener listener) 
+    {
         listenerList.remove(JPPaintableListener.class, listener);
     }
     
@@ -61,7 +64,8 @@ public class JPPaintable extends javax.swing.JPanel {
         }
     }
     
-    /**Stops the repaint for this element (When value is ture a repaint is triggered!) */
+    /**Stops the repaint for this element (When value is ture a repaint is triggered!)
+     * @param value */
     public void setRepaintEnable(boolean value){
         repaintEnable = value;
         repaint();

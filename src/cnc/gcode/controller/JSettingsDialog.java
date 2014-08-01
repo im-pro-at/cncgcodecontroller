@@ -9,7 +9,7 @@ package cnc.gcode.controller;
 import java.awt.GridLayout;
 import java.util.LinkedList;
 import javax.swing.JDialog;
-import javax.swing.JFrame;
+import javax.swing.JOptionPane;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
 
@@ -18,7 +18,7 @@ import javax.swing.JTextField;
  * @author n.rambaud
  */
 //javax.swing.JFrame
-public class JSettingsDialog extends JDialog{
+public final class JSettingsDialog extends JDialog{
     JTextField[] valuesFields;
     LinkedList<ISettingFeedback> feedbackValues  = null;
     ISettingsFeedback iftSettings = null;
@@ -38,6 +38,7 @@ public class JSettingsDialog extends JDialog{
     {
         this();
         iftSettings = settingsItf;
+        this.feedbackValues = feedbackValues;
         configureDataToDisplay( feedbackValues);
     }
     
@@ -127,10 +128,54 @@ public class JSettingsDialog extends JDialog{
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
+    private void ValidateNewValue(ISettingFeedback data)
+    {
+        double val = data.getSettingValue();
+        if(val < data.getSettingMinValue())
+        {
+            int answer = JOptionPane.showConfirmDialog(null,
+                                                        "Setting: " + data.getSettingId().toString() + " is invalid. min value:" + data.getSettingMinValue() + "\nDo you want to adjust this value to min value?." ,
+                                                        "Invalid setting",
+                                                         JOptionPane.YES_NO_OPTION);
+            if(answer == JOptionPane.YES_OPTION)
+            {
+               data.setSettingValue(data.getSettingMinValue());
+            }
+        }
+        else if(val > data.getSettingMaxValue())
+        {
+            int answer = JOptionPane.showConfirmDialog(null,
+                                                        "Setting: " + data.getSettingId().toString() + " is invalid. max value:" + data.getSettingMaxValue()+ "\nDo you want to adjust this value to max value?.",
+                                                        "Invalid setting",
+                                                        JOptionPane.YES_NO_OPTION);
+            if(answer == JOptionPane.YES_OPTION)
+            {
+               data.setSettingValue(data.getSettingMaxValue());
+            }
+        }
+    }
+    
     private void JOkButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_JOkButtonActionPerformed
         
         if( null != iftSettings && feedbackValues != null)
         {
+            for(int i = 0; i < feedbackValues.size();  i++)
+            {
+                try
+                {
+                    feedbackValues.get(i).setSettingValue(Double.valueOf(valuesFields[i].getText())); 
+                    ValidateNewValue(feedbackValues.get(i));// validating all settings before updating.
+                }
+                catch(Exception ex)
+                {
+                    JOptionPane.showMessageDialog(null,
+                                                "Error when converting " + valuesFields[i].getText() + ".\nIt seems not to be a double value",
+                                                "Convertion error",
+                                                JOptionPane.ERROR_MESSAGE);
+
+                }
+            }
+            
             iftSettings.settingsUpdated(feedbackValues);
         }
         this.dispose();
@@ -199,7 +244,9 @@ public class JSettingsDialog extends JDialog{
         JSettingsPanel.setLayout(singleGridLayout );
         for (int i = 0; i < feedbackValues.size(); i++)
         {
-            JTextArea description = new JTextArea(feedbackValues.get(i).getSettingDescription());
+            JTextArea description = new JTextArea(feedbackValues.get(i).getSettingDescription() 
+                                                    + "\nmin:" + feedbackValues.get(i).getSettingMinValue()
+                                                    + " | max: " + feedbackValues.get(i).getSettingMaxValue());
             valuesFields[i] = new JTextField(String.valueOf(feedbackValues.get(i).getSettingValue()));
             JSettingsPanel.add(description);
             JSettingsPanel.add(valuesFields[i]);

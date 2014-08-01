@@ -36,8 +36,7 @@ public class Tools {
     /**
      * on error returns 0.0
      * @param s
-     * @return
-     * @throws ParseException 
+     * @return 
      */
     public static Double strtodsave(String s)
     {
@@ -115,6 +114,32 @@ public class Tools {
                      .getPath())
                    .getName();
     }
+    
+    public static int adjustInt(int value, int min, int max)
+    {
+        if(value < min)
+        {
+            return min;
+        }
+        if(value > max)
+        {
+            return max;
+        }
+        return value;
+    }
+    public static double adjustDouble(double value, double min, double max)
+    {
+        if(value < min)
+        {
+            return min;
+        }
+        if(value > max)
+        {
+            return max;
+        }
+        return value;
+    }
+    
     
 }
 

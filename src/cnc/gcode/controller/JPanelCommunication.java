@@ -31,13 +31,13 @@ public class JPanelCommunication extends javax.swing.JPanel implements IGUIEvent
     public JPanelCommunication() {
         initComponents();
         
-        Communication.addResiveEvent(new IReceivedLines() {
+        Communication.addReceiveEvent(new IReceivedLines() {
             @Override
             public void received(String[] lines) {
                 for(String line: lines)
                 {
                     ((DefaultComboBoxModel<SendListElement>)jLCInOut.getModel()).addElement(new SendListElement(line, SendListElement.EType.IN));
-                    if(((DefaultComboBoxModel<SendListElement>)jLCInOut.getModel()).getSize()>100)
+                    if(((DefaultComboBoxModel<SendListElement>)jLCInOut.getModel()).getSize() > 100)
                     {
                         ((DefaultComboBoxModel<SendListElement>)jLCInOut.getModel()).removeElementAt(0);
                     }
@@ -173,7 +173,7 @@ public class JPanelCommunication extends javax.swing.JPanel implements IGUIEvent
     private void jBSendActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jBSendActionPerformed
         if(!jTFSend.getText().equals("") && Communication.isConnected())
         {
-            if(Communication.isbussy())
+            if(Communication.isBussy())
             {
                 JOptionPane.showMessageDialog(this, "Another command is in progress!");
                 return;

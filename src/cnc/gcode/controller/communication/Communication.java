@@ -28,7 +28,8 @@ public enum Communication {
         @Override
         protected void internal_connect() throws MyException,InterruptedException{
             //try 3 times to get answare:
-            for (int t = 0;t < 3;t++){
+            for (int t = 0;t < 3;t++)
+            {
                 internal_reset();
 
                 //Send M110 to reset checksum
@@ -166,7 +167,8 @@ public enum Communication {
         }
         @Override
         protected Double internal_ZEndStopHit(String line){
-            if(line.contains("endstops") && line.contains("hit") && line.contains("Z:")){
+            if(line.contains("endstops") && line.contains("hit") && line.contains("Z:"))
+            {
                 try {
                     return Tools.strtod(line.substring(line.indexOf("Z:") + 2));
                 } catch (ParseException ex) {
@@ -313,7 +315,7 @@ public enum Communication {
         changed.add(e);
     }
     
-    public static void addResiveEvent(IReceivedLines e){
+    public static void addReceiveEvent(IReceivedLines e){
         received.add(e);
     }
     public static void addZEndstopHitEvent(IEndstopHit e){
@@ -444,7 +446,7 @@ public enum Communication {
         return core.isConnected() && I().internal_isConnected() && !initThread.isAlive();
     }
     
-    public static synchronized boolean isbussy(){
+    public static synchronized boolean isBussy(){
         return !isConnected() || I().internal_isbusy();
     }
 

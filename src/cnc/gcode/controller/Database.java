@@ -89,7 +89,7 @@ public enum Database {
     ;
 
     private final String defaultValue;
-    private final static String SETTINGSFILE = System.getProperty("user.home")+File.separator+".cnccgcodecontroller"+File.separator+"Settings.ois";
+    private final static String SETTINGSFILE = System.getProperty("user.home") + File.separator + ".cnccgcodecontroller" + File.separator + "Settings.ois";
 
     private Database(String defaultvalue)
     {
@@ -126,6 +126,7 @@ public enum Database {
     
     /**
      * Loads the Data from a File 
+     * @param file
      * @return 
      * true => no errors 
      */
@@ -148,6 +149,7 @@ public enum Database {
     
     /**
      * Saves the Data to a File
+     * @param file
      * @return 
      * true => no errors
      */

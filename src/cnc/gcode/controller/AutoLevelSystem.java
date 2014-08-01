@@ -48,7 +48,7 @@ public class AutoLevelSystem implements java.io.Serializable{
 
         @Override
         public synchronized String toString() {
-            return "Position: ["+Tools.dtostr(p.x)+","+Tools.dtostr(p.y)+"] \nValue: "+(isLeveled()?Tools.dtostr(value) :"is not measured!"); 
+            return "Position: [" + Tools.dtostr(p.x) + ","+Tools.dtostr(p.y) + "] \nValue: " + (isLeveled()?Tools.dtostr(value) :"is not measured!"); 
         }
 
 
@@ -58,8 +58,8 @@ public class AutoLevelSystem implements java.io.Serializable{
     Rectangle2D.Double pos;
     
     public AutoLevelSystem() {
-        points = new Point[0][0];
-        pos = new Rectangle2D.Double(0, 0, 0, 0);
+        points  = new Point[0][0];
+        pos     = new Rectangle2D.Double(0, 0, 0, 0);
     }
     
     public AutoLevelSystem(double sx,double sy,double ex,double ey)
@@ -78,25 +78,27 @@ public class AutoLevelSystem implements java.io.Serializable{
         int countx = (int)Math.ceil(dx / Database.ALDISTANCE.getsaved());
         int county = (int)Math.ceil(dy / Database.ALDISTANCE.getsaved());
         
-        double distancex = dx / countx;
+        double distanceX = dx / countx;
         if(countx == 0)
         {
-            distancex = 0;
+            distanceX = 0;
         }
-        double distancey = dy / county;
+        double distanceY = dy / county;
         if(county == 0)
         {
-            distancey = 0;
+            distanceY = 0;
         }
         
-        points = new Point[countx + 1][county + 1];
-        pos = new Rectangle2D.Double(sx,sy, distancex, distancey);
+        points  = new Point[countx + 1][county + 1];
+        pos     = new Rectangle2D.Double(sx,sy, distanceX, distanceY);
         
         for(int i = 0;i < countx + 1; i++)
+        {
             for (int j = 0;j < county + 1;j++)
             {
-                points[i][j] = new Point(sx + i * distancex, sy + j * distancey);
+                points[i][j] = new Point(sx + i * distanceX, sy + j * distanceY);
             }
+        }
     }
     
     public Point[] getPoints()
@@ -149,24 +151,12 @@ public class AutoLevelSystem implements java.io.Serializable{
         
         //cals nearest
         int p0X = (int)Math.round((p.getX() - pos.x) / pos.width); 
-        if(p0X < 0)
-        {
-            p0X = 0;
-        }
-        if(p0X >= points.length)
-        {
-            p0X = points.length - 1;
-        }
+        
+        p0X = Tools.adjustInt(p0X, 0, points.length - 1);
+        
         
         int p0Y = (int)Math.round((p.getY() - pos.y) / pos.height); 
-        if(p0Y < 0) 
-        {
-            p0Y = 0;
-        }
-        if(p0Y >= points[p0X].length)
-        {
-            p0Y = points[p0X].length - 1;
-        }
+        p0Y = Tools.adjustInt(p0Y, 0, points[p0X].length - 1);
         
         if(p0X == -1 || p0Y == -1)
         {
@@ -185,8 +175,8 @@ public class AutoLevelSystem implements java.io.Serializable{
         boolean lu = p.getY() > points[p0X][p0Y].getPoint().getY(); //l=false u=true
 
         //calc neighbor coorinats
-        int p1X = p0X+(lr ? 1:-1);
-        int p1Y = p0Y+(lu ? 1:-1);
+        int p1X = p0X + (lr ? 1:-1);
+        int p1Y = p0Y + (lu ? 1:-1);
         
         //Test if there exists neighbor
         boolean neighborX_exists = p1X < points.length && p1X >= 0;

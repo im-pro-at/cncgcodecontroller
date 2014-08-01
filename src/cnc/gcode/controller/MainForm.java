@@ -4,11 +4,8 @@
  */
 package cnc.gcode.controller;
 
-import cnc.gcode.controller.communication.ComInterruptException;
 import cnc.gcode.controller.communication.Communication;
 import java.util.ArrayList;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.JOptionPane;
 import javax.swing.SwingUtilities;
@@ -27,7 +24,7 @@ public final class MainForm extends javax.swing.JFrame implements IGUIEvent{
     public MainForm() {
         
         //Load Database
-        if(!Database.load(null))
+        if(Database.load(null) == false)
         {
             JOptionPane.showMessageDialog(null,"Could not load settings!");
         }
@@ -56,7 +53,7 @@ public final class MainForm extends javax.swing.JFrame implements IGUIEvent{
         (new Thread(new Runnable() {
             @Override
             public void run() {
-                final ArrayList<String> ports=Communication.getPortsNames();
+                final ArrayList<String> ports = Communication.getPortsNames();
                 if(ports.isEmpty())
                 {
                     ports.add("No serial port found!");
@@ -104,12 +101,12 @@ public final class MainForm extends javax.swing.JFrame implements IGUIEvent{
             public void fired() {
                 jLStatus.setText(Communication.getStatus());
 
-                fireupdateGUI();
+                fireUpdateGUI();
             }
         });
        
         //First GUI update
-        fireupdateGUI();
+        fireUpdateGUI();
 
     }
     
@@ -127,7 +124,7 @@ public final class MainForm extends javax.swing.JFrame implements IGUIEvent{
         jBConnect.setText(serial?"Disconnect":"Connect");
     }
     
-    private void fireupdateGUI()
+    private void fireUpdateGUI()
     {
         if(GUIEvent == null)
         {
@@ -224,10 +221,12 @@ public final class MainForm extends javax.swing.JFrame implements IGUIEvent{
     private void formWindowClosing(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowClosing
         //close Connection
         if(Communication.isConnected())
+        {
             Communication.disconnect();
+        }
         
         //Save Database
-        if(!Database.save(null))
+        if(Database.save(null) == false)
         {
             JOptionPane.showMessageDialog(this,"Could not save settings!");
         }
@@ -239,15 +238,12 @@ public final class MainForm extends javax.swing.JFrame implements IGUIEvent{
         if(Communication.isConnected())
         {
             Communication.disconnect();
+            return;
         }
-        else
-        {
-            Communication.connect((String)jCBPort.getModel().getSelectedItem(), (Integer)jCBSpeed.getSelectedItem());
 
-            Database.PORT.set((String)jCBPort.getModel().getSelectedItem());
-            Database.SPEED.set(((Integer)jCBSpeed.getSelectedItem()).toString());
-                
-        }
+        Communication.connect((String)jCBPort.getModel().getSelectedItem(), (Integer)jCBSpeed.getSelectedItem());
+        Database.PORT.set((String)jCBPort.getModel().getSelectedItem());
+        Database.SPEED.set(((Integer)jCBSpeed.getSelectedItem()).toString());
     }//GEN-LAST:event_jBConnectActionPerformed
    
 
