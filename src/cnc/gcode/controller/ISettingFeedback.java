@@ -11,7 +11,7 @@ package cnc.gcode.controller;
  * @author n.rambaud
  */
 public interface ISettingFeedback {
-    JSettingEnum getSettingId();
+    DatabaseV2 getSettingId();
     double getSettingValue();
     double getSettingMinValue();
     double getSettingMaxValue();

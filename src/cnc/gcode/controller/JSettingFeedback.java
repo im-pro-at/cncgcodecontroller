@@ -11,20 +11,22 @@ package cnc.gcode.controller;
  * @author n.rambaud
  */
 public class JSettingFeedback implements ISettingFeedback{
-    public JSettingEnum id;
+    public DatabaseV2 id;
     public double value;
     public double minValue;
     public double maxValue;
     public String message;
-    public JSettingFeedback(JSettingEnum settingId,
+    public JSettingFeedback(DatabaseV2 settingId,
                             double settingValue,
                             String description)
     {
         id      = settingId;
         value   = settingValue;
         message = description; 
+        minValue = -Double.MAX_VALUE;
+        maxValue = Double.MAX_VALUE;
     }
-    public JSettingFeedback(JSettingEnum settingId,
+    public JSettingFeedback(DatabaseV2 settingId,
                             double settingValue,
                             double minValue,
                             double maxValue,
@@ -38,7 +40,7 @@ public class JSettingFeedback implements ISettingFeedback{
     }
 
     @Override
-    public JSettingEnum getSettingId() {
+    public DatabaseV2 getSettingId() {
         return id;
     }
 

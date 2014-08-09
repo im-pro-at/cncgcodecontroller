@@ -18,12 +18,12 @@ import javax.swing.filechooser.FileFilter;
  *
  * @author patrick
  */
-public class JPanelSettings extends javax.swing.JPanel implements IGUIEvent, ISettingsFeedback{
+public class JPanelSettings extends javax.swing.JPanel implements IGUIEvent{
     
     public static final String[] homing = {"upper left","upper right","lower left","lower right" }; //0= upper left; 1= upper right; 2= lower left; 3= lower right;
 
     private IEvent GUIEvent = null;
-    private LinkedList<ISettingFeedback> returnedFeedbackValues = null;
+
     /**
      * Creates new form JPanelSettings
      */
@@ -83,36 +83,6 @@ public class JPanelSettings extends javax.swing.JPanel implements IGUIEvent, ISe
         GUIEvent.fired();
     }
     
-    private LinkedList<ISettingFeedback> DisplaySettingPanel(String panelTitle,
-                                                             JSettingEnum[] ids,
-                                                             double[] currentValues,
-                                                             double[] minValues,
-                                                             double[] maxValues,
-                                                             String[] descriptions)
-    {
-        returnedFeedbackValues = null;
-        if(ids.length !=  currentValues.length && currentValues.length!= descriptions.length)
-        {
-            return null;
-        }
-        
-        LinkedList<ISettingFeedback> settings = new LinkedList<ISettingFeedback>();
-        for (int i = 0; i< currentValues.length; i++)
-        {
-            settings.add(new JSettingFeedback(ids[i],
-                                              currentValues[i],
-                                              minValues[i],
-                                              maxValues[i],
-                                              descriptions[i] ));
-        }
-        JSettingsDialog form = new JSettingsDialog(this, settings);
-        form.setTitle(panelTitle);
-        form.pack();
-        form.setModal(true);
-        form.setVisible(true);
-        
-        return returnedFeedbackValues;
-    }
     
     private void HandleBacklashSettings()
     {
@@ -124,11 +94,11 @@ public class JPanelSettings extends javax.swing.JPanel implements IGUIEvent, ISe
             messages[i] = "Set the backlash for the " + CommandParsing.axesName[i] + " axis:";
         }
 
-        LinkedList<ISettingFeedback> updatedValues = DisplaySettingPanel("Backlash correction",
-                                                                         new JSettingEnum[]{ //value
-                                                                                            JSettingEnum.BL0,
-                                                                                            JSettingEnum.BL1,
-                                                                                            JSettingEnum.BL2
+        LinkedList<ISettingFeedback> updatedValues = JSettingsDialog.DisplaySettingPanel("Backlash correction",
+                                                                         new DatabaseV2[]{ //value
+                                                                                            DatabaseV2.BL0,
+                                                                                            DatabaseV2.BL1,
+                                                                                            DatabaseV2.BL2
                                                                         },
                                                                         new double[]{ //value
                                                                                         DatabaseV2.getBacklash(0).getsaved(),
@@ -161,11 +131,11 @@ public class JPanelSettings extends javax.swing.JPanel implements IGUIEvent, ISe
     
     private void HandleWorkingSpaceSettings()
     {
-        LinkedList<ISettingFeedback> updatedValues = DisplaySettingPanel("Workspace size",
-                                                                             new JSettingEnum[]{ //value
-                                                                                JSettingEnum.WORKSPACE0,
-                                                                                JSettingEnum.WORKSPACE1,
-                                                                                JSettingEnum.WORKSPACE2
+        LinkedList<ISettingFeedback> updatedValues = JSettingsDialog.DisplaySettingPanel("Workspace size",
+                                                                             new DatabaseV2[]{ //value
+                                                                                DatabaseV2.WORKSPACE0,
+                                                                                DatabaseV2.WORKSPACE1,
+                                                                                DatabaseV2.WORKSPACE2
                                                                             },
                                                                             new double[]{ //value
                                                                                             DatabaseV2.getWorkspace(0).getsaved(),
@@ -198,13 +168,13 @@ public class JPanelSettings extends javax.swing.JPanel implements IGUIEvent, ISe
     
     private void HandleAutoLevelingSettings()
     {
-        LinkedList<ISettingFeedback> updatedValues = DisplaySettingPanel("Auto leveling settings",
-                                                                            new JSettingEnum[]{ //value
-                                                                                JSettingEnum.ALZERO,
-                                                                                JSettingEnum.ALMAXPROBDEPTH,
-                                                                                JSettingEnum.ALSAVEHEIGHT,
-                                                                                JSettingEnum.ALCLEARANCE,
-                                                                                JSettingEnum.ALFEEDRATE,
+        LinkedList<ISettingFeedback> updatedValues = JSettingsDialog.DisplaySettingPanel("Auto leveling settings",
+                                                                            new DatabaseV2[]{ 
+                                                                                DatabaseV2.ALZERO,
+                                                                                DatabaseV2.ALMAXPROBDEPTH,
+                                                                                DatabaseV2.ALSAVEHEIGHT,
+                                                                                DatabaseV2.ALCLEARANCE,
+                                                                                DatabaseV2.ALFEEDRATE,
                                                                             },
                                                                             new double[]{ //value
                                                                                             DatabaseV2.ALZERO.getsaved(),
@@ -250,10 +220,10 @@ public class JPanelSettings extends javax.swing.JPanel implements IGUIEvent, ISe
     
     private void HandleAutoLevelingDistanceSettings()
     {
-        LinkedList<ISettingFeedback> updatedValues = DisplaySettingPanel("Workspace size",
-                                                                             new JSettingEnum[]{ //value
-                                                                                JSettingEnum.ALDISTANCE,
-                                                                                JSettingEnum.ALMAXMOVELENGTH
+        LinkedList<ISettingFeedback> updatedValues = JSettingsDialog.DisplaySettingPanel("Workspace size",
+                                                                             new DatabaseV2[]{ 
+                                                                                DatabaseV2.ALDISTANCE,
+                                                                                DatabaseV2.ALMAXMOVELENGTH
                                                                             },
                                                                             new double[]{ //value
                                                                                 DatabaseV2.ALDISTANCE.getsaved(),
@@ -1078,9 +1048,4 @@ public class JPanelSettings extends javax.swing.JPanel implements IGUIEvent, ISe
     private javax.swing.JLabel jLabel43;
     private javax.swing.JLabel jLabel44;
     // End of variables declaration//GEN-END:variables
-
-    @Override
-    public void settingsUpdated(LinkedList<ISettingFeedback> settingValues) {
-        returnedFeedbackValues = settingValues;
-    }
 }

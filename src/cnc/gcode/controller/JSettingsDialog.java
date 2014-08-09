@@ -19,25 +19,53 @@ import javax.swing.JTextField;
  */
 //javax.swing.JFrame
 public final class JSettingsDialog extends JDialog{
-    JTextField[] valuesFields;
-    LinkedList<ISettingFeedback> feedbackValues  = null;
-    ISettingsFeedback iftSettings = null;
-    /**
-     * Creates new form JSettingsChange
-     */
+    private JTextField[] valuesFields;
+    private final LinkedList<ISettingFeedback> feedbackValues;
+    private boolean formok=false;
+
     
-    public JSettingsDialog() {
-        super();
-        super.setTitle("Main JFrame");
-        super.setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
-        setResizable(false);
-        initComponents();
+    public static LinkedList<ISettingFeedback> DisplaySettingPanel(String panelTitle,
+                                                             DatabaseV2[] ids,
+                                                             double[] currentValues,
+                                                             double[] minValues,
+                                                             double[] maxValues,
+                                                             String[] descriptions)
+    {
+        if(ids.length !=  currentValues.length && currentValues.length!= descriptions.length)
+        {
+            return null;
+        }
+        
+        LinkedList<ISettingFeedback> settings = new LinkedList<ISettingFeedback>();
+        for (int i = 0; i< currentValues.length; i++)
+        {
+            settings.add(new JSettingFeedback(ids[i],
+                                              currentValues[i],
+                                              minValues[i],
+                                              maxValues[i],
+                                              descriptions[i] ));
+        }
+        JSettingsDialog form = new JSettingsDialog(settings);
+        form.setTitle(panelTitle);
+        form.pack();
+        form.setModal(true);
+        form.setVisible(true);
+        
+        if(form.formok)
+        {
+            return form.feedbackValues;
+        }
+        else
+        {
+            return null;
+        }
     }
 
-    public JSettingsDialog(ISettingsFeedback settingsItf, LinkedList<ISettingFeedback> feedbackValues)
+    private JSettingsDialog(LinkedList<ISettingFeedback> feedbackValues)
     {
-        this();
-        iftSettings = settingsItf;
+        super();
+        setResizable(false);
+        initComponents();
         this.feedbackValues = feedbackValues;
         configureDataToDisplay( feedbackValues);
     }
@@ -56,7 +84,7 @@ public final class JSettingsDialog extends JDialog{
         JOkButton = new javax.swing.JButton();
         JCancelButton = new javax.swing.JButton();
 
-        setDefaultCloseOperation(javax.swing.WindowConstants.DO_NOTHING_ON_CLOSE);
+        setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
 
         javax.swing.GroupLayout JSettingsPanelLayout = new javax.swing.GroupLayout(JSettingsPanel);
         JSettingsPanel.setLayout(JSettingsPanelLayout);
@@ -122,13 +150,13 @@ public final class JSettingsDialog extends JDialog{
                 .addComponent(JSettingsPanel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jPanel2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(26, Short.MAX_VALUE))
+                .addGap(0, 0, 0))
         );
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
-    private void ValidateNewValue(ISettingFeedback data)
+    private boolean ValidateNewValue(ISettingFeedback data)
     {
         double val = data.getSettingValue();
         if(val < data.getSettingMinValue())
@@ -141,6 +169,9 @@ public final class JSettingsDialog extends JDialog{
             {
                data.setSettingValue(data.getSettingMinValue());
             }
+            else{
+                return false;
+            }
         }
         else if(val > data.getSettingMaxValue())
         {
@@ -152,76 +183,42 @@ public final class JSettingsDialog extends JDialog{
             {
                data.setSettingValue(data.getSettingMaxValue());
             }
+            else{
+                return false;
+            }
         }
+        return true;
     }
     
     private void JOkButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_JOkButtonActionPerformed
-        
-        if( null != iftSettings && feedbackValues != null)
+        for(int i = 0; i < feedbackValues.size();  i++)
         {
-            for(int i = 0; i < feedbackValues.size();  i++)
+            try
             {
-                try
-                {
-                    feedbackValues.get(i).setSettingValue(Double.valueOf(valuesFields[i].getText())); 
-                    ValidateNewValue(feedbackValues.get(i));// validating all settings before updating.
-                }
-                catch(Exception ex)
-                {
-                    JOptionPane.showMessageDialog(null,
-                                                "Error when converting " + valuesFields[i].getText() + ".\nIt seems not to be a double value",
-                                                "Convertion error",
-                                                JOptionPane.ERROR_MESSAGE);
-
-                }
+                feedbackValues.get(i).setSettingValue(Double.valueOf(valuesFields[i].getText())); 
+                if(!ValidateNewValue(feedbackValues.get(i)))// validating all settings before updating.
+                    return;
             }
-            
-            iftSettings.settingsUpdated(feedbackValues);
+            catch(Exception ex)
+            {
+                JOptionPane.showMessageDialog(null,
+                                            "Error when converting " + valuesFields[i].getText() + ".\nIt seems not to be a double value",
+                                            "Convertion error",
+                                            JOptionPane.ERROR_MESSAGE);
+                return;
+            }
         }
+        formok=true;
+        this.setVisible(false);
         this.dispose();
     }//GEN-LAST:event_JOkButtonActionPerformed
 
     private void JCancelButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_JCancelButtonActionPerformed
+        formok=false;
+        this.setVisible(false);
         this.dispose();
     }//GEN-LAST:event_JCancelButtonActionPerformed
 
-    /**
-     * @param args the command line arguments
-     */
-    public static void main(String args[]) {
-        
-        
-        /* Set the Nimbus look and feel */
-        //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
-        /* If Nimbus (introduced in Java SE 6) is not available, stay with the default look and feel.
-         * For details see http://download.oracle.com/javase/tutorial/uiswing/lookandfeel/plaf.html 
-         */
-        try {
-            for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
-                if ("Nimbus".equals(info.getName())) {
-                    javax.swing.UIManager.setLookAndFeel(info.getClassName());
-                    break;
-                }
-            }
-        } catch (ClassNotFoundException ex) {
-            java.util.logging.Logger.getLogger(JSettingsDialog.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (InstantiationException ex) {
-            java.util.logging.Logger.getLogger(JSettingsDialog.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (IllegalAccessException ex) {
-            java.util.logging.Logger.getLogger(JSettingsDialog.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (javax.swing.UnsupportedLookAndFeelException ex) {
-            java.util.logging.Logger.getLogger(JSettingsDialog.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        }
-        //</editor-fold>
-
-       
-        /* Create and display the form */
-        java.awt.EventQueue.invokeLater(new Runnable() {
-            public void run() {
-                new JSettingsDialog().setVisible(true);
-            }
-        });
-    }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton JCancelButton;
@@ -244,9 +241,12 @@ public final class JSettingsDialog extends JDialog{
         JSettingsPanel.setLayout(singleGridLayout );
         for (int i = 0; i < feedbackValues.size(); i++)
         {
-            JTextArea description = new JTextArea(feedbackValues.get(i).getSettingDescription() 
-                                                    + "\nmin:" + feedbackValues.get(i).getSettingMinValue()
-                                                    + " | max: " + feedbackValues.get(i).getSettingMaxValue());
+            double min=feedbackValues.get(i).getSettingMinValue();
+            double max=feedbackValues.get(i).getSettingMaxValue();
+            JTextArea description = new JTextArea(feedbackValues.get(i).getSettingDescription() + "\n"
+                                                    + "min: " + (min==-Double.MAX_VALUE?"-inf":""+min) + " | "
+                                                    + "max: " + (max==Double.MAX_VALUE?"-inf":""+max));
+            description.setEditable(false);
             valuesFields[i] = new JTextField(String.valueOf(feedbackValues.get(i).getSettingValue()));
             JSettingsPanel.add(description);
             JSettingsPanel.add(valuesFields[i]);
