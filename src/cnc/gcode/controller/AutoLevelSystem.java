@@ -75,8 +75,8 @@ public class AutoLevelSystem implements java.io.Serializable{
             return;
         }
         
-        int countx = (int)Math.ceil(dx / Database.ALDISTANCE.getsaved());
-        int county = (int)Math.ceil(dy / Database.ALDISTANCE.getsaved());
+        int countx = (int)Math.ceil(dx / DatabaseV2.ALDISTANCE.getsaved());
+        int county = (int)Math.ceil(dy / DatabaseV2.ALDISTANCE.getsaved());
         
         double distanceX = dx / countx;
         if(countx == 0)
@@ -217,13 +217,13 @@ public class AutoLevelSystem implements java.io.Serializable{
     
     public static double correctz(double x, double y, double z)
     {
-        double d = al.getdZ(new Point2D.Double(x, y))-Database.ALZERO.getsaved();
+        double d = al.getdZ(new Point2D.Double(x, y))-DatabaseV2.ALZERO.getsaved();
         
         if(Double.isNaN(d))
         {
             //this should never happen!
             (new MyException("Autoleveling Error!")).printStackTrace();
-            d = maxz()- Database.ALZERO.getsaved(); 
+            d = maxz()- DatabaseV2.ALZERO.getsaved(); 
         }
         
         return z + d;

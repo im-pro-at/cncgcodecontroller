@@ -105,7 +105,7 @@ public class JPanelAutoLevel extends javax.swing.JPanel implements IGUIEvent {
                 
                 //StartCorner
                 g2.translate(data.jpw / 2, data.jph / 2);
-                switch(Integer.parseInt(Database.HOMING.get()))
+                switch(Integer.parseInt(DatabaseV2.HOMING.get()))
                 {
                     case 0:
                     default:
@@ -124,8 +124,8 @@ public class JPanelAutoLevel extends javax.swing.JPanel implements IGUIEvent {
                 g2.translate(-data.jpw / 2, -data.jph / 2);
                 
                 //Display Position
-                double ariawidth    = Database.WORKSPACE0.getsaved(); //x
-                double ariaheight   = Database.WORKSPACE1.getsaved(); //y
+                double ariawidth    = DatabaseV2.WORKSPACE0.getsaved(); //x
+                double ariaheight   = DatabaseV2.WORKSPACE1.getsaved(); //y
                 Rectangle rect      = Geometrics.placeRectangle(data.jpw, data.jph, Geometrics.getRatio(ariawidth,ariaheight));
                 double scalex       = rect.width/ariawidth;
                 double scaley       = rect.height/ariaheight;
@@ -145,7 +145,7 @@ public class JPanelAutoLevel extends javax.swing.JPanel implements IGUIEvent {
                     trans = new AffineTransform();
                 }
                 
-                double d = Math.min(Database.ALDISTANCE.getsaved()/10,10);
+                double d = Math.min(DatabaseV2.ALDISTANCE.getsaved()/10,10);
                 if(AutoLevelSystem.leveled())
                 {
                     double max  = -Double.MAX_VALUE;
@@ -163,8 +163,8 @@ public class JPanelAutoLevel extends javax.swing.JPanel implements IGUIEvent {
                     }
                     double delta = max - min;
                     g2.setTransform(new AffineTransform());
-                    int cx  = Math.max((int)(Database.WORKSPACE0.getsaved()/Database.ALDISTANCE.getsaved() * 10),rect.width);
-                    int cy  = Math.max((int)(Database.WORKSPACE1.getsaved()/Database.ALDISTANCE.getsaved() * 10),rect.height);
+                    int cx  = Math.max((int)(DatabaseV2.WORKSPACE0.getsaved()/DatabaseV2.ALDISTANCE.getsaved() * 10),rect.width);
+                    int cy  = Math.max((int)(DatabaseV2.WORKSPACE1.getsaved()/DatabaseV2.ALDISTANCE.getsaved() * 10),rect.height);
                     double w    = rect.width/(double)cx;
                     double h    = rect.height/(double)cy;
                     for(int x = 0;x < cx;x++)
@@ -276,11 +276,11 @@ public class JPanelAutoLevel extends javax.swing.JPanel implements IGUIEvent {
                             n.setFocus();
                             n.popUpToolTip("Value must be bigger than zero");
                         }
-                        if(v > Database.getWorkspace(i).getsaved())
+                        if(v > DatabaseV2.getWorkspace(i).getsaved())
                         {
-                            n.set(Database.getWorkspace(i).getsaved());
+                            n.set(DatabaseV2.getWorkspace(i).getsaved());
                             n.setFocus();
-                            n.popUpToolTip("Value must be smaller than " + Database.getWorkspace(i));
+                            n.popUpToolTip("Value must be smaller than " + DatabaseV2.getWorkspace(i));
                         }
                     }
                     if(axes[i][0].getdsave()>axes[i][1].getdsave())
@@ -304,8 +304,8 @@ public class JPanelAutoLevel extends javax.swing.JPanel implements IGUIEvent {
         
         for(int i = 0;i < 2;i++)
         {
-                axes[i][0].set(Database.ALDISTANCE.getsaved() / 2);
-                axes[i][1].set(Database.getWorkspace(i).getsaved()- Database.ALDISTANCE.getsaved() / 2);
+                axes[i][0].set(DatabaseV2.ALDISTANCE.getsaved() / 2);
+                axes[i][1].set(DatabaseV2.getWorkspace(i).getsaved()- DatabaseV2.ALDISTANCE.getsaved() / 2);
         }
         makeNewAl();
 
@@ -729,7 +729,7 @@ public class JPanelAutoLevel extends javax.swing.JPanel implements IGUIEvent {
                     cmds.add(CNCCommand.getALStartCommand());
                     
                     //go to save hight
-                    cmds.add(new CNCCommand("G0 Z" + Database.ALSAVEHEIGHT));
+                    cmds.add(new CNCCommand("G0 Z" + DatabaseV2.ALSAVEHEIGHT));
 
                     AutoLevelSystem.Point aktpoint = points[0];
                     Point2D lastpos = null;
@@ -750,7 +750,7 @@ public class JPanelAutoLevel extends javax.swing.JPanel implements IGUIEvent {
                         
                         //Prope
                         cmdpropeindex[Arrays.asList(points).indexOf(aktpoint)] = cmds.size();
-                        cmds.add(new CNCCommand("G1 Z" + Tools.dtostr(Database.ALZERO.getsaved()- Database.ALMAXPROBDEPTH.getsaved()) + " F" + Database.ALFEEDRATE));
+                        cmds.add(new CNCCommand("G1 Z" + Tools.dtostr(DatabaseV2.ALZERO.getsaved()- DatabaseV2.ALMAXPROBDEPTH.getsaved()) + " F" + DatabaseV2.ALFEEDRATE));
                         
                         // --> Set Position + clearance is made after Propping
                         
@@ -777,7 +777,7 @@ public class JPanelAutoLevel extends javax.swing.JPanel implements IGUIEvent {
                     }
                     
                     //go to save hight
-                    cmds.add(new CNCCommand("G0 Z" + Database.ALSAVEHEIGHT));
+                    cmds.add(new CNCCommand("G0 Z" + DatabaseV2.ALSAVEHEIGHT));
                     
                     //calc time
                     CNCCommand.Calchelper c = new CNCCommand.Calchelper();
@@ -799,7 +799,7 @@ public class JPanelAutoLevel extends javax.swing.JPanel implements IGUIEvent {
                         //Simulate Clearancemove
                         if(Arrays.asList(cmdpropeindex).contains(i))
                         {
-                            (new CNCCommand("G0 Z" + Tools.dtostr(Database.ALZERO.getsaved()- Database.ALMAXPROBDEPTH.getsaved() + Database.ALCLEARANCE.getsaved()))).calcCommand(c);
+                            (new CNCCommand("G0 Z" + Tools.dtostr(DatabaseV2.ALZERO.getsaved()- DatabaseV2.ALMAXPROBDEPTH.getsaved() + DatabaseV2.ALCLEARANCE.getsaved()))).calcCommand(c);
                         }
                         
                     }
@@ -870,7 +870,7 @@ public class JPanelAutoLevel extends javax.swing.JPanel implements IGUIEvent {
                             while(true){
                                 waitForNextSend();
                                 try{
-                                    Communication.send("G0 Z" + Tools.dtostr(thitValue+Database.ALCLEARANCE.getsaved()) + " F" + Database.GOFEEDRATE);
+                                    Communication.send("G0 Z" + Tools.dtostr(thitValue+DatabaseV2.ALCLEARANCE.getsaved()) + " F" + DatabaseV2.GOFEEDRATE);
                                 }
                                 catch(ComInterruptException ex)
                                 {
@@ -969,7 +969,7 @@ public class JPanelAutoLevel extends javax.swing.JPanel implements IGUIEvent {
     }//GEN-LAST:event_jBPauseActionPerformed
 
     private void jBImportActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jBImportActionPerformed
-        JFileChooser fc = Database.getFileChooser();
+        JFileChooser fc = DatabaseV2.getFileChooser();
         fc.setFileFilter(new FileFilter() {
             @Override
             public boolean accept(File f) {
@@ -1007,7 +1007,7 @@ public class JPanelAutoLevel extends javax.swing.JPanel implements IGUIEvent {
 
     
     private void jBExportActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jBExportActionPerformed
-        JFileChooser fc= Database.getFileChooser();
+        JFileChooser fc= DatabaseV2.getFileChooser();
         fc.setFileFilter(new FileFilter() {
             @Override
             public boolean accept(File f) {

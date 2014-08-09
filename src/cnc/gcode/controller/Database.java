@@ -4,243 +4,48 @@
  */
 package cnc.gcode.controller;
 
-import cnc.gcode.controller.communication.Communication;
-import java.beans.PropertyChangeEvent;
-import java.beans.PropertyChangeListener;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.ObjectInput;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutput;
-import java.io.ObjectOutputStream;
-import java.util.EnumMap;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import javax.swing.JFileChooser;
-
 /**
- *
+ * Old Data base. Use to load old DataFiles without errors!
  * @author patrick
  */
-public enum Database {
-    //Port Settings
-//Port Settings
-//Port Settings
-//Port Settings
-//Port Settings
-//Port Settings
-//Port Settings
-//Port Settings
-//Port Settings
-//Port Settings
-//Port Settings
-//Port Settings
-//Port Settings
-//Port Settings
-//Port Settings
-//Port Settings
-    PORT,
-    SPEED("9"),
-    
-    //Control
-    HOMING("0"), //Homing Point 0= upper left; 1= upper right; 2= lower left; 3= lower right;
-    MAXFEEDRATE(Tools.dtostr(600.0)), 
-    WORKSPACE0(Tools.dtostr(200.0)),
-    WORKSPACE1(Tools.dtostr(200.0)),
-    WORKSPACE2(Tools.dtostr(200.0)),
-    
-    //CNC
-    FILEDIRECTORY(System.getProperty("user.home")),
-    STARTCODE,
-    TOOLCHANGE("M6 T?"),
-    SPINDLEON("M?"),
-    SPINDLEOFF("M5"),
-    GOFEEDRATE(Tools.dtostr(100.0)),
-    TOOLSIZE(Tools.dtostr(0.5)),
-    OPTIMISATIONTIMEOUT(Tools.dtostr(10)),
-    
-    //Autoleveling
-    ALZERO(Tools.dtostr(0.0)),
-    ALMAXPROBDEPTH(Tools.dtostr(-1.0)), 
-    ALSAVEHEIGHT(Tools.dtostr(10.0)),
-    ALCLEARANCE(Tools.dtostr(10.0)),
-    ALFEEDRATE(Tools.dtostr(10.0)),
-    ALDISTANCE(Tools.dtostr(10.0)),
-    ALMAXMOVELENGTH(Tools.dtostr(1.0)), 
-    ALSTARTCODE("G28"), 
-    
-    //ARC
-    ARCSEGMENTLENGTH(Tools.dtostr(0.1)),
-    
-    //Backlash
-    BL0(Tools.dtostr(0.0)),
-    BL1(Tools.dtostr(0.0)),
-    BL2(Tools.dtostr(0.0)),
-    
-    //Modal G1
-    G1MODAL("0"), //"0" == off, "1"==on
-    
-    //Communication Type
-    COMTYPE(Communication.MARLIN.toString()),   
-    
-    
-    ;
+ enum Database {
+    PORT(DatabaseV2.PORT), 
+    SPEED(DatabaseV2.SPEED), 
+    HOMEING(DatabaseV2.HOMING), 
+    MAXFEEDRATE(DatabaseV2.MAXFEEDRATE), 
+    WORKSPACE0(DatabaseV2.WORKSPACE0), 
+    WORKSPACE1(DatabaseV2.WORKSPACE1), 
+    WORKSPACE2(DatabaseV2.WORKSPACE2), 
+    FILEDIRECTORY(DatabaseV2.FILEDIRECTORY), 
+    STARTCODE(DatabaseV2.STARTCODE), 
+    TOOLCHANGE(DatabaseV2.TOOLCHANGE), 
+    SPINDLEON(DatabaseV2.SPINDLEON), 
+    SPINDLEOFF(DatabaseV2.SPINDLEOFF), 
+    GOFEEDRATE(DatabaseV2.GOFEEDRATE), 
+    TOOLSIZE(DatabaseV2.TOOLSIZE), 
+    OPTIMISATIONTIMEOUT(DatabaseV2.OPTIMISATIONTIMEOUT), 
+    ALZERO(DatabaseV2.ALZERO), 
+    ALMAXPROPDEPTH(DatabaseV2.ALMAXPROBDEPTH), 
+    ALSAVEHEIGHT(DatabaseV2.ALSAVEHEIGHT), 
+    ALCLEARENCE(DatabaseV2.ALCLEARANCE), 
+    ALFEEDRATE(DatabaseV2.ALFEEDRATE), 
+    ALDISTANACE(DatabaseV2.ALDISTANCE), 
+    ALMAXMOVELENGTH(DatabaseV2.ALMAXMOVELENGTH), 
+    ALSTARTCODE(DatabaseV2.ALSTARTCODE), 
+    ARCSEGMENTLENGTH(DatabaseV2.ARCSEGMENTLENGTH), 
+    BL0(DatabaseV2.BL0), 
+    BL1(DatabaseV2.BL1), 
+    BL2(DatabaseV2.BL2), 
+    G1MODAL(DatabaseV2.G1MODAL), 
+    COMTYPE(DatabaseV2.COMTYPE);
+    private final DatabaseV2 link;
 
-    private final String defaultValue;
-    private final static String SETTINGSFILE = System.getProperty("user.home") + File.separator + ".cnccgcodecontroller" + File.separator + "Settings.ois";
-
-    private Database(String defaultvalue)
-    {
-        this.defaultValue = defaultvalue;
-    }
-    private Database()
-    {
-        this.defaultValue = "";
-    }
-   
-    private static EnumMap<Database, String> data = new EnumMap<>(Database.class);
-    
-    public static JFileChooser getFileChooser()
-    {
-        final JFileChooser fc = new JFileChooser();
-        //set currantdiroctary
-        try {
-            fc.setCurrentDirectory(new File(Database.FILEDIRECTORY.get()));
-        }
-        catch(Exception ex){
-            //Its ok ;-)
-        }
-        fc.addPropertyChangeListener(new PropertyChangeListener() {
-            @Override
-            public void propertyChange(PropertyChangeEvent evt) {
-                if(JFileChooser.DIRECTORY_CHANGED_PROPERTY.equals(evt.getPropertyName()))
-                {
-                    Database.FILEDIRECTORY.set(fc.getCurrentDirectory().getPath());
-                }
-            }
-        });
-        return fc;
-    }
-    
-    /**
-     * Loads the Data from a File 
-     * @param file
-     * @return 
-     * true => no errors 
-     */
-    public static boolean load(File file){
-        try {
-            if(file== null)
-            {
-                file = new File(SETTINGSFILE);
-            }
-            try (ObjectInput in = new ObjectInputStream(new FileInputStream(file))) 
-            {
-                data = (EnumMap<Database, String>)in.readObject();
-                return true;
-            }
-        } catch (Exception ex) {
-            Logger.getLogger(Database.class.getName()).log(Level.SEVERE, null, ex); 
-            return false;
-        }
-    }
-    
-    /**
-     * Saves the Data to a File
-     * @param file
-     * @return 
-     * true => no errors
-     */
-    public static boolean save(File file){
-        try {
-            if(file == null)
-            {
-                file = new File(SETTINGSFILE);
-            }
-            if(file.getParentFile().exists() == false)
-            {
-                file.getParentFile().mkdirs();
-            }
-            if(file.exists() == false)
-            {
-                file.createNewFile();
-            }
-            try (ObjectOutput out = new ObjectOutputStream(new FileOutputStream(file))) 
-            {
-                out.writeObject(data);
-            }
-            return true;
-        } catch (IOException ex) {
-            Logger.getLogger(Database.class.getName()).log(Level.SEVERE, null, ex); 
-            return false;
-        }
+    private Database(DatabaseV2 link) {
+        this.link = link;
     }
 
-    public synchronized static void set(Database name, String value)
-    {
-       data.put(name, value);        
-    }
-    
-    public synchronized static String get(Database name)
-    {
-        if(data.containsKey(name))
-        {
-            return data.get(name);
-        }
-        else
-        {
-            return name.defaultValue;
-        }
-    }
-    
-    public void set(String value)
-    {
-        Database.set(this, value);
-    }
-    
-    public String get()
-    {
-        return Database.get(this);
-    }
-
-    public double getsaved()
-    {
-        return Tools.strtodsave(get());
-    }
-    
-    @Override
-    public String toString() {
-        return Database.get(this);
-    }
-
-    public static Database getWorkspace(int i)
-    {
-        switch(i)
-        {
-            case 0:
-            default:
-                return WORKSPACE0;
-            case 1:
-                return WORKSPACE1;
-            case 2:
-                return WORKSPACE2;
-        }
-    }
-
-    public static Database getBacklash(int i)
-    {
-        switch(i)
-        {
-            case 0:
-            default:
-                return BL0;
-            case 1:
-                return BL1;
-            case 2:
-                return BL2;
-        }
+    public DatabaseV2 getLink() {
+        return link;
     }
     
 }

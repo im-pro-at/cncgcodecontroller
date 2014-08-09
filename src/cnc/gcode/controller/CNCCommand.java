@@ -201,7 +201,7 @@ public class CNCCommand {
         }
 
         void setupGraphicsOptions(Graphics2D g, boolean selected) {
-            g.setStroke(new BasicStroke((float)Database.TOOLSIZE.getsaved(), BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND));
+            g.setStroke(new BasicStroke((float)DatabaseV2.TOOLSIZE.getsaved(), BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND));
             if(selected == false)
             {
                 g.setColor(new Color(color.getRed(), color.getGreen(), color.getBlue(), 200));
@@ -285,7 +285,7 @@ public class CNCCommand {
         else
         {
             //Support Modal G1: X00 Y00 Z00
-            if(Database.G1MODAL.get().equals("1"))
+            if(DatabaseV2.G1MODAL.get().equals("1"))
             {
                 switch(p.get(0).letter)
                 {
@@ -525,7 +525,7 @@ public class CNCCommand {
                 double f = c.axes[3];
                 if(type == Type.G0)
                 {
-                    f = Database.GOFEEDRATE.getsaved();
+                    f = DatabaseV2.GOFEEDRATE.getsaved();
                 }
                 c.seconds += d / f * 60;
 
@@ -660,7 +660,7 @@ public class CNCCommand {
                 double millimeters_of_travel = angular_travel * radius;
                 if (Math.abs(millimeters_of_travel) > 0.00001) 
                 {
-                    int segments = (int)Math.floor(Math.abs(millimeters_of_travel) / Database.ARCSEGMENTLENGTH.getsaved());
+                    int segments = (int)Math.floor(Math.abs(millimeters_of_travel) / DatabaseV2.ARCSEGMENTLENGTH.getsaved());
                     if(segments == 0)
                     {
                         segments = 1;
@@ -731,7 +731,7 @@ public class CNCCommand {
                     ArrayList<Move> newmoves = new ArrayList<>(moves.length);
                     for(Move move:moves)
                     {
-                        int parts = (int)Math.ceil(move.getDistanceXY() / Database.ALMAXMOVELENGTH.getsaved());
+                        int parts = (int)Math.ceil(move.getDistanceXY() / DatabaseV2.ALMAXMOVELENGTH.getsaved());
                         if(parts == 0)
                         {
                             //no X or Y move
@@ -772,16 +772,16 @@ public class CNCCommand {
                     //calc
                     for(int i = 0;i < 3;i++)
                     {
-                        compmove.s[i] = compmove.s[i] + Database.getBacklash(i).getsaved() / 2 * (direction[i] ? 1:-1);
+                        compmove.s[i] = compmove.s[i] + DatabaseV2.getBacklash(i).getsaved() / 2 * (direction[i] ? 1:-1);
                         if(Double.isNaN(move.s[i]) == false 
                            && Double.isNaN(move.e[i]) == false 
                            && move.s[i] != move.e[i])
                         {
                             direction[i] = move.s[i]<move.e[i];
                         }
-                        compmove.e[i] = compmove.e[i] + Database.getBacklash(i).getsaved() / 2 * (direction[i] ? 1:-1);
+                        compmove.e[i] = compmove.e[i] + DatabaseV2.getBacklash(i).getsaved() / 2 * (direction[i] ? 1:-1);
                         move.s[i] = compmove.e[i];
-                        move.e[i] = move.e[i] + Database.getBacklash(i).getsaved() / 2 * (direction[i] ? 1:-1);
+                        move.e[i] = move.e[i] + DatabaseV2.getBacklash(i).getsaved() / 2 * (direction[i] ? 1:-1);
                     }
                     
                     if(compmove.getDistance() > 0.00001)
@@ -824,7 +824,7 @@ public class CNCCommand {
                     {
                         if(type==Type.G0)
                         {
-                            cmd += " " + CommandParsing.axesName[3] + Database.GOFEEDRATE.get();
+                            cmd += " " + CommandParsing.axesName[3] + DatabaseV2.GOFEEDRATE.get();
                         }
                         else if(!Double.isNaN(cout.axes[3]))
                         {
@@ -838,13 +838,13 @@ public class CNCCommand {
 
             //Settings
             case STARTCOMMAND:
-                cmds.addAll(Arrays.asList(Database.STARTCODE.get().split("\n")));
+                cmds.addAll(Arrays.asList(DatabaseV2.STARTCODE.get().split("\n")));
                 break;
             case ALSTARTCOMMAND:
-                cmds.addAll(Arrays.asList(Database.ALSTARTCODE.get().split("\n")));
+                cmds.addAll(Arrays.asList(DatabaseV2.ALSTARTCODE.get().split("\n")));
                 break;
             case TOOLCHANGE:
-                cmd=Database.TOOLCHANGE.get();
+                cmd=DatabaseV2.TOOLCHANGE.get();
                 if(p.contains('T'))
                 {
                     cmd = cmd.replace("?", "" + (int)p.get('T').value);
@@ -852,10 +852,10 @@ public class CNCCommand {
                 cmds.addAll(Arrays.asList(cmd.split("\n")));
                 break;
             case SPINDLEON:
-                cmds.addAll(Arrays.asList(Database.SPINDLEON.get().replace("?", "" + (int)p.get('M').value).split("\n")));
+                cmds.addAll(Arrays.asList(DatabaseV2.SPINDLEON.get().replace("?", "" + (int)p.get('M').value).split("\n")));
                 break;
             case SPINDLEOFF:
-                cmds.addAll(Arrays.asList(Database.SPINDLEOFF.get().split("\n")));
+                cmds.addAll(Arrays.asList(DatabaseV2.SPINDLEOFF.get().split("\n")));
                 break;
 
             //Send directly:
@@ -1054,7 +1054,7 @@ public class CNCCommand {
                 if(G0moves.size()>1)
                 {
                     //Local Optimisation thry this for maximum of time:
-                    long timeout = System.currentTimeMillis() + (int)(1000 * Database.OPTIMISATIONTIMEOUT.getsaved())/reccount; 
+                    long timeout = System.currentTimeMillis() + (int)(1000 * DatabaseV2.OPTIMISATIONTIMEOUT.getsaved())/reccount; 
 
 
                     //Copy list
@@ -1135,7 +1135,7 @@ public class CNCCommand {
                     //Secound Algoritim
                     while(timeout > System.currentTimeMillis())
                     {
-                        progress.publish("Optimizing", (int)(doneccount * (100 / reccount) + 100 / reccount - (timeout - System.currentTimeMillis())/(10 * Database.OPTIMISATIONTIMEOUT.getsaved())));
+                        progress.publish("Optimizing", (int)(doneccount * (100 / reccount) + 100 / reccount - (timeout - System.currentTimeMillis())/(10 * DatabaseV2.OPTIMISATIONTIMEOUT.getsaved())));
 
                         OElement as = null;
                         double   d  = 0;
@@ -1157,7 +1157,7 @@ public class CNCCommand {
                             d = 0;
                             for(ae = as.n;ae != HEAD;ae = ae.n)
                             {
-                                progress.publish("Optimizing", (int)(doneccount * (100 / reccount) + 100 / reccount - (timeout - System.currentTimeMillis())/(10 * Database.OPTIMISATIONTIMEOUT.getsaved())));
+                                progress.publish("Optimizing", (int)(doneccount * (100 / reccount) + 100 / reccount - (timeout - System.currentTimeMillis())/(10 * DatabaseV2.OPTIMISATIONTIMEOUT.getsaved())));
 
                                 for(OElement s = ae.n;s != HEAD && s != HEAD.l;s = s.n)
                                 {

@@ -56,7 +56,7 @@ public class PrintableLayers {
         @Override
         public void paint(Graphics2D g2) 
         {
-            double ts = Database.TOOLSIZE.getsaved();
+            double ts = DatabaseV2.TOOLSIZE.getsaved();
             type.setupGraphicsOptions(g2, selected(getIndex()));
             g2.fill(new Ellipse2D.Double(point[0] - ts / 2,
                                         point[1] - ts / 2,
@@ -221,7 +221,7 @@ public class PrintableLayers {
             return new int[0];
         }
         LinkedList<Integer> list = new LinkedList<>();
-        double size = Database.TOOLSIZE.getsaved() * 2;
+        double size = DatabaseV2.TOOLSIZE.getsaved() * 2;
         for (IElement e : layers.get(keys[index]))
         {
             if (e.isInRange(p, size)) 

@@ -24,7 +24,7 @@ public final class MainForm extends javax.swing.JFrame implements IGUIEvent{
     public MainForm() {
         
         //Load Database
-        if(Database.load(null) == false)
+        if(DatabaseV2.load(null) == false)
         {
             JOptionPane.showMessageDialog(null,"Could not load settings!");
         }
@@ -70,7 +70,7 @@ public final class MainForm extends javax.swing.JFrame implements IGUIEvent{
                         //Load last Comport   
                         for (String port:ports) 
                         {
-                            if(port.equals(Database.PORT.get()))
+                            if(port.equals(DatabaseV2.PORT.get()))
                             {
                                 jCBPort.setSelectedIndex(index);
                                 break;
@@ -82,7 +82,7 @@ public final class MainForm extends javax.swing.JFrame implements IGUIEvent{
                         index = 0;
                         for (Integer speed:speeds) 
                         {
-                            if(speed.toString().equals(Database.SPEED.get()))
+                            if(speed.toString().equals(DatabaseV2.SPEED.get()))
                             {
                                 jCBSpeed.setSelectedIndex(index);
                                 break;
@@ -226,7 +226,7 @@ public final class MainForm extends javax.swing.JFrame implements IGUIEvent{
         }
         
         //Save Database
-        if(Database.save(null) == false)
+        if(DatabaseV2.save(null) == false)
         {
             JOptionPane.showMessageDialog(this,"Could not save settings!");
         }
@@ -242,8 +242,8 @@ public final class MainForm extends javax.swing.JFrame implements IGUIEvent{
         }
 
         Communication.connect((String)jCBPort.getModel().getSelectedItem(), (Integer)jCBSpeed.getSelectedItem());
-        Database.PORT.set((String)jCBPort.getModel().getSelectedItem());
-        Database.SPEED.set(((Integer)jCBSpeed.getSelectedItem()).toString());
+        DatabaseV2.PORT.set((String)jCBPort.getModel().getSelectedItem());
+        DatabaseV2.SPEED.set(((Integer)jCBSpeed.getSelectedItem()).toString());
     }//GEN-LAST:event_jBConnectActionPerformed
    
 

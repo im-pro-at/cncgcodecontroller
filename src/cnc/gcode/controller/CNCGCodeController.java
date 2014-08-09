@@ -60,14 +60,14 @@ public class CNCGCodeController {
                 System.exit(1);
             }
             File fout = new File(args[2]);
-            Database.OPTIMISATIONTIMEOUT.set("" + Integer.parseInt(args[3]));
+            DatabaseV2.OPTIMISATIONTIMEOUT.set("" + Integer.parseInt(args[3]));
             double movex        = Double.parseDouble(args[4]);
             double movey        = Double.parseDouble(args[5]);
             boolean mirrorx     = Boolean.parseBoolean(args[6]);
             boolean mirrory     = Boolean.parseBoolean(args[7]);
-            Database.BL0.set("" + Double.parseDouble(args[8]));
-            Database.BL1.set("" + Double.parseDouble(args[9]));
-            Database.BL2.set("" + Double.parseDouble(args[10]));
+            DatabaseV2.BL0.set("" + Double.parseDouble(args[8]));
+            DatabaseV2.BL1.set("" + Double.parseDouble(args[9]));
+            DatabaseV2.BL2.set("" + Double.parseDouble(args[10]));
 
             //Load File
             System.out.println("Loading file ...");

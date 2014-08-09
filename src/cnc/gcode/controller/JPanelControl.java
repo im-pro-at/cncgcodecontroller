@@ -127,7 +127,7 @@ public class JPanelControl extends javax.swing.JPanel implements IGUIEvent{
 //                    int oa=a;
 
                     //Calc mirroring + ccw
-                    switch(Integer.parseInt(Database.get(Database.HOMING)))
+                    switch(Integer.parseInt(DatabaseV2.get(DatabaseV2.HOMING)))
                     {
                         case 0:
                         case 3:
@@ -204,7 +204,7 @@ public class JPanelControl extends javax.swing.JPanel implements IGUIEvent{
                 field.set(0.0);
             }
         }
-        axes[5][0].set(Database.MAXFEEDRATE.getsaved()/10);
+        axes[5][0].set(DatabaseV2.MAXFEEDRATE.getsaved()/10);
 
         
        Communication.addReceiveEvent(new IReceivedLines() {
@@ -333,17 +333,17 @@ public class JPanelControl extends javax.swing.JPanel implements IGUIEvent{
                     //Manipulating a,d
                     num = 1; //only d is manipulatable!
                     min = -axes[cat][0].getdsave();
-                    max = Database.getWorkspace(cat).getsaved() - axes[cat][0].getdsave();
+                    max = DatabaseV2.getWorkspace(cat).getsaved() - axes[cat][0].getdsave();
                 }
                 else
                 {
                     //Manipulating n
                     min = 0.0;
-                    max = Database.getWorkspace(cat).getsaved();
+                    max = DatabaseV2.getWorkspace(cat).getsaved();
                 }
                 break;
             case 3: //I,J
-                max = Database.getWorkspace(num).getsaved();
+                max = DatabaseV2.getWorkspace(num).getsaved();
                 min = -max;
                 break;
             case 4: //Diameter
@@ -351,7 +351,7 @@ public class JPanelControl extends javax.swing.JPanel implements IGUIEvent{
                 break;
             case 5: //Feedrate
                 min = 0.0;
-                max = Database.MAXFEEDRATE.getsaved();
+                max = DatabaseV2.MAXFEEDRATE.getsaved();
                 break;
         }
         if(axes[cat][num].getdsave()<min)
@@ -388,8 +388,8 @@ public class JPanelControl extends javax.swing.JPanel implements IGUIEvent{
     
     private void paintAxesArea(Graphics g) {
         //Calc window
-        double areaWidth    = Database.WORKSPACE0.getsaved(); //x
-        double areaHeight   = Database.WORKSPACE1.getsaved(); //y
+        double areaWidth    = DatabaseV2.WORKSPACE0.getsaved(); //x
+        double areaHeight   = DatabaseV2.WORKSPACE1.getsaved(); //y
         Rectangle rect = Geometrics.placeRectangle(jPPaint.getWidth(),
                                                     jPPaint.getHeight(),
                                                     Geometrics.getRatio(areaWidth,areaHeight));
@@ -404,7 +404,7 @@ public class JPanelControl extends javax.swing.JPanel implements IGUIEvent{
 
         //Scale for homeing position
         g2d.translate(jPPaint.getWidth() / 2, jPPaint.getHeight() / 2);
-        switch(Integer.parseInt(Database.HOMING.get()))
+        switch(Integer.parseInt(DatabaseV2.HOMING.get()))
         {
             case 0:
             default:
@@ -1269,7 +1269,7 @@ public class JPanelControl extends javax.swing.JPanel implements IGUIEvent{
         {
             messages[i] = "Set the value for the " + CommandParsing.axesName[i] + " Axis";
             values[i]   = axes[i][0].getdsave();
-            max[i]      = Database.getWorkspace(i).getsaved();
+            max[i]      = DatabaseV2.getWorkspace(i).getsaved();
         }
 
         values = Tools.getValues(messages, values, max, new Double[]{0.0,0.0,0.0});
@@ -1523,7 +1523,7 @@ public class JPanelControl extends javax.swing.JPanel implements IGUIEvent{
         Double feedrate;
         if(jCBFastMode.isSelected())
         {
-            feedrate = Database.MAXFEEDRATE.getsaved();
+            feedrate = DatabaseV2.MAXFEEDRATE.getsaved();
         }
         else
         {
@@ -1574,8 +1574,8 @@ public class JPanelControl extends javax.swing.JPanel implements IGUIEvent{
     }//GEN-LAST:event_jBMoveActionPerformed
 
     private void jPPaintMouseReleased(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jPPaintMouseReleased
-        double areaWidth    = Database.WORKSPACE0.getsaved(); //x
-        double areaHeight   = Database.WORKSPACE1.getsaved(); //y
+        double areaWidth    = DatabaseV2.WORKSPACE0.getsaved(); //x
+        double areaHeight   = DatabaseV2.WORKSPACE1.getsaved(); //y
         Rectangle rect = Geometrics.placeRectangle(jPPaint.getWidth(),
                                                    jPPaint.getHeight(),
                                                    Geometrics.getRatio(areaWidth,areaHeight));
@@ -1584,7 +1584,7 @@ public class JPanelControl extends javax.swing.JPanel implements IGUIEvent{
         {
             double x    = (evt.getX()- rect.x) * Geometrics.getScale(areaWidth, areaHeight, rect.width, rect.height);
             double y    = (evt.getY()- rect.y) * Geometrics.getScale(areaWidth, areaHeight, rect.width, rect.height);
-            switch(Integer.parseInt(Database.HOMING.get()))
+            switch(Integer.parseInt(DatabaseV2.HOMING.get()))
             {
                 case 1:
                 x   = areaWidth - x;

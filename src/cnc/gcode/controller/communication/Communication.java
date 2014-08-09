@@ -4,7 +4,7 @@
  */
 package cnc.gcode.controller.communication;
 
-import cnc.gcode.controller.Database;
+import cnc.gcode.controller.DatabaseV2;
 import cnc.gcode.controller.IEvent;
 import cnc.gcode.controller.MyException;
 import cnc.gcode.controller.Tools;
@@ -468,7 +468,7 @@ public enum Communication {
                 
     //Internal Function to call
     private static Communication I(){
-        return valueOf(Database.COMTYPE.get());
+        return valueOf(DatabaseV2.COMTYPE.get());
     }
 
     private static synchronized void receive(String[] lines) {

@@ -9,7 +9,6 @@ import java.awt.Dimension;
 import java.io.File;
 import java.util.LinkedList;
 import javax.swing.JFileChooser;
-import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
@@ -43,36 +42,36 @@ public class JPanelSettings extends javax.swing.JPanel implements IGUIEvent, ISe
     {
         jBImport.setEnabled(!isworking);
         //Akt Text
-        jLSHomeing.setText(homing[Integer.parseInt(Database.HOMING.get())]); //Homeing
-        jLSFastFeedrate.setText(Database.MAXFEEDRATE.get());
+        jLSHomeing.setText(homing[Integer.parseInt(DatabaseV2.HOMING.get())]); //Homeing
+        jLSFastFeedrate.setText(DatabaseV2.MAXFEEDRATE.get());
         jLSWorkSpace.setText("");
         for(int i = 0; i < 3;i++ )
         {
-            jLSWorkSpace.setText(jLSWorkSpace.getText() + CommandParsing.axesName[i] + " = " + Database.getWorkspace(i)+"   ");        
+            jLSWorkSpace.setText(jLSWorkSpace.getText() + CommandParsing.axesName[i] + " = " + DatabaseV2.getWorkspace(i)+"   ");        
         }
-        jLSCNCStart.setText(Tools.convertToMultiline(Database.STARTCODE.get()));
-        jLSCNCToolChange.setText(Tools.convertToMultiline(Database.TOOLCHANGE.get()));
-        jLSCNCSpindleON.setText(Tools.convertToMultiline(Database.SPINDLEON.get()));
-        jLSCNCSpindleOFF.setText(Tools.convertToMultiline(Database.SPINDLEOFF.get()));
-        jLSCNCG0Feedrate.setText(Database.GOFEEDRATE.get());
-        jLSCNCToolSize.setText(Database.TOOLSIZE.get());
-        jLSCNCOptimiserTime.setText(Database.OPTIMISATIONTIMEOUT.get());
-        jLSALOptions.setText(Tools.convertToMultiline("Zero height: " + Database.ALZERO +
-                                                      "\nMax depth: " + Database.ALMAXPROBDEPTH +
-                                                      "\nSafe height: " + Database.ALSAVEHEIGHT +
-                                                      "\nClearence: " + Database.ALCLEARANCE +
-                                                       "\nFeedrate: " + Database.ALFEEDRATE));
-        jLSALDistance.setText(Tools.convertToMultiline("Distance: " + Database.ALDISTANCE +       
-                                                        "\nMax XY Move Length: " + Database.ALMAXMOVELENGTH));
-        jLSALStart.setText(Tools.convertToMultiline(Database.ALSTARTCODE.get()));
-        jLSARC.setText(Database.ARCSEGMENTLENGTH.get());
+        jLSCNCStart.setText(Tools.convertToMultiline(DatabaseV2.STARTCODE.get()));
+        jLSCNCToolChange.setText(Tools.convertToMultiline(DatabaseV2.TOOLCHANGE.get()));
+        jLSCNCSpindleON.setText(Tools.convertToMultiline(DatabaseV2.SPINDLEON.get()));
+        jLSCNCSpindleOFF.setText(Tools.convertToMultiline(DatabaseV2.SPINDLEOFF.get()));
+        jLSCNCG0Feedrate.setText(DatabaseV2.GOFEEDRATE.get());
+        jLSCNCToolSize.setText(DatabaseV2.TOOLSIZE.get());
+        jLSCNCOptimiserTime.setText(DatabaseV2.OPTIMISATIONTIMEOUT.get());
+        jLSALOptions.setText(Tools.convertToMultiline("Zero height: " + DatabaseV2.ALZERO +
+                                                      "\nMax depth: " + DatabaseV2.ALMAXPROBDEPTH +
+                                                      "\nSafe height: " + DatabaseV2.ALSAVEHEIGHT +
+                                                      "\nClearence: " + DatabaseV2.ALCLEARANCE +
+                                                       "\nFeedrate: " + DatabaseV2.ALFEEDRATE));
+        jLSALDistance.setText(Tools.convertToMultiline("Distance: " + DatabaseV2.ALDISTANCE +       
+                                                        "\nMax XY Move Length: " + DatabaseV2.ALMAXMOVELENGTH));
+        jLSALStart.setText(Tools.convertToMultiline(DatabaseV2.ALSTARTCODE.get()));
+        jLSARC.setText(DatabaseV2.ARCSEGMENTLENGTH.get());
         jLSBacklash.setText("");
         for(int i=0; i<3;i++ )
         {
-            jLSBacklash.setText(jLSBacklash.getText() + CommandParsing.axesName[i] + " = " + Database.getBacklash(i) + "   ");       
+            jLSBacklash.setText(jLSBacklash.getText() + CommandParsing.axesName[i] + " = " + DatabaseV2.getBacklash(i) + "   ");       
         }
-        jLSmodalG1.setText(Database.G1MODAL.get().equals("0")?"OFF":"ON");
-        jLSComType.setText(Database.COMTYPE.get());
+        jLSmodalG1.setText(DatabaseV2.G1MODAL.get().equals("0")?"OFF":"ON");
+        jLSComType.setText(DatabaseV2.COMTYPE.get());
     }
     
     private void fireupdateGUI()
@@ -132,9 +131,9 @@ public class JPanelSettings extends javax.swing.JPanel implements IGUIEvent, ISe
                                                                                             JSettingEnum.BL2
                                                                         },
                                                                         new double[]{ //value
-                                                                                        Database.getBacklash(0).getsaved(),
-                                                                                        Database.getBacklash(1).getsaved(),
-                                                                                        Database.getBacklash(2).getsaved()
+                                                                                        DatabaseV2.getBacklash(0).getsaved(),
+                                                                                        DatabaseV2.getBacklash(1).getsaved(),
+                                                                                        DatabaseV2.getBacklash(2).getsaved()
                                                                                     },
                                                                         new double[]{ //min 
                                                                                     0,
@@ -155,7 +154,7 @@ public class JPanelSettings extends javax.swing.JPanel implements IGUIEvent, ISe
         {
             for(int i = 0; i < 3;i++ )
             {
-                Database.getBacklash(i).set(Tools.dtostr(updatedValues.get(i).getSettingValue()));
+                DatabaseV2.getBacklash(i).set(Tools.dtostr(updatedValues.get(i).getSettingValue()));
             }
         }
     }
@@ -169,9 +168,9 @@ public class JPanelSettings extends javax.swing.JPanel implements IGUIEvent, ISe
                                                                                 JSettingEnum.WORKSPACE2
                                                                             },
                                                                             new double[]{ //value
-                                                                                            Database.getWorkspace(0).getsaved(),
-                                                                                            Database.getWorkspace(1).getsaved(),
-                                                                                            Database.getWorkspace(2).getsaved()
+                                                                                            DatabaseV2.getWorkspace(0).getsaved(),
+                                                                                            DatabaseV2.getWorkspace(1).getsaved(),
+                                                                                            DatabaseV2.getWorkspace(2).getsaved()
                                                                                         },
                                                                             new double[]{ //min 
                                                                                 /*ALZERO*/          0,
@@ -192,7 +191,7 @@ public class JPanelSettings extends javax.swing.JPanel implements IGUIEvent, ISe
             {
                 for(int i = 0; i < 3;i++ )
                 {
-                    Database.getWorkspace(i).set(Tools.dtostr(updatedValues.get(i).getSettingValue()));
+                    DatabaseV2.getWorkspace(i).set(Tools.dtostr(updatedValues.get(i).getSettingValue()));
                 }
             }
     }
@@ -208,24 +207,24 @@ public class JPanelSettings extends javax.swing.JPanel implements IGUIEvent, ISe
                                                                                 JSettingEnum.ALFEEDRATE,
                                                                             },
                                                                             new double[]{ //value
-                                                                                            Database.ALZERO.getsaved(),
-                                                                                            Database.ALMAXPROBDEPTH.getsaved(),
-                                                                                            Database.ALSAVEHEIGHT.getsaved(),
-                                                                                            Database.ALCLEARANCE.getsaved(),
-                                                                                            Database.ALFEEDRATE.getsaved(),
+                                                                                            DatabaseV2.ALZERO.getsaved(),
+                                                                                            DatabaseV2.ALMAXPROBDEPTH.getsaved(),
+                                                                                            DatabaseV2.ALSAVEHEIGHT.getsaved(),
+                                                                                            DatabaseV2.ALCLEARANCE.getsaved(),
+                                                                                            DatabaseV2.ALFEEDRATE.getsaved(),
                                                                                         },
                                                                             new double[]{ //min 
                                                                                 /*ALZERO*/          -Double.MAX_VALUE,
                                                                                 /*ALMAXPROBDEPTH*/  -1.0,
-                                                                                /*ALSAVEHEIGHT*/    0.0-Database.WORKSPACE2.getsaved(),                    
+                                                                                /*ALSAVEHEIGHT*/    0.0-DatabaseV2.WORKSPACE2.getsaved(),                    
                                                                                 /*ALCLEARANCE*/     0.0,
                                                                                 /*ALFEEDRATE*/      0.0,
                                                                             },
                                                                             new double[]{ //max
                                                                                             /*ALZERO*/          Double.MAX_VALUE,
-                                                                                            /*ALMAXPROBDEPTH*/  Database.WORKSPACE2.getsaved(),
-                                                                                            /*ALSAVEHEIGHT*/    Database.WORKSPACE2.getsaved(),
-                                                                                            /*ALCLEARANCE*/     Database.WORKSPACE2.getsaved(),    
+                                                                                            /*ALMAXPROBDEPTH*/  DatabaseV2.WORKSPACE2.getsaved(),
+                                                                                            /*ALSAVEHEIGHT*/    DatabaseV2.WORKSPACE2.getsaved(),
+                                                                                            /*ALCLEARANCE*/     DatabaseV2.WORKSPACE2.getsaved(),    
                                                                                             /*ALFEEDRATE*/      Double.MAX_VALUE,
                                                                                         },
                                                                             new String[]{ //message
@@ -240,11 +239,11 @@ public class JPanelSettings extends javax.swing.JPanel implements IGUIEvent, ISe
             
             if(updatedValues != null)
             {
-                    Database.ALZERO.set(Tools.dtostr(updatedValues.get(0).getSettingValue()));
-                    Database.ALMAXPROBDEPTH.set(Tools.dtostr(updatedValues.get(1).getSettingValue()));
-                    Database.ALSAVEHEIGHT.set(Tools.dtostr(updatedValues.get(2).getSettingValue()));
-                    Database.ALCLEARANCE.set(Tools.dtostr(updatedValues.get(3).getSettingValue()));
-                    Database.ALFEEDRATE.set(Tools.dtostr(updatedValues.get(4).getSettingValue()));
+                    DatabaseV2.ALZERO.set(Tools.dtostr(updatedValues.get(0).getSettingValue()));
+                    DatabaseV2.ALMAXPROBDEPTH.set(Tools.dtostr(updatedValues.get(1).getSettingValue()));
+                    DatabaseV2.ALSAVEHEIGHT.set(Tools.dtostr(updatedValues.get(2).getSettingValue()));
+                    DatabaseV2.ALCLEARANCE.set(Tools.dtostr(updatedValues.get(3).getSettingValue()));
+                    DatabaseV2.ALFEEDRATE.set(Tools.dtostr(updatedValues.get(4).getSettingValue()));
             }
     }
     
@@ -257,8 +256,8 @@ public class JPanelSettings extends javax.swing.JPanel implements IGUIEvent, ISe
                                                                                 JSettingEnum.ALMAXMOVELENGTH
                                                                             },
                                                                             new double[]{ //value
-                                                                                Database.ALDISTANCE.getsaved(),
-                                                                                Database.ALMAXMOVELENGTH.getsaved(),
+                                                                                DatabaseV2.ALDISTANCE.getsaved(),
+                                                                                DatabaseV2.ALMAXMOVELENGTH.getsaved(),
                                                                             },
                                                                             new double[]{ //min 
                                                                                 Double.MIN_VALUE,
@@ -274,8 +273,8 @@ public class JPanelSettings extends javax.swing.JPanel implements IGUIEvent, ISe
                                                                                         });
             if(updatedValues != null)
             {
-                Database.ALDISTANCE.set(Tools.dtostr(updatedValues.get(0).getSettingValue()));
-                Database.ALMAXMOVELENGTH.set(Tools.dtostr(updatedValues.get(1).getSettingValue()));
+                DatabaseV2.ALDISTANCE.set(Tools.dtostr(updatedValues.get(0).getSettingValue()));
+                DatabaseV2.ALMAXMOVELENGTH.set(Tools.dtostr(updatedValues.get(1).getSettingValue()));
             }
     }
     /**
@@ -728,7 +727,7 @@ public class JPanelSettings extends javax.swing.JPanel implements IGUIEvent, ISe
                                                        0);
             if(options != JOptionPane.CLOSED_OPTION)
             {
-                Database.HOMING.set("" + options);
+                DatabaseV2.HOMING.set("" + options);
             }
         }
 
@@ -736,12 +735,12 @@ public class JPanelSettings extends javax.swing.JPanel implements IGUIEvent, ISe
         if(evt.getSource() == jBSFastFeedrate)
         {
             Double[] feedrates = Tools.getValues(new String[]{"Set the feedrate for the fast move:"},
-                                        new Double[]{Database.MAXFEEDRATE.getsaved()},
+                                        new Double[]{DatabaseV2.MAXFEEDRATE.getsaved()},
                                         new Double[]{Double.MAX_VALUE},
                                         new Double[]{0.0});
             if(feedrates != null)
             {
-                Database.MAXFEEDRATE.set(Tools.dtostr(feedrates[0]));
+                DatabaseV2.MAXFEEDRATE.set(Tools.dtostr(feedrates[0]));
             }
         }
 
@@ -754,7 +753,7 @@ public class JPanelSettings extends javax.swing.JPanel implements IGUIEvent, ISe
         //StartCode
         if(evt.getSource() == jBSCNCStart)
         {
-            JTextArea textArea      = new JTextArea(Database.STARTCODE.get()); 
+            JTextArea textArea      = new JTextArea(DatabaseV2.STARTCODE.get()); 
             JScrollPane scrollArea  = new JScrollPane(textArea); 
             scrollArea.setPreferredSize(new Dimension(100, 100));
 
@@ -767,13 +766,13 @@ public class JPanelSettings extends javax.swing.JPanel implements IGUIEvent, ISe
                                             JOptionPane.OK_CANCEL_OPTION
                                             )
                                             == JOptionPane.OK_OPTION)
-                Database.STARTCODE.set(textArea.getText().trim());
+                DatabaseV2.STARTCODE.set(textArea.getText().trim());
         }
 
         //Toolchange
         if(evt.getSource() == jBSCNCToolChange)
         {
-            JTextArea textArea      = new JTextArea(Database.TOOLCHANGE.get()); 
+            JTextArea textArea      = new JTextArea(DatabaseV2.TOOLCHANGE.get()); 
             JScrollPane scrollArea  = new JScrollPane(textArea); 
             scrollArea.setPreferredSize(new Dimension(100, 100));
 
@@ -787,13 +786,13 @@ public class JPanelSettings extends javax.swing.JPanel implements IGUIEvent, ISe
                                             JOptionPane.OK_CANCEL_OPTION
                                             )
                                             == JOptionPane.OK_OPTION)
-                Database.TOOLCHANGE.set(textArea.getText().trim());
+                DatabaseV2.TOOLCHANGE.set(textArea.getText().trim());
         }
         
         //Spindle ON
         if(evt.getSource() == jBSCNCSpindleON)
         {
-            JTextArea textArea      = new JTextArea(Database.SPINDLEON.get()); 
+            JTextArea textArea      = new JTextArea(DatabaseV2.SPINDLEON.get()); 
             JScrollPane scrollArea  = new JScrollPane(textArea); 
             scrollArea.setPreferredSize(new Dimension(100, 100));
 
@@ -807,13 +806,13 @@ public class JPanelSettings extends javax.swing.JPanel implements IGUIEvent, ISe
                                             JOptionPane.OK_CANCEL_OPTION
                                             )
                                             == JOptionPane.OK_OPTION)
-                Database.SPINDLEON.set(textArea.getText().trim());
+                DatabaseV2.SPINDLEON.set(textArea.getText().trim());
         }
 
         //Spindle OFF
         if(evt.getSource() == jBSCNCSpindleOFF)
         {
-            JTextArea textArea          = new JTextArea(Database.SPINDLEOFF.get()); 
+            JTextArea textArea          = new JTextArea(DatabaseV2.SPINDLEOFF.get()); 
             JScrollPane scrollArea      = new JScrollPane(textArea); 
             scrollArea.setPreferredSize(new Dimension(100, 100));
 
@@ -825,7 +824,7 @@ public class JPanelSettings extends javax.swing.JPanel implements IGUIEvent, ISe
                                             JOptionPane.OK_CANCEL_OPTION
                                             )
                                             == JOptionPane.OK_OPTION)
-                Database.SPINDLEOFF.set(textArea.getText().trim());
+                DatabaseV2.SPINDLEOFF.set(textArea.getText().trim());
         }
         
         
@@ -833,12 +832,12 @@ public class JPanelSettings extends javax.swing.JPanel implements IGUIEvent, ISe
         if(evt.getSource() == jBSCNCG0Feedrate)
         {
             Double[] d = Tools.getValues(new String[]{"Set the feedrate for the G0 move:"},
-                                        new Double[]{Database.GOFEEDRATE.getsaved()},
-                                        new Double[]{Database.MAXFEEDRATE.getsaved()},
+                                        new Double[]{DatabaseV2.GOFEEDRATE.getsaved()},
+                                        new Double[]{DatabaseV2.MAXFEEDRATE.getsaved()},
                                         new Double[]{0.0});
             if(d != null) 
             {
-                Database.GOFEEDRATE.set(Tools.dtostr(d[0]));
+                DatabaseV2.GOFEEDRATE.set(Tools.dtostr(d[0]));
             }
         }
         
@@ -846,12 +845,12 @@ public class JPanelSettings extends javax.swing.JPanel implements IGUIEvent, ISe
         if(evt.getSource() == jBSCNCToolSize)
         {
             Double[] d = Tools.getValues(new String[]{"Set the toolsize for CNC milling simulation:"},
-                                        new Double[]{Database.TOOLSIZE.getsaved()},
+                                        new Double[]{DatabaseV2.TOOLSIZE.getsaved()},
                                         new Double[]{Double.MAX_VALUE},
                                         new Double[]{0.0});
             if(d != null) 
             {
-                Database.TOOLSIZE.set(Tools.dtostr(d[0]));
+                DatabaseV2.TOOLSIZE.set(Tools.dtostr(d[0]));
             }
         }
         
@@ -859,12 +858,12 @@ public class JPanelSettings extends javax.swing.JPanel implements IGUIEvent, ISe
         if(evt.getSource() == jBSCNCOptimiserTime)
         {
             Double[] d = Tools.getValues(new String[]{"Set the timeout in seconds for optimizing:"},
-                                        new Double[]{Database.OPTIMISATIONTIMEOUT.getsaved()},
+                                        new Double[]{DatabaseV2.OPTIMISATIONTIMEOUT.getsaved()},
                                         new Double[]{Double.MAX_VALUE},
                                         new Double[]{0.0});
             if(d != null)
             {
-                Database.OPTIMISATIONTIMEOUT.set(Tools.dtostr(d[0]));
+                DatabaseV2.OPTIMISATIONTIMEOUT.set(Tools.dtostr(d[0]));
             }
         }
         
@@ -884,7 +883,7 @@ public class JPanelSettings extends javax.swing.JPanel implements IGUIEvent, ISe
         //AutoLavel StartCode
         if(evt.getSource( )== jBSALStart)
         {
-            JTextArea textArea      = new JTextArea(Database.ALSTARTCODE.get()); 
+            JTextArea textArea      = new JTextArea(DatabaseV2.ALSTARTCODE.get()); 
             JScrollPane scrollArea  = new JScrollPane(textArea); 
             scrollArea.setPreferredSize(new Dimension(100, 100));
 
@@ -897,19 +896,19 @@ public class JPanelSettings extends javax.swing.JPanel implements IGUIEvent, ISe
                     JOptionPane.OK_CANCEL_OPTION
                     )
                     == JOptionPane.OK_OPTION)
-                Database.ALSTARTCODE.set(textArea.getText().trim());
+                DatabaseV2.ALSTARTCODE.set(textArea.getText().trim());
         }
         
         //ARC
         if(evt.getSource() == jBSARC)
         {
             Double[] d = Tools.getValues(new String[]{"Set the maximum segment length for ARC to linear move conversion \n The lower the value the more communication is needed:"},
-                                        new Double[]{Database.ARCSEGMENTLENGTH.getsaved()},
+                                        new Double[]{DatabaseV2.ARCSEGMENTLENGTH.getsaved()},
                                         new Double[]{Double.MAX_VALUE},
                                         new Double[]{Double.MIN_VALUE});
             if(d != null)
             {
-                Database.ARCSEGMENTLENGTH.set(Tools.dtostr(d[0]));
+                DatabaseV2.ARCSEGMENTLENGTH.set(Tools.dtostr(d[0]));
             }
         }
 
@@ -932,7 +931,7 @@ public class JPanelSettings extends javax.swing.JPanel implements IGUIEvent, ISe
                                                        0);
             if(options != JOptionPane.CLOSED_OPTION)
             {
-                Database.G1MODAL.set("" + options);
+                DatabaseV2.G1MODAL.set("" + options);
             }
         }
         
@@ -949,7 +948,7 @@ public class JPanelSettings extends javax.swing.JPanel implements IGUIEvent, ISe
                                                         0);
             if(options != JOptionPane.CLOSED_OPTION)
             {
-                Database.COMTYPE.set(Communication.values()[options].toString());
+                DatabaseV2.COMTYPE.set(Communication.values()[options].toString());
             }
         }
         
@@ -957,7 +956,7 @@ public class JPanelSettings extends javax.swing.JPanel implements IGUIEvent, ISe
     }//GEN-LAST:event_jBSettingsActionPerformed
 
     private void jBexportActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jBexportActionPerformed
-        JFileChooser fc = Database.getFileChooser();
+        JFileChooser fc = DatabaseV2.getFileChooser();
         fc.setFileFilter(new FileFilter() 
         {
             @Override
@@ -985,14 +984,14 @@ public class JPanelSettings extends javax.swing.JPanel implements IGUIEvent, ISe
             f = new File(f.getPath()+".ois");
         }
 
-        if(Database.save(f) == false)
+        if(DatabaseV2.save(f) == false)
         {
             JOptionPane.showMessageDialog(this, "Cannot export Settings!");
         }
     }//GEN-LAST:event_jBexportActionPerformed
 
     private void jBImportActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jBImportActionPerformed
-        JFileChooser fc = Database.getFileChooser();
+        JFileChooser fc = DatabaseV2.getFileChooser();
         fc.setFileFilter(new FileFilter() 
         {
             @Override
@@ -1015,7 +1014,7 @@ public class JPanelSettings extends javax.swing.JPanel implements IGUIEvent, ISe
             return;
         }
         
-        if(Database.load(fc.getSelectedFile()) == false)
+        if(DatabaseV2.load(fc.getSelectedFile()) == false)
         {
             JOptionPane.showMessageDialog(this, "Cannot import settings!");
         }

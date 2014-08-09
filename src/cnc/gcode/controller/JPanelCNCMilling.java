@@ -129,7 +129,7 @@ public class JPanelCNCMilling extends javax.swing.JPanel implements IGUIEvent{
 
                 //StartCorner
                 g2.translate(data.jpw / 2, data.jph / 2);
-                switch(Integer.parseInt(Database.HOMING.get()))
+                switch(Integer.parseInt(DatabaseV2.HOMING.get()))
                 {
                     case 0:
                     default:
@@ -160,8 +160,8 @@ public class JPanelCNCMilling extends javax.swing.JPanel implements IGUIEvent{
                 g2.translate(-data.jpw / 2, -data.jph / 2);
 
                 //Display Position
-                double ariawidth    = Database.WORKSPACE0.getsaved(); //x
-                double ariaheight   = Database.WORKSPACE1.getsaved(); //y
+                double ariawidth    = DatabaseV2.WORKSPACE0.getsaved(); //x
+                double ariaheight   = DatabaseV2.WORKSPACE1.getsaved(); //y
                 Rectangle rect      = Geometrics.placeRectangle(data.jpw, data.jph, Geometrics.getRatio(ariawidth,ariaheight));
                 double scalex       = rect.width / ariawidth;
                 double scaley       = rect.height / ariaheight;
@@ -881,7 +881,7 @@ public class JPanelCNCMilling extends javax.swing.JPanel implements IGUIEvent{
         if (!serial)
         {
             //File choose dialog
-            JFileChooser fc = Database.getFileChooser();
+            JFileChooser fc = DatabaseV2.getFileChooser();
             if(fc.showSaveDialog(this) != JFileChooser.APPROVE_OPTION)
             {
                 return;
@@ -1054,7 +1054,7 @@ public class JPanelCNCMilling extends javax.swing.JPanel implements IGUIEvent{
     }//GEN-LAST:event_jBMillingActionPerformed
     
     private void jLoadFileActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jLoadFileActionPerformed
-        JFileChooser fc = Database.getFileChooser();
+        JFileChooser fc = DatabaseV2.getFileChooser();
         fc.setFileSelectionMode(JFileChooser.FILES_ONLY);
         fc.setMultiSelectionEnabled(false);
         
