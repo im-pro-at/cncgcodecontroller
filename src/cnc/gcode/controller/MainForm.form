@@ -39,13 +39,13 @@
               <EmptySpace max="-2" attributes="0"/>
               <Component id="jLStatus" max="32767" attributes="0"/>
           </Group>
-          <Component id="jTabbedPane2" pref="1054" max="32767" attributes="0"/>
+          <Component id="jTabbedPane2" pref="1123" max="32767" attributes="0"/>
       </Group>
     </DimensionLayout>
     <DimensionLayout dim="1">
       <Group type="103" groupAlignment="0" attributes="0">
           <Group type="102" alignment="0" attributes="0">
-              <Component id="jTabbedPane2" pref="576" max="32767" attributes="0"/>
+              <Component id="jTabbedPane2" pref="609" max="32767" attributes="0"/>
               <EmptySpace max="-2" attributes="0"/>
               <Group type="103" groupAlignment="3" attributes="0">
                   <Component id="jBConnect" alignment="3" min="-2" max="-2" attributes="0"/>

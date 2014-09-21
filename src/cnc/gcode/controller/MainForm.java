@@ -26,7 +26,7 @@ public final class MainForm extends javax.swing.JFrame implements IGUIEvent{
         //Load Database
         if(DatabaseV2.load(null) == false)
         {
-            JOptionPane.showMessageDialog(null,"Could not load settings!");
+            JOptionPane.showMessageDialog(null,"Could not load settings! Loading defaults...");
         }
         
         initComponents();
@@ -200,12 +200,12 @@ public final class MainForm extends javax.swing.JFrame implements IGUIEvent{
                 .addComponent(jBConnect)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jLStatus, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-            .addComponent(jTabbedPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 1054, Short.MAX_VALUE)
+            .addComponent(jTabbedPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 1123, Short.MAX_VALUE)
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
-                .addComponent(jTabbedPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 576, Short.MAX_VALUE)
+                .addComponent(jTabbedPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 609, Short.MAX_VALUE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jBConnect)

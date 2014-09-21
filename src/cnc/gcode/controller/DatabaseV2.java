@@ -31,11 +31,11 @@ public enum DatabaseV2 {
     SPEED("9"),
     
     //Control
-    HOMING("0"), //Homing Point 0= upper left; 1= upper right; 2= lower left; 3= lower right;
-    MAXFEEDRATE(Tools.dtostr(600.0)), 
-    WORKSPACE0(Tools.dtostr(200.0)),
-    WORKSPACE1(Tools.dtostr(200.0)),
-    WORKSPACE2(Tools.dtostr(200.0)),
+    HOMING("2"), //Homing Point 0= upper left; 1= upper right; 2= lower left; 3= lower right;
+    MAXFEEDRATE(Tools.dtostr(500.0)), 
+    WORKSPACE0(Tools.dtostr(168.0)),
+    WORKSPACE1(Tools.dtostr(101.0)),
+    WORKSPACE2(Tools.dtostr(50.0)),
     
     //CNC
     FILEDIRECTORY(System.getProperty("user.home")),
@@ -43,19 +43,19 @@ public enum DatabaseV2 {
     TOOLCHANGE("M6 T?"),
     SPINDLEON("M?"),
     SPINDLEOFF("M5"),
-    GOFEEDRATE(Tools.dtostr(100.0)),
+    GOFEEDRATE(Tools.dtostr(500.0)),
     TOOLSIZE(Tools.dtostr(0.5)),
-    OPTIMISATIONTIMEOUT(Tools.dtostr(10)),
+    OPTIMISATIONTIMEOUT(Tools.dtostr(20)),
     
     //Autoleveling
     ALZERO(Tools.dtostr(0.0)),
-    ALMAXPROBDEPTH(Tools.dtostr(-1.0)), 
-    ALSAVEHEIGHT(Tools.dtostr(10.0)),
-    ALCLEARANCE(Tools.dtostr(10.0)),
-    ALFEEDRATE(Tools.dtostr(10.0)),
-    ALDISTANCE(Tools.dtostr(10.0)),
+    ALMAXPROBDEPTH(Tools.dtostr(5.0)), 
+    ALSAVEHEIGHT(Tools.dtostr(5.0)),
+    ALCLEARANCE(Tools.dtostr(2.0)),
+    ALFEEDRATE(Tools.dtostr(150.0)),
+    ALDISTANCE(Tools.dtostr(40.0)),
     ALMAXMOVELENGTH(Tools.dtostr(1.0)), 
-    ALSTARTCODE("G28"), 
+    ALSTARTCODE("G0 X11 Y11\nG28 Z"), 
     
     //ARC
     ARCSEGMENTLENGTH(Tools.dtostr(0.1)),
@@ -66,7 +66,7 @@ public enum DatabaseV2 {
     BL2(Tools.dtostr(0.0)),
     
     //Modal G1
-    G1MODAL("0"), //"0" == off, "1"==on
+    G1MODAL("1"), //"0" == off, "1"==on
     
     //Communication Type
     COMTYPE(Communication.MARLIN.toString()),   

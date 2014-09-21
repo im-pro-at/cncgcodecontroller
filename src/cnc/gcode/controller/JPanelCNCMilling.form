@@ -60,7 +60,7 @@
               <EmptySpace max="-2" attributes="0"/>
               <Component id="jPanel3" min="-2" max="-2" attributes="0"/>
               <EmptySpace type="unrelated" max="-2" attributes="0"/>
-              <Component id="jScrollPane5" pref="423" max="32767" attributes="0"/>
+              <Component id="jScrollPane5" pref="409" max="32767" attributes="0"/>
               <EmptySpace max="-2" attributes="0"/>
           </Group>
       </Group>
@@ -155,6 +155,13 @@
                               <EmptySpace type="separate" max="-2" attributes="0"/>
                               <Component id="jBOptimise" min="-2" max="-2" attributes="0"/>
                           </Group>
+                          <Group type="102" alignment="0" attributes="0">
+                              <Component id="jLabel4" min="-2" max="-2" attributes="0"/>
+                              <EmptySpace type="separate" max="-2" attributes="0"/>
+                              <Component id="jBLiftTool" min="-2" max="-2" attributes="0"/>
+                              <EmptySpace max="-2" attributes="0"/>
+                              <Component id="jBZeroTool" min="-2" max="-2" attributes="0"/>
+                          </Group>
                       </Group>
                       <EmptySpace max="-2" attributes="0"/>
                   </Group>
@@ -167,12 +174,18 @@
                           <Component id="jLabel1" alignment="3" min="-2" max="-2" attributes="0"/>
                           <Component id="jLoadFile" alignment="3" min="-2" max="-2" attributes="0"/>
                       </Group>
-                      <EmptySpace type="unrelated" pref="21" max="32767" attributes="0"/>
+                      <EmptySpace pref="18" max="32767" attributes="0"/>
                       <Group type="103" groupAlignment="3" attributes="0">
                           <Component id="jLabel3" alignment="3" min="-2" max="-2" attributes="0"/>
                           <Component id="jBOptimise" alignment="3" min="-2" max="-2" attributes="0"/>
                       </Group>
-                      <EmptySpace type="unrelated" pref="22" max="32767" attributes="0"/>
+                      <EmptySpace pref="24" max="32767" attributes="0"/>
+                      <Group type="103" groupAlignment="3" attributes="0">
+                          <Component id="jLabel4" alignment="3" min="-2" max="-2" attributes="0"/>
+                          <Component id="jBLiftTool" alignment="3" min="-2" max="-2" attributes="0"/>
+                          <Component id="jBZeroTool" alignment="3" min="-2" max="-2" attributes="0"/>
+                      </Group>
+                      <EmptySpace pref="24" max="32767" attributes="0"/>
                       <Group type="103" groupAlignment="3" attributes="0">
                           <Component id="jLabel23" alignment="3" min="-2" max="-2" attributes="0"/>
                           <Component id="jBMilling" alignment="3" min="-2" max="-2" attributes="0"/>
@@ -198,7 +211,7 @@
             </Component>
             <Component class="javax.swing.JLabel" name="jLabel23">
               <Properties>
-                <Property name="text" type="java.lang.String" value="3.)"/>
+                <Property name="text" type="java.lang.String" value="4.)"/>
               </Properties>
             </Component>
             <Component class="javax.swing.JButton" name="jBMilling">
@@ -222,6 +235,27 @@
               </Properties>
               <Events>
                 <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="jBOptimiseActionPerformed"/>
+              </Events>
+            </Component>
+            <Component class="javax.swing.JLabel" name="jLabel4">
+              <Properties>
+                <Property name="text" type="java.lang.String" value="3.)"/>
+              </Properties>
+            </Component>
+            <Component class="javax.swing.JButton" name="jBLiftTool">
+              <Properties>
+                <Property name="text" type="java.lang.String" value="Lift tool"/>
+              </Properties>
+              <Events>
+                <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="jBLiftToolActionPerformed"/>
+              </Events>
+            </Component>
+            <Component class="javax.swing.JButton" name="jBZeroTool">
+              <Properties>
+                <Property name="text" type="java.lang.String" value="Zero tool"/>
+              </Properties>
+              <Events>
+                <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="jBZeroToolActionPerformed"/>
               </Events>
             </Component>
           </SubComponents>
@@ -285,7 +319,7 @@
                           </Group>
                           <Component id="jCBmirroX" min="-2" max="-2" attributes="0"/>
                       </Group>
-                      <EmptySpace type="unrelated" max="32767" attributes="0"/>
+                      <EmptySpace type="unrelated" pref="28" max="32767" attributes="0"/>
                       <Group type="103" groupAlignment="0" attributes="0">
                           <Component id="jCBmirroY" alignment="0" min="-2" max="-2" attributes="0"/>
                           <Group type="103" groupAlignment="3" attributes="0">
@@ -293,12 +327,12 @@
                               <Component id="jTFmoveY" alignment="3" min="-2" max="-2" attributes="0"/>
                           </Group>
                       </Group>
-                      <EmptySpace type="unrelated" max="32767" attributes="0"/>
+                      <EmptySpace type="unrelated" pref="28" max="32767" attributes="0"/>
                       <Group type="103" groupAlignment="3" attributes="0">
                           <Component id="jCBAutoLeveling" alignment="3" min="-2" max="-2" attributes="0"/>
                           <Component id="jLabel10" alignment="3" min="-2" max="-2" attributes="0"/>
                       </Group>
-                      <EmptySpace pref="14" max="32767" attributes="0"/>
+                      <EmptySpace pref="26" max="32767" attributes="0"/>
                   </Group>
               </Group>
             </DimensionLayout>
@@ -463,7 +497,7 @@
           <Layout>
             <DimensionLayout dim="0">
               <Group type="103" groupAlignment="0" attributes="0">
-                  <Component id="jPBar" pref="197" max="32767" attributes="0"/>
+                  <Component id="jPBar" pref="201" max="32767" attributes="0"/>
                   <Group type="102" alignment="0" attributes="0">
                       <EmptySpace max="-2" attributes="0"/>
                       <Component id="jBAbrote" min="-2" max="-2" attributes="0"/>
@@ -558,7 +592,7 @@
               <ComponentRef name="jMPcommand"/>
             </Property>
             <Property name="cursor" type="java.awt.Cursor" editor="org.netbeans.modules.form.editors2.CursorEditor">
-              <Color id="Curseur par d&#xe9;faut"/>
+              <Color id="Default Cursor"/>
             </Property>
           </Properties>
           <Events>

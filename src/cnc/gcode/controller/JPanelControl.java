@@ -270,7 +270,8 @@ public class JPanelControl extends javax.swing.JPanel implements IGUIEvent{
 
     @Override
     public void updateGUI(boolean serial, boolean isworking) {
-        jBHoming.setEnabled(!isworking && serial);
+        jBHomeXY.setEnabled(!isworking && serial);
+        jBHomeZ.setEnabled(!isworking && serial);
         jBPowerON.setEnabled(!isworking && serial);
         jBPowerOFF.setEnabled(!isworking && serial);
         jBSetPos.setEnabled(!isworking && serial);
@@ -470,7 +471,7 @@ public class JPanelControl extends javax.swing.JPanel implements IGUIEvent{
         jSplitPane1 = new javax.swing.JSplitPane();
         jScrollPane2 = new javax.swing.JScrollPane();
         jPanel1 = new javax.swing.JPanel();
-        jBHoming = new javax.swing.JButton();
+        jBHomeXY = new javax.swing.JButton();
         jBPowerON = new javax.swing.JButton();
         jBPowerOFF = new javax.swing.JButton();
         jBSetPos = new javax.swing.JButton();
@@ -533,15 +534,16 @@ public class JPanelControl extends javax.swing.JPanel implements IGUIEvent{
         jCBarcJ = new javax.swing.JComboBox();
         jCBfeedrate = new javax.swing.JComboBox();
         jBMove = new javax.swing.JButton();
+        jBHomeZ = new javax.swing.JButton();
         jPPaint = new cnc.gcode.controller.JPPaintable();
 
         jSplitPane1.setDividerLocation(350);
         jSplitPane1.setResizeWeight(0.5);
 
-        jBHoming.setText("Homing");
-        jBHoming.addActionListener(new java.awt.event.ActionListener() {
+        jBHomeXY.setText("Home XY");
+        jBHomeXY.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jBHomingActionPerformed(evt);
+                jBHomeXYActionPerformed(evt);
             }
         });
 
@@ -552,7 +554,7 @@ public class JPanelControl extends javax.swing.JPanel implements IGUIEvent{
             }
         });
 
-        jBPowerOFF.setText("Power OFF");
+        jBPowerOFF.setText("OFF");
         jBPowerOFF.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jBPowerOFFActionPerformed(evt);
@@ -729,7 +731,7 @@ public class JPanelControl extends javax.swing.JPanel implements IGUIEvent{
         jPZnewLayout.setVerticalGroup(
             jPZnewLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPZnewLayout.createSequentialGroup()
-                .addGap(0, 2, Short.MAX_VALUE)
+                .addGap(0, 23, Short.MAX_VALUE)
                 .addComponent(jCBZn, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
         );
 
@@ -795,7 +797,7 @@ public class JPanelControl extends javax.swing.JPanel implements IGUIEvent{
         jPdiameterLayout.setVerticalGroup(
             jPdiameterLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPdiameterLayout.createSequentialGroup()
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addContainerGap(33, Short.MAX_VALUE)
                 .addComponent(jCBdiameter, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
@@ -868,7 +870,7 @@ public class JPanelControl extends javax.swing.JPanel implements IGUIEvent{
                     .addComponent(jBTXfp, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(jBTXfm, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(jLabel16))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 8, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addGroup(jPXdiameterLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jBTXhp, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(jBTXhm, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -943,7 +945,7 @@ public class JPanelControl extends javax.swing.JPanel implements IGUIEvent{
                     .addComponent(jBTYfp, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(jBTYfm, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(jLabel10))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 8, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addGroup(jPYdiameterLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jBTYhp, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(jBTYhm, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -979,6 +981,7 @@ public class JPanelControl extends javax.swing.JPanel implements IGUIEvent{
 
         jLabel22.setText("Feedrate:");
 
+        jCBFastMode.setSelected(true);
         jCBFastMode.setText("Fast Moves");
         jCBFastMode.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -996,6 +999,11 @@ public class JPanelControl extends javax.swing.JPanel implements IGUIEvent{
 
         jCBfeedrate.setEditable(true);
         jCBfeedrate.setModel(new DefaultComboBoxModel<String>(new String[0]));
+        jCBfeedrate.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jCBfeedrateActionPerformed(evt);
+            }
+        });
 
         javax.swing.GroupLayout jPoptionsLayout = new javax.swing.GroupLayout(jPoptions);
         jPoptions.setLayout(jPoptionsLayout);
@@ -1050,6 +1058,13 @@ public class JPanelControl extends javax.swing.JPanel implements IGUIEvent{
             }
         });
 
+        jBHomeZ.setText("Z");
+        jBHomeZ.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jBHomeZActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
         jPanel1Layout.setHorizontalGroup(
@@ -1085,12 +1100,14 @@ public class JPanelControl extends javax.swing.JPanel implements IGUIEvent{
                             .addComponent(jBPosLoad, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                             .addComponent(jBPosSave, javax.swing.GroupLayout.PREFERRED_SIZE, 128, javax.swing.GroupLayout.PREFERRED_SIZE)))
                     .addGroup(jPanel1Layout.createSequentialGroup()
-                        .addComponent(jBHoming, javax.swing.GroupLayout.DEFAULT_SIZE, 94, Short.MAX_VALUE)
+                        .addComponent(jBHomeXY, javax.swing.GroupLayout.DEFAULT_SIZE, 94, Short.MAX_VALUE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(jBHomeZ)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                         .addComponent(jBPowerON, javax.swing.GroupLayout.DEFAULT_SIZE, 96, Short.MAX_VALUE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(jBPowerOFF, javax.swing.GroupLayout.DEFAULT_SIZE, 100, Short.MAX_VALUE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(jBPowerOFF, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                         .addComponent(jBSetPos, javax.swing.GroupLayout.DEFAULT_SIZE, 104, Short.MAX_VALUE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(jBGetPos, javax.swing.GroupLayout.DEFAULT_SIZE, 104, Short.MAX_VALUE))
@@ -1118,11 +1135,12 @@ public class JPanelControl extends javax.swing.JPanel implements IGUIEvent{
                     .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                         .addComponent(jBSetPos)
                         .addComponent(jBGetPos, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addComponent(jBHoming)
+                        .addComponent(jBHomeXY)
                         .addComponent(jBPowerON)
-                        .addComponent(jBPowerOFF))
+                        .addComponent(jBPowerOFF)
+                        .addComponent(jBHomeZ))
                     .addComponent(jLabel18))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 11, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 17, Short.MAX_VALUE)
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(jPanel1Layout.createSequentialGroup()
                         .addGap(3, 3, 3)
@@ -1136,7 +1154,7 @@ public class JPanelControl extends javax.swing.JPanel implements IGUIEvent{
                             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
                                 .addGap(15, 15, 15)
                                 .addComponent(jPXYname, javax.swing.GroupLayout.PREFERRED_SIZE, 54, javax.swing.GroupLayout.PREFERRED_SIZE)))))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 16, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 19, Short.MAX_VALUE)
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(jLabel7)
                     .addGroup(jPanel1Layout.createSequentialGroup()
@@ -1146,7 +1164,7 @@ public class JPanelControl extends javax.swing.JPanel implements IGUIEvent{
                         .addGap(7, 7, 7)
                         .addComponent(jBPosRem))
                     .addComponent(jScrollPane4, javax.swing.GroupLayout.PREFERRED_SIZE, 88, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 13, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 16, Short.MAX_VALUE)
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(jLabel11)
                     .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
@@ -1154,20 +1172,20 @@ public class JPanelControl extends javax.swing.JPanel implements IGUIEvent{
                         .addComponent(jPZname, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, 31, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addComponent(jPZakt, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                     .addComponent(jPZnew, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 12, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 15, Short.MAX_VALUE)
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                         .addComponent(jPYdiameter, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                         .addComponent(jPdiameter, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                         .addComponent(jPXdiameter, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                     .addComponent(jLabel14))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 12, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 15, Short.MAX_VALUE)
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
                         .addComponent(jBMove, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                         .addComponent(jPoptions, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                     .addComponent(jLabel21))
-                .addContainerGap(16, Short.MAX_VALUE))
+                .addContainerGap(19, Short.MAX_VALUE))
         );
 
         jScrollPane2.setViewportView(jPanel1);
@@ -1188,7 +1206,7 @@ public class JPanelControl extends javax.swing.JPanel implements IGUIEvent{
         );
         jPPaintLayout.setVerticalGroup(
             jPPaintLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 555, Short.MAX_VALUE)
+            .addGap(0, 648, Short.MAX_VALUE)
         );
 
         jSplitPane1.setLeftComponent(jPPaint);
@@ -1203,232 +1221,47 @@ public class JPanelControl extends javax.swing.JPanel implements IGUIEvent{
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 555, Short.MAX_VALUE)
+            .addGap(0, 648, Short.MAX_VALUE)
             .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                .addComponent(jSplitPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 555, Short.MAX_VALUE))
+                .addComponent(jSplitPane1))
         );
     }// </editor-fold>//GEN-END:initComponents
 
-    private void jBHomingActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jBHomingActionPerformed
-        if(Communication.isBussy())
-        {
-            JOptionPane.showMessageDialog(this, "Another command is in progress!");
-            return;
-        }
-        try {
-            Communication.send("G28 X Y Z");
-        } catch (ComInterruptException ex) {
-            Logger.getLogger(JPanelControl.class.getName()).log(Level.SEVERE, null, ex);
-            return;
-        }
-        jPPaint.setRepaintEnable(false);
-        for(int i = 0;i < 3;i++)
-        {
-            axes[i][0].set(0.0);
-            axes[i][0].dispatchEvent();
-        }
-        jPPaint.setRepaintEnable(true);
-    }//GEN-LAST:event_jBHomingActionPerformed
+    private void jPPaintMouseReleased(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jPPaintMouseReleased
+        double areaWidth    = DatabaseV2.WORKSPACE0.getsaved(); //x
+        double areaHeight   = DatabaseV2.WORKSPACE1.getsaved(); //y
+        Rectangle rect = Geometrics.placeRectangle(jPPaint.getWidth(),
+                                                   jPPaint.getHeight(),
+                                                   Geometrics.getRatio(areaWidth,areaHeight));
 
-    private void jBPowerONActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jBPowerONActionPerformed
-        if(Communication.isBussy())
+        if(Geometrics.pointInRectangle(new Point(evt.getX(),evt.getY()), rect, 0))
         {
-            JOptionPane.showMessageDialog(this, "Another command is in progress!");
-            return;
-        }
-        try {
-            Communication.send("M80");
-        } catch (ComInterruptException ex) {
-            Logger.getLogger(JPanelControl.class.getName()).log(Level.SEVERE, null, ex);
-        }
-    }//GEN-LAST:event_jBPowerONActionPerformed
-
-    private void jBPowerOFFActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jBPowerOFFActionPerformed
-        if(Communication.isBussy())
-        {
-            JOptionPane.showMessageDialog(this, "Another command is in progress!");
-            return;
-        }
-        try {
-            Communication.send("M81");
-        } catch (ComInterruptException ex) {
-            Logger.getLogger(JPanelControl.class.getName()).log(Level.SEVERE, null, ex);
-        }
-    }//GEN-LAST:event_jBPowerOFFActionPerformed
-
-    private void jBSetPosActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jBSetPosActionPerformed
-        if(Communication.isBussy())
-        {
-            JOptionPane.showMessageDialog(this, "Another command is in progress!");
-            return;
-        }
-        Double[] values = new Double[3];
-        Double[] max    = new Double[3];
-        String[] messages = new String[3];
-        for(int i = 0;i < 3;i++)
-        {
-            messages[i] = "Set the value for the " + CommandParsing.axesName[i] + " Axis";
-            values[i]   = axes[i][0].getdsave();
-            max[i]      = DatabaseV2.getWorkspace(i).getsaved();
-        }
-
-        values = Tools.getValues(messages, values, max, new Double[]{0.0,0.0,0.0});
-
-        if(values!= null)
-        {
-            String cmd = "G92";
-            jPPaint.setRepaintEnable(false);
-            for(int i = 0;i < 3;i++)
+            double x    = (evt.getX()- rect.x) * Geometrics.getScale(areaWidth, areaHeight, rect.width, rect.height);
+            double y    = (evt.getY()- rect.y) * Geometrics.getScale(areaWidth, areaHeight, rect.width, rect.height);
+            switch(Integer.parseInt(DatabaseV2.HOMING.get()))
             {
-                axes[i][0].set(values[i]);
-                axes[i][0].dispatchEvent();
-                cmd += " " + CommandParsing.axesName[i] + Tools.dtostr(values[i]);
+                case 1:
+                x   = areaWidth - x;
+                break;
+                case 2:
+                y   = areaHeight - y;
+                break;
+                case 3:
+                x   = areaWidth - x;
+                y   = areaHeight - y;
+                break;
             }
-            try {
-                Communication.send(cmd);
-            } catch (ComInterruptException ex) {
-                Logger.getLogger(JPanelControl.class.getName()).log(Level.SEVERE, null, ex);
-            }
+
+            //Calc pos:
+            jPPaint.setRepaintEnable(false);
+            axes[0][2].set(x);
+            axes[1][2].set(y);
+            axes[0][2].dispatchEvent();
+            axes[1][2].dispatchEvent();
             jPPaint.setRepaintEnable(true);
         }
 
-    }//GEN-LAST:event_jBSetPosActionPerformed
-
-    private void jBGetPosActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jBGetPosActionPerformed
-        if(Communication.isBussy())
-        {
-            JOptionPane.showMessageDialog(this, "Another command is in progress!");
-            return;
-        }
-        parseNextSerial = true;
-        try {
-            Communication.send("M114");
-        } catch (ComInterruptException ex) {
-            Logger.getLogger(JPanelControl.class.getName()).log(Level.SEVERE, null, ex);
-        }
-    }//GEN-LAST:event_jBGetPosActionPerformed
-
-    private void jLSaveMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jLSaveMouseClicked
-        if(evt.getClickCount() == 2)
-        {
-            loadFormSaveList(jLSave.locationToIndex(evt.getPoint()));
-        }
-    }//GEN-LAST:event_jLSaveMouseClicked
-
-    private void jLSaveKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_jLSaveKeyPressed
-        if(evt.getKeyCode() == KeyEvent.VK_ENTER)
-        {
-            loadFormSaveList(jLSave.getSelectedIndex());
-        }
-        if(evt.getKeyCode() == KeyEvent.VK_DELETE)
-        {
-            if(jLSave.getSelectedIndex() != -1)
-            {
-                ((SortedComboBoxModel<PositionListElement>)jLSave.getModel()).removeElementAt(jLSave.getSelectedIndex());
-            }
-        }
-
-    }//GEN-LAST:event_jLSaveKeyPressed
-
-    private void jBPosSaveActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jBPosSaveActionPerformed
-        String name = JOptionPane.showInputDialog("Name for the position");
-        if(name == null)
-        {
-            return;
-        }
-
-        PositionListElement element = new PositionListElement(name, axes[0][0].getdsave(), axes[1][0].getdsave());
-
-        ((SortedComboBoxModel<PositionListElement>)jLSave.getModel()).addElement(element);
-
-    }//GEN-LAST:event_jBPosSaveActionPerformed
-
-    private void jBPosLoadActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jBPosLoadActionPerformed
-        loadFormSaveList(jLSave.getSelectedIndex());
-    }//GEN-LAST:event_jBPosLoadActionPerformed
-
-    private void jBPosRemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jBPosRemActionPerformed
-        if(jLSave.getSelectedIndex() != -1)
-        ((SortedComboBoxModel<PositionListElement>)jLSave.getModel()).removeElementAt(jLSave.getSelectedIndex());
-    }//GEN-LAST:event_jBPosRemActionPerformed
-
-    private void jBTool(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jBTool
-        JButton[][][] buttons= new JButton[][][]
-        {{ //X
-            {jBTXfp, jBTXfm}, //1
-            {jBTXhp, jBTXhm}  //1/2
-        },{ //Y
-            {jBTYfp, jBTYfm}, //1
-            {jBTYhp, jBTYhm}}};  //1/2
-    int axis = -1,type = -1,sign = -1;
-
-    for(int i = 0;i < buttons.length;i++)
-    {
-        for(int j = 0;j < buttons[i].length;j++)
-        {
-            for(int k = 0;k < buttons[i][j].length;k++)
-            {
-                if(buttons[i][j][k] == evt.getSource())
-                {
-                    axis    = i;
-                    type    = j;
-                    sign    = k;
-                }
-            }
-        }
-    }
-            Double d = axes[4][0].getdsave();
-
-            if(type == 1)
-            {
-                d = d / 2;
-            }
-
-            if(sign == 1)
-            {
-                d = 0.0 - d;
-            }
-
-            axes[axis][1].set(axes[axis][1].getdsave() + d);
-            axes[axis][1].dispatchEvent();
-
-            //Save Diameter
-            if(((DefaultComboBoxModel<String>)jCBdiameter.getModel()).getIndexOf(axes[4][0].get()) == -1)
-            {
-                jCBdiameter.addItem(axes[4][0].get());
-            }
-    }//GEN-LAST:event_jBTool
-
-    private void jCBarcActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jCBarcActionPerformed
-        if(jCBarc.isSelected())
-        {
-            jCBarcI.setEnabled(true);
-            jCBarcJ.setEnabled(true);
-            jCBarcCCW.setEnabled(true);
-        }
-        else
-        {
-            jCBarcI.setEnabled(false);
-            jCBarcJ.setEnabled(false);
-            jCBarcCCW.setEnabled(false);
-        }
-        jPPaint.repaint();
-    }//GEN-LAST:event_jCBarcActionPerformed
-
-    private void jCBarcCCWActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jCBarcCCWActionPerformed
-        jPPaint.repaint();
-    }//GEN-LAST:event_jCBarcCCWActionPerformed
-
-    private void jCBFastModeActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jCBFastModeActionPerformed
-        if(jCBFastMode.isSelected())
-        {
-            jCBfeedrate.setEnabled(false);
-        }
-        else
-        {
-            jCBfeedrate.setEnabled(true);
-        }
-    }//GEN-LAST:event_jCBFastModeActionPerformed
+    }//GEN-LAST:event_jPPaintMouseReleased
 
     private void jBMoveActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jBMoveActionPerformed
         if(Communication.isBussy())
@@ -1456,14 +1289,14 @@ public class JPanelControl extends javax.swing.JPanel implements IGUIEvent{
         }
         //Z or XY move allowed but not both
         boolean mxy = !Geometrics.doubleEquals(axes[0][0].getdsave(),
-                                                axes[0][2].getdsave(),
-                                                0.001)
-                        || !Geometrics.doubleEquals(axes[1][0].getdsave(),
-                                                    axes[1][2].getdsave(),
-                                                    0.001);
+            axes[0][2].getdsave(),
+            0.001)
+        || !Geometrics.doubleEquals(axes[1][0].getdsave(),
+            axes[1][2].getdsave(),
+            0.001);
         boolean mz  = !Geometrics.doubleEquals(axes[2][0].getdsave(),
-                                               axes[2][2].getdsave(),
-                                               0.001);
+            axes[2][2].getdsave(),
+            0.001);
         if(mxy && mz)
         {
             JOptionPane.showMessageDialog(this, "Only XY move or Z move allowed .. but not both!");
@@ -1530,7 +1363,7 @@ public class JPanelControl extends javax.swing.JPanel implements IGUIEvent{
             feedrate = axes[5][0].getdsave();
         }
         cmd += " F" + Tools.dtostr(feedrate);
-        
+
         //Execute
         try {
             Communication.send(cmd);
@@ -1570,48 +1403,253 @@ public class JPanelControl extends javax.swing.JPanel implements IGUIEvent{
         }
 
         jPPaint.setRepaintEnable(true);
-
     }//GEN-LAST:event_jBMoveActionPerformed
 
-    private void jPPaintMouseReleased(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jPPaintMouseReleased
-        double areaWidth    = DatabaseV2.WORKSPACE0.getsaved(); //x
-        double areaHeight   = DatabaseV2.WORKSPACE1.getsaved(); //y
-        Rectangle rect = Geometrics.placeRectangle(jPPaint.getWidth(),
-                                                   jPPaint.getHeight(),
-                                                   Geometrics.getRatio(areaWidth,areaHeight));
+    private void jCBfeedrateActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jCBfeedrateActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_jCBfeedrateActionPerformed
 
-        if(Geometrics.pointInRectangle(new Point(evt.getX(),evt.getY()), rect, 0))
+    private void jCBFastModeActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jCBFastModeActionPerformed
+        if(jCBFastMode.isSelected())
         {
-            double x    = (evt.getX()- rect.x) * Geometrics.getScale(areaWidth, areaHeight, rect.width, rect.height);
-            double y    = (evt.getY()- rect.y) * Geometrics.getScale(areaWidth, areaHeight, rect.width, rect.height);
-            switch(Integer.parseInt(DatabaseV2.HOMING.get()))
-            {
-                case 1:
-                x   = areaWidth - x;
-                break;
-                case 2:
-                y   = areaHeight - y;
-                break;
-                case 3:
-                x   = areaWidth - x;
-                y   = areaHeight - y;
-                break;
-            }
+            jCBfeedrate.setEnabled(false);
+        }
+        else
+        {
+            jCBfeedrate.setEnabled(true);
+        }
+    }//GEN-LAST:event_jCBFastModeActionPerformed
 
-            //Calc pos:
-            jPPaint.setRepaintEnable(false);
-            axes[0][2].set(x);
-            axes[1][2].set(y);
-            axes[0][2].dispatchEvent();
-            axes[1][2].dispatchEvent();
-            jPPaint.setRepaintEnable(true);
+    private void jCBarcCCWActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jCBarcCCWActionPerformed
+        jPPaint.repaint();
+    }//GEN-LAST:event_jCBarcCCWActionPerformed
+
+    private void jCBarcActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jCBarcActionPerformed
+        if(jCBarc.isSelected())
+        {
+            jCBarcI.setEnabled(true);
+            jCBarcJ.setEnabled(true);
+            jCBarcCCW.setEnabled(true);
+        }
+        else
+        {
+            jCBarcI.setEnabled(false);
+            jCBarcJ.setEnabled(false);
+            jCBarcCCW.setEnabled(false);
+        }
+        jPPaint.repaint();
+    }//GEN-LAST:event_jCBarcActionPerformed
+
+    private void jBTool(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jBTool
+        JButton[][][] buttons= new JButton[][][]
+        {{ //X
+            {jBTXfp, jBTXfm}, //1
+            {jBTXhp, jBTXhm}  //1/2
+        },{ //Y
+            {jBTYfp, jBTYfm}, //1
+            {jBTYhp, jBTYhm}}};  //1/2
+    int axis = -1,type = -1,sign = -1;
+
+    for(int i = 0;i < buttons.length;i++)
+    {
+        for(int j = 0;j < buttons[i].length;j++)
+        {
+            for(int k = 0;k < buttons[i][j].length;k++)
+            {
+                if(buttons[i][j][k] == evt.getSource())
+                {
+                    axis    = i;
+                    type    = j;
+                    sign    = k;
+                }
+            }
+        }
+        }
+        Double d = axes[4][0].getdsave();
+
+        if(type == 1)
+        {
+            d = d / 2;
         }
 
-    }//GEN-LAST:event_jPPaintMouseReleased
+        if(sign == 1)
+        {
+            d = 0.0 - d;
+        }
+
+        axes[axis][1].set(axes[axis][1].getdsave() + d);
+        axes[axis][1].dispatchEvent();
+
+        //Save Diameter
+        if(((DefaultComboBoxModel<String>)jCBdiameter.getModel()).getIndexOf(axes[4][0].get()) == -1)
+        {
+            jCBdiameter.addItem(axes[4][0].get());
+        }
+    }//GEN-LAST:event_jBTool
+
+    private void jBPosRemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jBPosRemActionPerformed
+        if(jLSave.getSelectedIndex() != -1)
+        ((SortedComboBoxModel<PositionListElement>)jLSave.getModel()).removeElementAt(jLSave.getSelectedIndex());
+    }//GEN-LAST:event_jBPosRemActionPerformed
+
+    private void jBPosLoadActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jBPosLoadActionPerformed
+        loadFormSaveList(jLSave.getSelectedIndex());
+    }//GEN-LAST:event_jBPosLoadActionPerformed
+
+    private void jBPosSaveActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jBPosSaveActionPerformed
+        String name = JOptionPane.showInputDialog("Name for the position");
+        if(name == null)
+        {
+            return;
+        }
+
+        PositionListElement element = new PositionListElement(name, axes[0][0].getdsave(), axes[1][0].getdsave());
+
+        ((SortedComboBoxModel<PositionListElement>)jLSave.getModel()).addElement(element);
+    }//GEN-LAST:event_jBPosSaveActionPerformed
+
+    private void jLSaveKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_jLSaveKeyPressed
+        if(evt.getKeyCode() == KeyEvent.VK_ENTER)
+        {
+            loadFormSaveList(jLSave.getSelectedIndex());
+        }
+        if(evt.getKeyCode() == KeyEvent.VK_DELETE)
+        {
+            if(jLSave.getSelectedIndex() != -1)
+            {
+                ((SortedComboBoxModel<PositionListElement>)jLSave.getModel()).removeElementAt(jLSave.getSelectedIndex());
+            }
+        }
+    }//GEN-LAST:event_jLSaveKeyPressed
+
+    private void jLSaveMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jLSaveMouseClicked
+        if(evt.getClickCount() == 2)
+        {
+            loadFormSaveList(jLSave.locationToIndex(evt.getPoint()));
+        }
+    }//GEN-LAST:event_jLSaveMouseClicked
+
+    private void jBGetPosActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jBGetPosActionPerformed
+        if(Communication.isBussy())
+        {
+            JOptionPane.showMessageDialog(this, "Another command is in progress!");
+            return;
+        }
+        parseNextSerial = true;
+        try {
+            Communication.send("M114");
+        } catch (ComInterruptException ex) {
+            Logger.getLogger(JPanelControl.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }//GEN-LAST:event_jBGetPosActionPerformed
+
+    private void jBSetPosActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jBSetPosActionPerformed
+        if(Communication.isBussy())
+        {
+            JOptionPane.showMessageDialog(this, "Another command is in progress!");
+            return;
+        }
+        Double[] values = new Double[3];
+        Double[] max    = new Double[3];
+        String[] messages = new String[3];
+        for(int i = 0;i < 3;i++)
+        {
+            messages[i] = "Set the value for the " + CommandParsing.axesName[i] + " Axis";
+            values[i]   = axes[i][0].getdsave();
+            max[i]      = DatabaseV2.getWorkspace(i).getsaved();
+        }
+
+        values = Tools.getValues(messages, values, max, new Double[]{0.0,0.0,0.0});
+
+        if(values!= null)
+        {
+            String cmd = "G92";
+            jPPaint.setRepaintEnable(false);
+            for(int i = 0;i < 3;i++)
+            {
+                axes[i][0].set(values[i]);
+                axes[i][0].dispatchEvent();
+                cmd += " " + CommandParsing.axesName[i] + Tools.dtostr(values[i]);
+            }
+            try {
+                Communication.send(cmd);
+            } catch (ComInterruptException ex) {
+                Logger.getLogger(JPanelControl.class.getName()).log(Level.SEVERE, null, ex);
+            }
+            jPPaint.setRepaintEnable(true);
+        }
+    }//GEN-LAST:event_jBSetPosActionPerformed
+
+    private void jBPowerOFFActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jBPowerOFFActionPerformed
+        if(Communication.isBussy())
+        {
+            JOptionPane.showMessageDialog(this, "Another command is in progress!");
+            return;
+        }
+        try {
+            Communication.send("M81");
+        } catch (ComInterruptException ex) {
+            Logger.getLogger(JPanelControl.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }//GEN-LAST:event_jBPowerOFFActionPerformed
+
+    private void jBPowerONActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jBPowerONActionPerformed
+        if(Communication.isBussy())
+        {
+            JOptionPane.showMessageDialog(this, "Another command is in progress!");
+            return;
+        }
+        try {
+            Communication.send("M80");
+        } catch (ComInterruptException ex) {
+            Logger.getLogger(JPanelControl.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }//GEN-LAST:event_jBPowerONActionPerformed
+
+    private void jBHomeXYActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jBHomeXYActionPerformed
+        if(Communication.isBussy())
+        {
+            JOptionPane.showMessageDialog(this, "Another command is in progress!");
+            return;
+        }
+        try {
+            //Communication.send("G0 Z10");
+            Communication.send("G28 X Y");
+        } catch (ComInterruptException ex) {
+            Logger.getLogger(JPanelControl.class.getName()).log(Level.SEVERE, null, ex);
+            return;
+        }
+        jPPaint.setRepaintEnable(false);
+        for(int i = 0;i < 2;i++)
+        {
+            axes[i][0].set(0.0);
+            axes[i][0].dispatchEvent();
+        }
+        jPPaint.setRepaintEnable(true);
+    }//GEN-LAST:event_jBHomeXYActionPerformed
+
+    private void jBHomeZActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jBHomeZActionPerformed
+        if(Communication.isBussy())
+        {
+            JOptionPane.showMessageDialog(this, "Another command is in progress!");
+            return;
+        }
+        try {
+            Communication.send("G28 Z");
+        } catch (ComInterruptException ex) {
+            Logger.getLogger(JPanelControl.class.getName()).log(Level.SEVERE, null, ex);
+            return;
+        }
+        jPPaint.setRepaintEnable(false);
+        axes[3][0].set(0.0);
+        axes[3][0].dispatchEvent();
+        jPPaint.setRepaintEnable(true);
+    }//GEN-LAST:event_jBHomeZActionPerformed
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton jBGetPos;
-    private javax.swing.JButton jBHoming;
+    private javax.swing.JButton jBHomeXY;
+    private javax.swing.JButton jBHomeZ;
     private javax.swing.JButton jBMove;
     private javax.swing.JButton jBPosLoad;
     private javax.swing.JButton jBPosRem;

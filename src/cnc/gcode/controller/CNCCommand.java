@@ -102,9 +102,9 @@ public class CNCCommand {
    
     public static class Calchelper
     {
-        double[] axes= new double[]{Double.NaN,
-                                    Double.NaN,
-                                    Double.NaN,
+        double[] axes= new double[]{0,
+                                    0,
+                                    0,
                                     Double.NaN}; //X,Y,Z,F
 
         Type lastMovetype = Type.UNKNOWN;
@@ -293,13 +293,13 @@ public class CNCCommand {
                     case 'M':
                         break;
                     default:
-                        if(p.contains('X') || p.contains('Y') || p.contains('Z'))
+                        if(p.contains('X') || p.contains('Y') || p.contains('Z') || p.contains('F'))
                         {
-                            if(c.lastMovetype == Type.G1)
-                            {
+                            //if(c.lastMovetype == Type.G1)
+                            //{
                                 p.insert(0, 'G', 1, true);
                                 message += "Using modal G1! ";
-                            }
+                            //}
                         }
                         break;
                 }
@@ -359,6 +359,9 @@ public class CNCCommand {
                             type = Type.PAUSE;
                             break;
                         case 90: //Absolute Positioning
+                            type = Type.GXX;
+                            break;
+                        case 94: //Feedrate mode
                             type = Type.GXX;
                             break;
                     }

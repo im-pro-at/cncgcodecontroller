@@ -459,6 +459,12 @@ public class JPanelAutoLevel extends javax.swing.JPanel implements IGUIEvent {
 
         jLabel4.setText("End");
 
+        jTFStartX.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jTFStartXActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout jPanel2Layout = new javax.swing.GroupLayout(jPanel2);
         jPanel2.setLayout(jPanel2Layout);
         jPanel2Layout.setHorizontalGroup(
@@ -713,7 +719,7 @@ public class JPanelAutoLevel extends javax.swing.JPanel implements IGUIEvent {
                         {
                             AutoLevelSystem.Point[] ps = al.getPoints();
                             addAll(Arrays.asList(ps));
-                            add(new AutoLevelSystem.Point(ps[0].getPoint().x, ps[0].getPoint().y));
+                            //add(new AutoLevelSystem.Point(ps[0].getPoint().x, ps[0].getPoint().y));
                         }
                     }).toArray(new AutoLevelSystem.Point[0]);
                     
@@ -725,7 +731,7 @@ public class JPanelAutoLevel extends javax.swing.JPanel implements IGUIEvent {
                     Integer[] cmdpropeindex = new Integer[points.length];
                     ArrayList<CNCCommand> cmds = new ArrayList<>(points.length * 2 + 20);
                     
-                    //add start Command
+                    //add start Command (zero tool)
                     cmds.add(CNCCommand.getALStartCommand());
                     
                     //go to save hight
@@ -1050,6 +1056,10 @@ public class JPanelAutoLevel extends javax.swing.JPanel implements IGUIEvent {
         
 
     }//GEN-LAST:event_jBExportActionPerformed
+
+    private void jTFStartXActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jTFStartXActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_jTFStartXActionPerformed
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton jBAction;

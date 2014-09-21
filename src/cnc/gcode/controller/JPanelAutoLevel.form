@@ -129,6 +129,9 @@
           </Properties>
         </Component>
         <Component class="javax.swing.JTextField" name="jTFStartX">
+          <Events>
+            <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="jTFStartXActionPerformed"/>
+          </Events>
         </Component>
         <Component class="javax.swing.JTextField" name="jTFStartY">
         </Component>
