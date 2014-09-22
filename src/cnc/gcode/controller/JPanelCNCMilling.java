@@ -1363,12 +1363,14 @@ public class JPanelCNCMilling extends javax.swing.JPanel implements IGUIEvent{
     private void jBZeroToolActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jBZeroToolActionPerformed
         final boolean serial = Communication.isConnected();
         if(serial){
-            String[] cmds = DatabaseV2.ALSTARTCODE.get().split("\n");
             try{
+                // Run the Auto Level start codes
+                String[] cmds = DatabaseV2.ALSTARTCODE.get().split("\n");
                 for(int i=0;i<cmds.length;i++)
                 {
                     Communication.send(cmds[i]);
                 }
+                Communication.send("G0 Z2"); // Lift a small distance for clearance
             }
             catch(ComInterruptException ex){
                 // Do nothing
