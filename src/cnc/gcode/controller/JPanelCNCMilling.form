@@ -174,18 +174,18 @@
                           <Component id="jLabel1" alignment="3" min="-2" max="-2" attributes="0"/>
                           <Component id="jLoadFile" alignment="3" min="-2" max="-2" attributes="0"/>
                       </Group>
-                      <EmptySpace pref="21" max="32767" attributes="0"/>
+                      <EmptySpace pref="24" max="32767" attributes="0"/>
                       <Group type="103" groupAlignment="3" attributes="0">
                           <Component id="jLabel3" alignment="3" min="-2" max="-2" attributes="0"/>
                           <Component id="jBOptimise" alignment="3" min="-2" max="-2" attributes="0"/>
                       </Group>
-                      <EmptySpace pref="26" max="32767" attributes="0"/>
+                      <EmptySpace pref="28" max="32767" attributes="0"/>
                       <Group type="103" groupAlignment="3" attributes="0">
                           <Component id="jLabel4" alignment="3" min="-2" max="-2" attributes="0"/>
                           <Component id="jBLiftTool" alignment="3" min="-2" max="-2" attributes="0"/>
                           <Component id="jBZeroTool" alignment="3" min="-2" max="-2" attributes="0"/>
                       </Group>
-                      <EmptySpace pref="26" max="32767" attributes="0"/>
+                      <EmptySpace pref="28" max="32767" attributes="0"/>
                       <Group type="103" groupAlignment="3" attributes="0">
                           <Component id="jLabel23" alignment="3" min="-2" max="-2" attributes="0"/>
                           <Component id="jBMilling" alignment="3" min="-2" max="-2" attributes="0"/>
@@ -252,7 +252,7 @@
             </Component>
             <Component class="javax.swing.JButton" name="jBZeroTool">
               <Properties>
-                <Property name="text" type="java.lang.String" value="Zero tool (origin)"/>
+                <Property name="text" type="java.lang.String" value="Zero tool (1mm plate)"/>
               </Properties>
               <Events>
                 <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="jBZeroToolActionPerformed"/>
@@ -319,7 +319,7 @@
                           </Group>
                           <Component id="jCBmirroX" min="-2" max="-2" attributes="0"/>
                       </Group>
-                      <EmptySpace type="unrelated" pref="30" max="32767" attributes="0"/>
+                      <EmptySpace type="unrelated" pref="36" max="32767" attributes="0"/>
                       <Group type="103" groupAlignment="0" attributes="0">
                           <Component id="jCBmirroY" alignment="0" min="-2" max="-2" attributes="0"/>
                           <Group type="103" groupAlignment="3" attributes="0">
@@ -327,12 +327,12 @@
                               <Component id="jTFmoveY" alignment="3" min="-2" max="-2" attributes="0"/>
                           </Group>
                       </Group>
-                      <EmptySpace type="unrelated" pref="30" max="32767" attributes="0"/>
+                      <EmptySpace type="unrelated" pref="37" max="32767" attributes="0"/>
                       <Group type="103" groupAlignment="3" attributes="0">
                           <Component id="jCBAutoLeveling" alignment="3" min="-2" max="-2" attributes="0"/>
                           <Component id="jLabel10" alignment="3" min="-2" max="-2" attributes="0"/>
                       </Group>
-                      <EmptySpace pref="29" max="32767" attributes="0"/>
+                      <EmptySpace pref="37" max="32767" attributes="0"/>
                   </Group>
               </Group>
             </DimensionLayout>
@@ -374,6 +374,7 @@
             </Component>
             <Component class="javax.swing.JCheckBox" name="jCBAutoLeveling">
               <Properties>
+                <Property name="selected" type="boolean" value="true"/>
                 <Property name="text" type="java.lang.String" value="AutoLeveling"/>
               </Properties>
               <Events>
@@ -414,7 +415,7 @@
                                   <Component id="jCBScroll" min="-2" max="-2" attributes="0"/>
                                   <Component id="jCBPerview" min="-2" max="-2" attributes="0"/>
                               </Group>
-                              <EmptySpace min="0" pref="56" max="32767" attributes="0"/>
+                              <EmptySpace min="0" pref="91" max="32767" attributes="0"/>
                           </Group>
                       </Group>
                       <EmptySpace max="-2" attributes="0"/>
@@ -433,7 +434,7 @@
                           <Component id="jLabel9" min="-2" max="-2" attributes="0"/>
                           <Component id="jSZoom" min="-2" max="-2" attributes="0"/>
                       </Group>
-                      <EmptySpace pref="13" max="32767" attributes="0"/>
+                      <EmptySpace pref="20" max="32767" attributes="0"/>
                       <Group type="103" groupAlignment="3" attributes="0">
                           <Component id="jCBScroll" alignment="3" min="-2" max="-2" attributes="0"/>
                           <Component id="jLabel11" alignment="3" min="-2" max="-2" attributes="0"/>
