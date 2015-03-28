@@ -8,6 +8,7 @@ package cnc.gcode.controller;
 import cnc.gcode.controller.communication.ComInterruptException;
 import cnc.gcode.controller.communication.Communication;
 import cnc.gcode.controller.communication.IReceivedLines;
+import java.text.DecimalFormat;
 import java.text.ParseException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -23,6 +24,43 @@ public class JBasicControls extends javax.swing.JPanel implements IGUIEvent{
      */
     //private boolean parseNextSerial = false;
     private IEvent GUIEvent=null;
+    
+    
+    //X:2.00Y:0.00Z:0.00E:0.00 Count X: 1.01Y:0.00Z:0.00
+    private double ExtractAxisPosition(String line, Axis axis) throws Exception
+    {
+        if(line.contains(axis.toString() + ":"))
+        {
+            int pos = line.indexOf( "" + axis.toString() + ":");
+            if(pos == -1)
+            {
+                throw new Exception("Error when extracting position of Axis " + axis.toString() + " from " + line);
+            }
+            try {
+                    String temp = line.substring(pos + 2);
+                    return Tools.strtod(temp);
+                } catch (ParseException ex) {
+                    throw new Exception("Error when extracting position of Axis " + axis.toString() + " from " + line + " exception : " + ex.getMessage());
+                }
+        }
+        throw new Exception("Error: Current line doesn not contains position information for axis " + axis.toString());
+    }
+    private XYZPosition ExtractPosFromLine(String line)
+    {
+        XYZPosition position = new XYZPosition();
+        try
+        {
+            position.setX(ExtractAxisPosition(line, Axis.X));
+            position.setY(ExtractAxisPosition(line, Axis.Y));
+            position.setZ(ExtractAxisPosition(line, Axis.Z));
+            position.setIsValidPosition(true);
+        }catch(Exception ex)
+        {
+            appendToConsole(ex.getMessage());
+            position.setIsValidPosition(false);
+        }
+        return position;
+    }
     public JBasicControls() {
         initComponents();
         
@@ -31,35 +69,20 @@ public class JBasicControls extends javax.swing.JPanel implements IGUIEvent{
             public void received(String[] lines) {
                 for(String line: lines)
                 {
-                    //if(parseNextSerial)
+                    String in   = line;
+                    if((line.toLowerCase().contains("ok") == true && FilterOk.isSelected() == true) == false )
+                    {
+                        appendToConsole(line);
+                    }
+                    if( line.contains(Axis.X + ":" ) && line.contains(Axis.Y + ":" ) && line.contains(Axis.Z + ":" ))
                     {
                         //parseNextSerial = false;
-                        String in   = line;
-                        appendToConsole(in);
-                        Double[] values = new Double[3];
-                        for(int j = 0;j < 3;j++)
+                        XYZPosition pos = ExtractPosFromLine(in);
+                        if( pos.IsValidPosition())
                         {
-                            int pos = in.indexOf( "" + CommandParsing.axesName[j] + ":");
-                            if(pos == -1)
-                            {
-                                values = null;
-                                break;
-                            }
-                            try {
-                                String temp = in.substring(pos+2);
-                                values[j] = Tools.strtod(temp);
-                            } catch (ParseException ex) {
-                                values = null;
-                                break;
-                            }
+                            CurrentPos.setText("Position: X=" + pos.getX() + " Y=" + pos.getY() + " Z=" + pos.getZ());
                         }
-                        if(values != null)
-                        {
-                            
-                        }
-                        else
-                        {
-                       }
+                        
                     }
                 }
             }
@@ -119,6 +142,8 @@ public class JBasicControls extends javax.swing.JPanel implements IGUIEvent{
         jLabel3 = new javax.swing.JLabel();
         jLabel4 = new javax.swing.JLabel();
         jLabel5 = new javax.swing.JLabel();
+        jPanel6 = new javax.swing.JPanel();
+        HomeXY = new javax.swing.JLabel();
         jPanel10 = new javax.swing.JPanel();
         HomeAll = new javax.swing.JButton();
         jPanel11 = new javax.swing.JPanel();
@@ -144,13 +169,20 @@ public class JBasicControls extends javax.swing.JPanel implements IGUIEvent{
         jScrollPane1 = new javax.swing.JScrollPane();
         ConsoleOutput = new javax.swing.JTextArea();
         ClearConsole = new javax.swing.JButton();
+        FilterOk = new javax.swing.JCheckBox();
         MotorsOn = new javax.swing.JButton();
 
         setName("jBasicControls"); // NOI18N
 
         ZPlus10.setText("+10");
         ZPlus10.setName("ZPlus10"); // NOI18N
+        ZPlus10.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseReleased(java.awt.event.MouseEvent evt) {
+                ZPlus10MouseReleased(evt);
+            }
+        });
 
+        jLabel1.setFont(new java.awt.Font("Ubuntu", 1, 15)); // NOI18N
         jLabel1.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         jLabel1.setText("Z");
         jLabel1.setToolTipText("");
@@ -158,13 +190,34 @@ public class JBasicControls extends javax.swing.JPanel implements IGUIEvent{
 
         ZPlus5.setLabel("+5");
         ZPlus5.setName("ZPlus5"); // NOI18N
+        ZPlus5.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseReleased(java.awt.event.MouseEvent evt) {
+                ZPlus5MouseReleased(evt);
+            }
+        });
 
         ZPlus1.setLabel("+1");
         ZPlus1.setName("ZPlus1"); // NOI18N
+        ZPlus1.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseReleased(java.awt.event.MouseEvent evt) {
+                ZPlus1MouseReleased(evt);
+            }
+        });
 
         ZPlus01.setLabel("+0.1");
         ZPlus01.setName("ZPlus01"); // NOI18N
+        ZPlus01.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseReleased(java.awt.event.MouseEvent evt) {
+                ZPlus01MouseReleased(evt);
+            }
+        });
+        ZPlus01.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                ZPlus01ActionPerformed(evt);
+            }
+        });
 
+        HomeZ.setFont(new java.awt.Font("Ubuntu", 1, 15)); // NOI18N
         HomeZ.setText("Home");
         HomeZ.setName("HomeZ"); // NOI18N
         HomeZ.addActionListener(new java.awt.event.ActionListener() {
@@ -175,24 +228,49 @@ public class JBasicControls extends javax.swing.JPanel implements IGUIEvent{
 
         ZMinus01.setLabel("-0.1");
         ZMinus01.setName("ZMinus01"); // NOI18N
+        ZMinus01.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseReleased(java.awt.event.MouseEvent evt) {
+                ZMinus01MouseReleased(evt);
+            }
+        });
 
         ZMinus1.setLabel("-1");
         ZMinus1.setName("ZMinus1"); // NOI18N
+        ZMinus1.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseReleased(java.awt.event.MouseEvent evt) {
+                ZMinus1MouseReleased(evt);
+            }
+        });
 
         ZMinus5.setLabel("-5");
         ZMinus5.setName("ZMinus5"); // NOI18N
+        ZMinus5.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseReleased(java.awt.event.MouseEvent evt) {
+                ZMinus5MouseReleased(evt);
+            }
+        });
 
         ZMinus10.setLabel("-10");
         ZMinus10.setName("ZMinus10"); // NOI18N
+        ZMinus10.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseReleased(java.awt.event.MouseEvent evt) {
+                ZMinus10MouseReleased(evt);
+            }
+        });
 
         jSeparator1.setOrientation(javax.swing.SwingConstants.VERTICAL);
 
-        jPanel1.setBackground(new java.awt.Color(255, 0, 0));
+        jPanel1.setBackground(new java.awt.Color(0, 255, 72));
         jPanel1.setPreferredSize(new java.awt.Dimension(38, 124));
 
         XMinus10.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         XMinus10.setText("-10");
         XMinus10.setName("LXMinus10"); // NOI18N
+        XMinus10.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseReleased(java.awt.event.MouseEvent evt) {
+                XMinus10MouseReleased(evt);
+            }
+        });
 
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
@@ -205,12 +283,17 @@ public class JBasicControls extends javax.swing.JPanel implements IGUIEvent{
             .addComponent(XMinus10, javax.swing.GroupLayout.DEFAULT_SIZE, 124, Short.MAX_VALUE)
         );
 
-        jPanel4.setBackground(java.awt.Color.orange);
+        jPanel4.setBackground(new java.awt.Color(124, 255, 0));
         jPanel4.setPreferredSize(new java.awt.Dimension(38, 124));
 
         XMinus1.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         XMinus1.setText("-1");
         XMinus1.setName("LXMinus1"); // NOI18N
+        XMinus1.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseReleased(java.awt.event.MouseEvent evt) {
+                XMinus1MouseReleased(evt);
+            }
+        });
 
         javax.swing.GroupLayout jPanel4Layout = new javax.swing.GroupLayout(jPanel4);
         jPanel4.setLayout(jPanel4Layout);
@@ -223,12 +306,17 @@ public class JBasicControls extends javax.swing.JPanel implements IGUIEvent{
             .addComponent(XMinus1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
         );
 
-        jPanel14.setBackground(java.awt.Color.yellow);
+        jPanel14.setBackground(new java.awt.Color(221, 250, 1));
         jPanel14.setPreferredSize(new java.awt.Dimension(38, 124));
 
         XMinus01.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         XMinus01.setText("-0.1");
         XMinus01.setName("LXMinus01"); // NOI18N
+        XMinus01.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseReleased(java.awt.event.MouseEvent evt) {
+                XMinus01MouseReleased(evt);
+            }
+        });
 
         javax.swing.GroupLayout jPanel14Layout = new javax.swing.GroupLayout(jPanel14);
         jPanel14.setLayout(jPanel14Layout);
@@ -260,7 +348,13 @@ public class JBasicControls extends javax.swing.JPanel implements IGUIEvent{
             .addComponent(jPanel14, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
         );
 
+        jPanel2.setBackground(java.awt.Color.red);
+
+        HomeX.setBackground(java.awt.Color.red);
+        HomeX.setFont(new java.awt.Font("Ubuntu", 1, 15)); // NOI18N
+        HomeX.setForeground(new java.awt.Color(254, 254, 254));
         HomeX.setText("Home X");
+        HomeX.setBorderPainted(false);
         HomeX.setName("BHomeX"); // NOI18N
         HomeX.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -279,7 +373,13 @@ public class JBasicControls extends javax.swing.JPanel implements IGUIEvent{
             .addComponent(HomeX, javax.swing.GroupLayout.DEFAULT_SIZE, 124, Short.MAX_VALUE)
         );
 
+        jPanel8.setBackground(java.awt.Color.green);
+
+        HomeY.setBackground(java.awt.Color.green);
+        HomeY.setFont(new java.awt.Font("Ubuntu", 1, 15)); // NOI18N
+        HomeY.setForeground(new java.awt.Color(254, 254, 254));
         HomeY.setText("Home Y");
+        HomeY.setBorderPainted(false);
         HomeY.setName("BHomeY"); // NOI18N
         HomeY.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -298,12 +398,17 @@ public class JBasicControls extends javax.swing.JPanel implements IGUIEvent{
             .addComponent(HomeY, javax.swing.GroupLayout.DEFAULT_SIZE, 124, Short.MAX_VALUE)
         );
 
-        jPanel18.setBackground(java.awt.Color.red);
+        jPanel18.setBackground(new java.awt.Color(0, 255, 72));
         jPanel18.setPreferredSize(new java.awt.Dimension(38, 124));
 
         YPlus10.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         YPlus10.setText("+10");
         YPlus10.setName("LYPlus10"); // NOI18N
+        YPlus10.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseReleased(java.awt.event.MouseEvent evt) {
+                YPlus10MouseReleased(evt);
+            }
+        });
 
         javax.swing.GroupLayout jPanel18Layout = new javax.swing.GroupLayout(jPanel18);
         jPanel18.setLayout(jPanel18Layout);
@@ -316,7 +421,7 @@ public class JBasicControls extends javax.swing.JPanel implements IGUIEvent{
             .addComponent(YPlus10, javax.swing.GroupLayout.DEFAULT_SIZE, 36, Short.MAX_VALUE)
         );
 
-        jPanel19.setBackground(java.awt.Color.yellow);
+        jPanel19.setBackground(new java.awt.Color(221, 250, 1));
         jPanel19.setToolTipText("");
         jPanel19.setName(""); // NOI18N
         jPanel19.setPreferredSize(new java.awt.Dimension(38, 124));
@@ -329,6 +434,11 @@ public class JBasicControls extends javax.swing.JPanel implements IGUIEvent{
         YPlus01.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         YPlus01.setText("+0.1");
         YPlus01.setName("LYPlus01"); // NOI18N
+        YPlus01.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseReleased(java.awt.event.MouseEvent evt) {
+                YPlus01MouseReleased(evt);
+            }
+        });
 
         javax.swing.GroupLayout jPanel19Layout = new javax.swing.GroupLayout(jPanel19);
         jPanel19.setLayout(jPanel19Layout);
@@ -341,12 +451,17 @@ public class JBasicControls extends javax.swing.JPanel implements IGUIEvent{
             .addComponent(YPlus01, javax.swing.GroupLayout.DEFAULT_SIZE, 36, Short.MAX_VALUE)
         );
 
-        jPanel20.setBackground(java.awt.Color.orange);
+        jPanel20.setBackground(new java.awt.Color(124, 255, 0));
         jPanel20.setPreferredSize(new java.awt.Dimension(38, 124));
 
         YPlus1.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         YPlus1.setText("+1");
         YPlus1.setName("LYPlus1"); // NOI18N
+        YPlus1.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseReleased(java.awt.event.MouseEvent evt) {
+                YPlus1MouseReleased(evt);
+            }
+        });
 
         javax.swing.GroupLayout jPanel20Layout = new javax.swing.GroupLayout(jPanel20);
         jPanel20.setLayout(jPanel20Layout);
@@ -380,6 +495,8 @@ public class JBasicControls extends javax.swing.JPanel implements IGUIEvent{
                 .addComponent(jPanel19, javax.swing.GroupLayout.PREFERRED_SIZE, 36, javax.swing.GroupLayout.PREFERRED_SIZE))
         );
 
+        jPanel7.setBackground(java.awt.Color.lightGray);
+
         jLabel2.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         jLabel2.setText("+Y");
 
@@ -392,6 +509,28 @@ public class JBasicControls extends javax.swing.JPanel implements IGUIEvent{
         jLabel5.setText("+X");
         jLabel5.setToolTipText("");
 
+        jPanel6.setBackground(java.awt.Color.gray);
+
+        HomeXY.setFont(new java.awt.Font("Ubuntu", 1, 15)); // NOI18N
+        HomeXY.setForeground(new java.awt.Color(254, 254, 254));
+        HomeXY.setText("Home X Y");
+        HomeXY.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseReleased(java.awt.event.MouseEvent evt) {
+                HomeXYMouseReleased(evt);
+            }
+        });
+
+        javax.swing.GroupLayout jPanel6Layout = new javax.swing.GroupLayout(jPanel6);
+        jPanel6.setLayout(jPanel6Layout);
+        jPanel6Layout.setHorizontalGroup(
+            jPanel6Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addComponent(HomeXY, javax.swing.GroupLayout.DEFAULT_SIZE, 73, Short.MAX_VALUE)
+        );
+        jPanel6Layout.setVerticalGroup(
+            jPanel6Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addComponent(HomeXY, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+        );
+
         javax.swing.GroupLayout jPanel7Layout = new javax.swing.GroupLayout(jPanel7);
         jPanel7.setLayout(jPanel7Layout);
         jPanel7Layout.setHorizontalGroup(
@@ -399,9 +538,11 @@ public class JBasicControls extends javax.swing.JPanel implements IGUIEvent{
             .addComponent(jLabel2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
             .addComponent(jLabel3, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
             .addGroup(jPanel7Layout.createSequentialGroup()
-                .addComponent(jLabel4, javax.swing.GroupLayout.PREFERRED_SIZE, 55, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(jLabel4, javax.swing.GroupLayout.PREFERRED_SIZE, 17, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jLabel5, javax.swing.GroupLayout.DEFAULT_SIZE, 63, Short.MAX_VALUE))
+                .addComponent(jPanel6, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jLabel5))
         );
         jPanel7Layout.setVerticalGroup(
             jPanel7Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -410,12 +551,19 @@ public class JBasicControls extends javax.swing.JPanel implements IGUIEvent{
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(jPanel7Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(jLabel4, javax.swing.GroupLayout.DEFAULT_SIZE, 78, Short.MAX_VALUE)
-                    .addComponent(jLabel5, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                    .addComponent(jLabel5, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(jPanel6, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jLabel3))
         );
 
+        jPanel10.setBackground(new java.awt.Color(0, 255, 185));
+
+        HomeAll.setBackground(new java.awt.Color(255, 255, 0));
+        HomeAll.setFont(new java.awt.Font("Ubuntu", 1, 15)); // NOI18N
+        HomeAll.setForeground(new java.awt.Color(254, 254, 254));
         HomeAll.setText("Home All");
+        HomeAll.setBorderPainted(false);
         HomeAll.setName("BHomeAll"); // NOI18N
         HomeAll.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -434,12 +582,17 @@ public class JBasicControls extends javax.swing.JPanel implements IGUIEvent{
             .addComponent(HomeAll, javax.swing.GroupLayout.DEFAULT_SIZE, 124, Short.MAX_VALUE)
         );
 
-        jPanel21.setBackground(java.awt.Color.yellow);
+        jPanel21.setBackground(new java.awt.Color(221, 250, 1));
         jPanel21.setPreferredSize(new java.awt.Dimension(38, 124));
 
         YMinus01.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         YMinus01.setText("-0.1");
         YMinus01.setName("LYMinus01"); // NOI18N
+        YMinus01.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseReleased(java.awt.event.MouseEvent evt) {
+                YMinus01MouseReleased(evt);
+            }
+        });
 
         javax.swing.GroupLayout jPanel21Layout = new javax.swing.GroupLayout(jPanel21);
         jPanel21.setLayout(jPanel21Layout);
@@ -452,12 +605,17 @@ public class JBasicControls extends javax.swing.JPanel implements IGUIEvent{
             .addComponent(YMinus01, javax.swing.GroupLayout.DEFAULT_SIZE, 36, Short.MAX_VALUE)
         );
 
-        jPanel22.setBackground(java.awt.Color.orange);
+        jPanel22.setBackground(new java.awt.Color(124, 255, 0));
         jPanel22.setPreferredSize(new java.awt.Dimension(38, 124));
 
         YMinus1.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         YMinus1.setText("-1");
         YMinus1.setName("LYMinus1"); // NOI18N
+        YMinus1.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseReleased(java.awt.event.MouseEvent evt) {
+                YMinus1MouseReleased(evt);
+            }
+        });
 
         javax.swing.GroupLayout jPanel22Layout = new javax.swing.GroupLayout(jPanel22);
         jPanel22.setLayout(jPanel22Layout);
@@ -470,7 +628,7 @@ public class JBasicControls extends javax.swing.JPanel implements IGUIEvent{
             .addComponent(YMinus1, javax.swing.GroupLayout.DEFAULT_SIZE, 36, Short.MAX_VALUE)
         );
 
-        jPanel23.setBackground(java.awt.Color.red);
+        jPanel23.setBackground(new java.awt.Color(0, 255, 72));
         jPanel23.setToolTipText("");
         jPanel23.setPreferredSize(new java.awt.Dimension(38, 124));
 
@@ -478,6 +636,11 @@ public class JBasicControls extends javax.swing.JPanel implements IGUIEvent{
         YMinus10.setText("+10");
         YMinus10.setToolTipText("");
         YMinus10.setName("LYMinus10"); // NOI18N
+        YMinus10.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseReleased(java.awt.event.MouseEvent evt) {
+                YMinus10MouseReleased(evt);
+            }
+        });
 
         javax.swing.GroupLayout jPanel23Layout = new javax.swing.GroupLayout(jPanel23);
         jPanel23.setLayout(jPanel23Layout);
@@ -511,7 +674,13 @@ public class JBasicControls extends javax.swing.JPanel implements IGUIEvent{
                 .addComponent(jPanel23, javax.swing.GroupLayout.PREFERRED_SIZE, 36, javax.swing.GroupLayout.PREFERRED_SIZE))
         );
 
+        jPanel12.setBackground(java.awt.Color.blue);
+
+        HomeZ2.setBackground(java.awt.Color.blue);
+        HomeZ2.setFont(new java.awt.Font("Ubuntu", 1, 15)); // NOI18N
+        HomeZ2.setForeground(new java.awt.Color(254, 254, 254));
         HomeZ2.setText("Home Z");
+        HomeZ2.setBorderPainted(false);
         HomeZ2.setName("BHomeZ"); // NOI18N
         HomeZ2.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -530,12 +699,17 @@ public class JBasicControls extends javax.swing.JPanel implements IGUIEvent{
             .addComponent(HomeZ2, javax.swing.GroupLayout.DEFAULT_SIZE, 124, Short.MAX_VALUE)
         );
 
-        jPanel15.setBackground(java.awt.Color.yellow);
+        jPanel15.setBackground(new java.awt.Color(221, 250, 1));
         jPanel15.setPreferredSize(new java.awt.Dimension(38, 124));
 
         XPlus01.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         XPlus01.setText("+0.1");
         XPlus01.setName("LXPlus01"); // NOI18N
+        XPlus01.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseReleased(java.awt.event.MouseEvent evt) {
+                XPlus01MouseReleased(evt);
+            }
+        });
 
         javax.swing.GroupLayout jPanel15Layout = new javax.swing.GroupLayout(jPanel15);
         jPanel15.setLayout(jPanel15Layout);
@@ -548,12 +722,17 @@ public class JBasicControls extends javax.swing.JPanel implements IGUIEvent{
             .addComponent(XPlus01, javax.swing.GroupLayout.DEFAULT_SIZE, 124, Short.MAX_VALUE)
         );
 
-        jPanel16.setBackground(java.awt.Color.red);
+        jPanel16.setBackground(new java.awt.Color(0, 255, 72));
         jPanel16.setPreferredSize(new java.awt.Dimension(38, 124));
 
         XPlus10.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         XPlus10.setText("+10");
         XPlus10.setName("LXPlus10"); // NOI18N
+        XPlus10.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseReleased(java.awt.event.MouseEvent evt) {
+                XPlus10MouseReleased(evt);
+            }
+        });
 
         javax.swing.GroupLayout jPanel16Layout = new javax.swing.GroupLayout(jPanel16);
         jPanel16.setLayout(jPanel16Layout);
@@ -566,12 +745,17 @@ public class JBasicControls extends javax.swing.JPanel implements IGUIEvent{
             .addComponent(XPlus10, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
         );
 
-        jPanel17.setBackground(java.awt.Color.orange);
+        jPanel17.setBackground(new java.awt.Color(124, 255, 0));
         jPanel17.setPreferredSize(new java.awt.Dimension(38, 124));
 
         XPlus1.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         XPlus1.setText("+1");
         XPlus1.setName("LXPlus1"); // NOI18N
+        XPlus1.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseReleased(java.awt.event.MouseEvent evt) {
+                XPlus1MouseReleased(evt);
+            }
+        });
 
         javax.swing.GroupLayout jPanel17Layout = new javax.swing.GroupLayout(jPanel17);
         jPanel17.setLayout(jPanel17Layout);
@@ -607,6 +791,11 @@ public class JBasicControls extends javax.swing.JPanel implements IGUIEvent{
 
         MotorsOff.setText("Motors Off");
         MotorsOff.setName("BMotorsOff"); // NOI18N
+        MotorsOff.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseReleased(java.awt.event.MouseEvent evt) {
+                MotorsOffMouseReleased(evt);
+            }
+        });
         MotorsOff.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 MotorsOffActionPerformed(evt);
@@ -627,25 +816,37 @@ public class JBasicControls extends javax.swing.JPanel implements IGUIEvent{
             }
         });
 
+        FilterOk.setSelected(true);
+        FilterOk.setLabel("Filter \"OK\" Feedbacks");
+
         javax.swing.GroupLayout jPanel5Layout = new javax.swing.GroupLayout(jPanel5);
         jPanel5.setLayout(jPanel5Layout);
         jPanel5Layout.setHorizontalGroup(
             jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 292, Short.MAX_VALUE)
             .addGroup(jPanel5Layout.createSequentialGroup()
-                .addGap(0, 0, Short.MAX_VALUE)
+                .addComponent(FilterOk)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addComponent(ClearConsole))
+            .addComponent(jScrollPane1, javax.swing.GroupLayout.Alignment.TRAILING)
         );
         jPanel5Layout.setVerticalGroup(
             jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel5Layout.createSequentialGroup()
-                .addContainerGap()
                 .addComponent(jScrollPane1)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(ClearConsole))
+                .addGroup(jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(ClearConsole)
+                    .addComponent(FilterOk)))
         );
 
+        FilterOk.getAccessibleContext().setAccessibleName("Filter \"OK\" Feedbacks");
+
         MotorsOn.setText("Motors On");
+        MotorsOn.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseReleased(java.awt.event.MouseEvent evt) {
+                MotorsOnMouseReleased(evt);
+            }
+        });
         MotorsOn.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 MotorsOnActionPerformed(evt);
@@ -787,18 +988,22 @@ public class JBasicControls extends javax.swing.JPanel implements IGUIEvent{
 
     private void HomeAllActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_HomeAllActionPerformed
         ExecuteSingleAction("G28 X Y Z");
+        ExecuteSingleAction("M114");
     }//GEN-LAST:event_HomeAllActionPerformed
 
     private void HomeXActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_HomeXActionPerformed
         ExecuteSingleAction("G28 X");
+        ExecuteSingleAction("M114");
     }//GEN-LAST:event_HomeXActionPerformed
 
     private void HomeYActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_HomeYActionPerformed
         ExecuteSingleAction("G28 Y");
+        ExecuteSingleAction("M114");
     }//GEN-LAST:event_HomeYActionPerformed
 
     private void HomeZ2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_HomeZ2ActionPerformed
         ExecuteSingleAction("G28 Z");
+        ExecuteSingleAction("M114");
     }//GEN-LAST:event_HomeZ2ActionPerformed
 
     private void HomeZActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_HomeZActionPerformed
@@ -813,6 +1018,115 @@ public class JBasicControls extends javax.swing.JPanel implements IGUIEvent{
         ExecuteSingleAction("M18");
     }//GEN-LAST:event_MotorsOffActionPerformed
 
+    private void ZPlus01ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_ZPlus01ActionPerformed
+        PerformSimpleMove(0.1,Axis.Z, Double.valueOf(Database.MAXFEEDRATE.get()).intValue());
+    }//GEN-LAST:event_ZPlus01ActionPerformed
+
+    private void XMinus01MouseReleased(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_XMinus01MouseReleased
+        PerformSimpleMove(-0.1,Axis.X, Double.valueOf(Database.MAXFEEDRATE.get()).intValue());
+    }//GEN-LAST:event_XMinus01MouseReleased
+
+    private void XMinus1MouseReleased(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_XMinus1MouseReleased
+        PerformSimpleMove(-1,Axis.X, Double.valueOf(Database.MAXFEEDRATE.get()).intValue());
+    }//GEN-LAST:event_XMinus1MouseReleased
+
+    private void XMinus10MouseReleased(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_XMinus10MouseReleased
+        PerformSimpleMove(-10,Axis.X, Double.valueOf(Database.MAXFEEDRATE.get()).intValue());
+    }//GEN-LAST:event_XMinus10MouseReleased
+
+    private void XPlus01MouseReleased(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_XPlus01MouseReleased
+        PerformSimpleMove(0.1,Axis.X, Double.valueOf(Database.MAXFEEDRATE.get()).intValue());
+    }//GEN-LAST:event_XPlus01MouseReleased
+
+    private void XPlus1MouseReleased(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_XPlus1MouseReleased
+        PerformSimpleMove(1,Axis.X, Double.valueOf(Database.MAXFEEDRATE.get()).intValue());
+    }//GEN-LAST:event_XPlus1MouseReleased
+
+    private void XPlus10MouseReleased(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_XPlus10MouseReleased
+        PerformSimpleMove(10,Axis.X, Double.valueOf(Database.MAXFEEDRATE.get()).intValue());
+    }//GEN-LAST:event_XPlus10MouseReleased
+
+    private void YPlus01MouseReleased(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_YPlus01MouseReleased
+        PerformSimpleMove(0.1,Axis.Y, Double.valueOf(Database.MAXFEEDRATE.get()).intValue());
+    }//GEN-LAST:event_YPlus01MouseReleased
+
+    private void YPlus1MouseReleased(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_YPlus1MouseReleased
+        PerformSimpleMove(1,Axis.Y, Double.valueOf(Database.MAXFEEDRATE.get()).intValue());
+    }//GEN-LAST:event_YPlus1MouseReleased
+
+    private void YPlus10MouseReleased(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_YPlus10MouseReleased
+        PerformSimpleMove(10,Axis.Y, Double.valueOf(Database.MAXFEEDRATE.get()).intValue());
+    }//GEN-LAST:event_YPlus10MouseReleased
+
+    private void YMinus01MouseReleased(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_YMinus01MouseReleased
+        PerformSimpleMove(-0.1,Axis.Y, Double.valueOf(Database.MAXFEEDRATE.get()).intValue());
+    }//GEN-LAST:event_YMinus01MouseReleased
+
+    private void YMinus1MouseReleased(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_YMinus1MouseReleased
+        PerformSimpleMove(-1,Axis.Y, Double.valueOf(Database.MAXFEEDRATE.get()).intValue());
+    }//GEN-LAST:event_YMinus1MouseReleased
+
+    private void YMinus10MouseReleased(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_YMinus10MouseReleased
+        PerformSimpleMove(-10,Axis.Y, Double.valueOf(Database.MAXFEEDRATE.get()).intValue());
+    }//GEN-LAST:event_YMinus10MouseReleased
+
+    private void ZPlus01MouseReleased(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_ZPlus01MouseReleased
+        PerformSimpleMove(0.1,Axis.Z, Double.valueOf(Database.MAXFEEDRATE.get()).intValue());
+    }//GEN-LAST:event_ZPlus01MouseReleased
+
+    private void ZPlus1MouseReleased(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_ZPlus1MouseReleased
+        PerformSimpleMove(1,Axis.Z, Double.valueOf(Database.MAXFEEDRATE.get()).intValue());
+    }//GEN-LAST:event_ZPlus1MouseReleased
+
+    private void ZPlus5MouseReleased(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_ZPlus5MouseReleased
+        PerformSimpleMove(5,Axis.Z, Double.valueOf(Database.MAXFEEDRATE.get()).intValue());
+    }//GEN-LAST:event_ZPlus5MouseReleased
+
+    private void ZPlus10MouseReleased(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_ZPlus10MouseReleased
+        PerformSimpleMove(10,Axis.Z, Double.valueOf(Database.MAXFEEDRATE.get()).intValue());
+    }//GEN-LAST:event_ZPlus10MouseReleased
+
+    private void ZMinus01MouseReleased(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_ZMinus01MouseReleased
+        PerformSimpleMove(-0.1,Axis.Z, Double.valueOf(Database.MAXFEEDRATE.get()).intValue());
+    }//GEN-LAST:event_ZMinus01MouseReleased
+
+    private void ZMinus1MouseReleased(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_ZMinus1MouseReleased
+        PerformSimpleMove(-1,Axis.Z, Double.valueOf(Database.MAXFEEDRATE.get()).intValue());
+    }//GEN-LAST:event_ZMinus1MouseReleased
+
+    private void ZMinus5MouseReleased(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_ZMinus5MouseReleased
+        PerformSimpleMove(-5,Axis.Z, Double.valueOf(Database.MAXFEEDRATE.get()).intValue());
+    }//GEN-LAST:event_ZMinus5MouseReleased
+
+    private void ZMinus10MouseReleased(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_ZMinus10MouseReleased
+        PerformSimpleMove(-10,Axis.Z, Double.valueOf(Database.MAXFEEDRATE.get()).intValue());
+    }//GEN-LAST:event_ZMinus10MouseReleased
+
+    private void MotorsOffMouseReleased(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_MotorsOffMouseReleased
+        
+    }//GEN-LAST:event_MotorsOffMouseReleased
+
+    private void MotorsOnMouseReleased(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_MotorsOnMouseReleased
+        
+    }//GEN-LAST:event_MotorsOnMouseReleased
+
+    private void HomeXYMouseReleased(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_HomeXYMouseReleased
+        ExecuteSingleAction("G28 X Y");
+        ExecuteSingleAction("M114");
+    }//GEN-LAST:event_HomeXYMouseReleased
+
+    private enum Axis
+    {
+        X, Y, Z, E
+    }
+    private void PerformSimpleMove(double distance, Axis axis, int feedrate)
+    {
+        ExecuteSingleAction("G91");
+        ExecuteSingleAction("G0 " + axis.toString() + new DecimalFormat("#.##").format(distance).replace(",", ".") +  " F" + feedrate);
+        ExecuteSingleAction("G90");
+        ExecuteSingleAction("M114");
+    }
+    
     private void ExecuteSingleAction(String Gcode)
     {
         if(Communication.isBussy())
@@ -820,22 +1134,30 @@ public class JBasicControls extends javax.swing.JPanel implements IGUIEvent{
             appendToConsole("ERROR: Another command is in progress!");
             return;
         }
-        try {
+        try 
+        {
             Communication.send(Gcode);
             appendToConsole(Gcode);
-        } catch (ComInterruptException ex) {
+            while(Communication.isBussy())
+            {
+               Thread.sleep(100);
+            }
+        } catch (Exception ex) {
             appendToConsole("ERROR: " + ex.getMessage());
             Logger.getLogger(JPanelControl.class.getName()).log(Level.SEVERE, null, ex);
             return;
-        }
+        } 
+        
     }
     
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton ClearConsole;
     private javax.swing.JTextArea ConsoleOutput;
     private javax.swing.JLabel CurrentPos;
+    private javax.swing.JCheckBox FilterOk;
     private javax.swing.JButton HomeAll;
     private javax.swing.JButton HomeX;
+    private javax.swing.JLabel HomeXY;
     private javax.swing.JButton HomeY;
     private javax.swing.JButton HomeZ;
     private javax.swing.JButton HomeZ2;
@@ -885,6 +1207,7 @@ public class JBasicControls extends javax.swing.JPanel implements IGUIEvent{
     private javax.swing.JPanel jPanel3;
     private javax.swing.JPanel jPanel4;
     private javax.swing.JPanel jPanel5;
+    private javax.swing.JPanel jPanel6;
     private javax.swing.JPanel jPanel7;
     private javax.swing.JPanel jPanel8;
     private javax.swing.JPanel jPanel9;
@@ -904,9 +1227,11 @@ public class JBasicControls extends javax.swing.JPanel implements IGUIEvent{
         this.HomeAll.setEnabled(enable);
         this.HomeX.setEnabled(enable);
         this.HomeY.setEnabled(enable);
+        this.HomeXY.setEnabled(enable);
         this.HomeZ.setEnabled(enable);
         this.HomeZ2.setEnabled(enable);
         this.MotorsOff.setEnabled(enable);
+        this.MotorsOn.setEnabled(enable);
         this.XMinus01.setEnabled(enable);
         this.XMinus1.setEnabled(enable);
         this.XMinus10.setEnabled(enable);

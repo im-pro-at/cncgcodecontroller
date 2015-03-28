@@ -147,8 +147,8 @@ public final class MainForm extends javax.swing.JFrame implements IGUIEvent{
     private void initComponents() {
 
         jTabbedPane2 = new javax.swing.JTabbedPane();
-        jPanelControl = new cnc.gcode.controller.JPanelControl();
         jBasicControls1 = new cnc.gcode.controller.JBasicControls();
+        jPanelControl = new cnc.gcode.controller.JPanelControl();
         jPanelAutoLevel1 = new cnc.gcode.controller.JPanelAutoLevel();
         jPanelCNCMilling = new cnc.gcode.controller.JPanelCNCMilling();
         jPanelCommunication = new cnc.gcode.controller.JPanelCommunication();
@@ -170,8 +170,8 @@ public final class MainForm extends javax.swing.JFrame implements IGUIEvent{
         });
 
         jTabbedPane2.setName("JSimpleControlPane"); // NOI18N
-        jTabbedPane2.addTab("Control", jPanelControl);
-        jTabbedPane2.addTab("SimpleControls", jBasicControls1);
+        jTabbedPane2.addTab("Simple Controls", jBasicControls1);
+        jTabbedPane2.addTab("Advanced Controls", jPanelControl);
         jTabbedPane2.addTab("Auto Level", jPanelAutoLevel1);
         jTabbedPane2.addTab("CNC Milling", jPanelCNCMilling);
         jTabbedPane2.addTab("Communication", jPanelCommunication);
