@@ -1000,7 +1000,7 @@ public class JPanelAutoLevel extends javax.swing.JPanel implements IGUIEvent {
         }
 
         AutoLevelSystem.publish(al);
-        
+
         fireupdateGUI();
 
     }//GEN-LAST:event_jBImportActionPerformed

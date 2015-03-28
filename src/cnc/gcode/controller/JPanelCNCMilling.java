@@ -333,10 +333,11 @@ public class JPanelCNCMilling extends javax.swing.JPanel implements IGUIEvent{
         jCBmirroX.setEnabled(!cncLoadedFile || !isRunning() );
         jCBmirroY.setEnabled(!cncLoadedFile || !isRunning() );
         jCBAutoLeveling.setEnabled((!cncLoadedFile || !isRunning())&& AutoLevelSystem.leveled()  );
-        if(!AutoLevelSystem.leveled())
+        /*if(AutoLevelSystem.leveled() == false)
         {
             jCBAutoLeveling.setSelected(false);
-        }
+        }*/
+        jCBAutoLeveling.setSelected(AutoLevelSystem.leveled());
         painter.trigger();
 
     }
@@ -801,10 +802,14 @@ public class JPanelCNCMilling extends javax.swing.JPanel implements IGUIEvent{
         fireupdateGUI();
     }//GEN-LAST:event_jBAbroteActionPerformed
 
-    private void showInfors(int index){
+    private void showInfos(int index){
         if(index != -1)
         {
-            String[] lines = ((CNCCommand)jLCNCCommands.getModel().getElementAt(index)).getInfos(new CNCCommand.Transform(positioningMove[0].getdsave(), positioningMove[1].getdsave(), jCBmirroX.isSelected(), jCBmirroY.isSelected()),jCBAutoLeveling.isSelected()).split("\n");
+            String[] lines = ((CNCCommand)jLCNCCommands.getModel().getElementAt(index)).getInfos(new CNCCommand.Transform(positioningMove[0].getdsave(),
+                                                                                                                          positioningMove[1].getdsave(),
+                                                                                                                          jCBmirroX.isSelected(),
+                                                                                                                          jCBmirroY.isSelected()),
+                                                                                                                          jCBAutoLeveling.isSelected()).split("\n");
 
             JList<String> list = new JList<>(lines);
             JScrollPane sp = new JScrollPane(list);
@@ -816,7 +821,7 @@ public class JPanelCNCMilling extends javax.swing.JPanel implements IGUIEvent{
     private void jLCNCCommandsMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jLCNCCommandsMouseClicked
         if(evt.getClickCount() == 2)
         {
-            showInfors(jLCNCCommands.locationToIndex(evt.getPoint()));
+            showInfos(jLCNCCommands.locationToIndex(evt.getPoint()));
         }
     }//GEN-LAST:event_jLCNCCommandsMouseClicked
 
@@ -1302,7 +1307,7 @@ public class JPanelCNCMilling extends javax.swing.JPanel implements IGUIEvent{
     }//GEN-LAST:event_jPPaintMouseDragged
 
     private void jMIInfoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMIInfoActionPerformed
-        showInfors(jLCNCCommands.getSelectedIndex());
+        showInfos(jLCNCCommands.getSelectedIndex());
     }//GEN-LAST:event_jMIInfoActionPerformed
 
     private void jMIStartActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMIStartActionPerformed

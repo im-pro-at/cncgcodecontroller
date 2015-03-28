@@ -181,7 +181,7 @@ public class JPanelControl extends javax.swing.JPanel implements IGUIEvent{
     public JPanelControl() {
         initComponents();
 
-        //Init Fileds:
+        //Init Fields:
         NumberFieldManipulator.IAxesEvent event= new NumberFieldManipulator.IAxesEvent() {
             @Override
             public void fired(NumberFieldManipulator axis) {
