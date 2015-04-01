@@ -215,7 +215,7 @@ public class AutoLevelSystem implements java.io.Serializable{
         AutoLevelSystem.al = al;
     }
     
-    public static double correctz(double x, double y, double z)
+    public static double correctZ(double x, double y, double z)
     {
         double d = al.getdZ(new Point2D.Double(x, y))-DatabaseV2.ALZERO.getsaved();
         

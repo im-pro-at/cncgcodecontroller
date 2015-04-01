@@ -743,7 +743,7 @@ public class CNCCommand {
                             {
                                 double[] s = new double[3];
                                 double[] e = new double[3];
-                                for(int i=0;i<3;i++)
+                                for(int i = 0;i < 3;i++)
                                 {
                                     double d = (move.e[i] - move.s[i])/parts;
                                     s[i] = move.s[i] + d * part;
@@ -758,8 +758,8 @@ public class CNCCommand {
                     //Correct Z
                     for(Move move:moves)
                     {
-                        move.s[2] = AutoLevelSystem.correctz(move.s[0], move.s[1], move.s[2]);
-                        move.e[2] = AutoLevelSystem.correctz(move.e[0], move.e[1], move.e[2]);
+                        move.s[2] = AutoLevelSystem.correctZ(move.s[0], move.s[1], move.s[2]);
+                        move.e[2] = AutoLevelSystem.correctZ(move.e[0], move.e[1], move.e[2]);
                     }
                 }
                 

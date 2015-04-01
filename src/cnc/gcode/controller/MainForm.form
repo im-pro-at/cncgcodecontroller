@@ -60,23 +60,35 @@
   </Layout>
   <SubComponents>
     <Container class="javax.swing.JTabbedPane" name="jTabbedPane2">
+      <Properties>
+        <Property name="name" type="java.lang.String" value="JSimpleControlPane" noResource="true"/>
+      </Properties>
 
       <Layout class="org.netbeans.modules.form.compat2.layouts.support.JTabbedPaneSupportLayout"/>
       <SubComponents>
-        <Component class="cnc.gcode.controller.JPanelControl" name="jPanelControl">
+        <Component class="cnc.gcode.controller.JBasicControls" name="jBasicControls1">
           <Constraints>
             <Constraint layoutClass="org.netbeans.modules.form.compat2.layouts.support.JTabbedPaneSupportLayout" value="org.netbeans.modules.form.compat2.layouts.support.JTabbedPaneSupportLayout$JTabbedPaneConstraintsDescription">
-              <JTabbedPaneConstraints tabName="Control">
-                <Property name="tabTitle" type="java.lang.String" value="Control"/>
+              <JTabbedPaneConstraints tabName="Simple Controls">
+                <Property name="tabTitle" type="java.lang.String" value="Simple Controls"/>
               </JTabbedPaneConstraints>
             </Constraint>
           </Constraints>
         </Component>
-        <Component class="cnc.gcode.controller.JPanelAutoLevel" name="jPanelAutoLevel">
+        <Component class="cnc.gcode.controller.JPanelControl" name="jPanelControl">
           <Constraints>
             <Constraint layoutClass="org.netbeans.modules.form.compat2.layouts.support.JTabbedPaneSupportLayout" value="org.netbeans.modules.form.compat2.layouts.support.JTabbedPaneSupportLayout$JTabbedPaneConstraintsDescription">
-              <JTabbedPaneConstraints tabName="Auto Leveler">
-                <Property name="tabTitle" type="java.lang.String" value="Auto Leveler"/>
+              <JTabbedPaneConstraints tabName="Advanced Controls">
+                <Property name="tabTitle" type="java.lang.String" value="Advanced Controls"/>
+              </JTabbedPaneConstraints>
+            </Constraint>
+          </Constraints>
+        </Component>
+        <Component class="cnc.gcode.controller.JPanelAutoLevel" name="jPanelAutoLevel1">
+          <Constraints>
+            <Constraint layoutClass="org.netbeans.modules.form.compat2.layouts.support.JTabbedPaneSupportLayout" value="org.netbeans.modules.form.compat2.layouts.support.JTabbedPaneSupportLayout$JTabbedPaneConstraintsDescription">
+              <JTabbedPaneConstraints tabName="Auto Level">
+                <Property name="tabTitle" type="java.lang.String" value="Auto Level"/>
               </JTabbedPaneConstraints>
             </Constraint>
           </Constraints>
