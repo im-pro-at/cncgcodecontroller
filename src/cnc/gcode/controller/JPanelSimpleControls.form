@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 
-<Form version="1.3" maxVersion="1.9" type="org.netbeans.modules.form.forminfo.JPanelFormInfo">
+<Form version="1.3" maxVersion="1.8" type="org.netbeans.modules.form.forminfo.JPanelFormInfo">
   <Properties>
     <Property name="name" type="java.lang.String" value="jBasicControls" noResource="true"/>
   </Properties>
@@ -176,7 +176,7 @@
         <Property name="name" type="java.lang.String" value="ZPlus10" noResource="true"/>
       </Properties>
       <Events>
-        <EventHandler event="mouseReleased" listener="java.awt.event.MouseListener" parameters="java.awt.event.MouseEvent" handler="ZPlus10MouseReleased"/>
+        <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="buttonActionPerformed"/>
       </Events>
     </Component>
     <Component class="javax.swing.JLabel" name="jLabel1">
@@ -196,7 +196,7 @@
         <Property name="name" type="java.lang.String" value="ZPlus5" noResource="true"/>
       </Properties>
       <Events>
-        <EventHandler event="mouseReleased" listener="java.awt.event.MouseListener" parameters="java.awt.event.MouseEvent" handler="ZPlus5MouseReleased"/>
+        <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="buttonActionPerformed"/>
       </Events>
     </Component>
     <Component class="javax.swing.JButton" name="ZPlus1">
@@ -205,7 +205,7 @@
         <Property name="name" type="java.lang.String" value="ZPlus1" noResource="true"/>
       </Properties>
       <Events>
-        <EventHandler event="mouseReleased" listener="java.awt.event.MouseListener" parameters="java.awt.event.MouseEvent" handler="ZPlus1MouseReleased"/>
+        <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="buttonActionPerformed"/>
       </Events>
     </Component>
     <Component class="javax.swing.JButton" name="ZPlus01">
@@ -214,8 +214,7 @@
         <Property name="name" type="java.lang.String" value="ZPlus01" noResource="true"/>
       </Properties>
       <Events>
-        <EventHandler event="mouseReleased" listener="java.awt.event.MouseListener" parameters="java.awt.event.MouseEvent" handler="ZPlus01MouseReleased"/>
-        <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="ZPlus01ActionPerformed"/>
+        <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="buttonActionPerformed"/>
       </Events>
     </Component>
     <Component class="javax.swing.JButton" name="HomeZ">
@@ -227,7 +226,7 @@
         <Property name="name" type="java.lang.String" value="HomeZ" noResource="true"/>
       </Properties>
       <Events>
-        <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="HomeZActionPerformed"/>
+        <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="buttonActionPerformed"/>
       </Events>
     </Component>
     <Component class="javax.swing.JButton" name="ZMinus01">
@@ -236,7 +235,7 @@
         <Property name="name" type="java.lang.String" value="ZMinus01" noResource="true"/>
       </Properties>
       <Events>
-        <EventHandler event="mouseReleased" listener="java.awt.event.MouseListener" parameters="java.awt.event.MouseEvent" handler="ZMinus01MouseReleased"/>
+        <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="buttonActionPerformed"/>
       </Events>
     </Component>
     <Component class="javax.swing.JButton" name="ZMinus1">
@@ -245,7 +244,7 @@
         <Property name="name" type="java.lang.String" value="ZMinus1" noResource="true"/>
       </Properties>
       <Events>
-        <EventHandler event="mouseReleased" listener="java.awt.event.MouseListener" parameters="java.awt.event.MouseEvent" handler="ZMinus1MouseReleased"/>
+        <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="buttonActionPerformed"/>
       </Events>
     </Component>
     <Component class="javax.swing.JButton" name="ZMinus5">
@@ -254,7 +253,7 @@
         <Property name="name" type="java.lang.String" value="ZMinus5" noResource="true"/>
       </Properties>
       <Events>
-        <EventHandler event="mouseReleased" listener="java.awt.event.MouseListener" parameters="java.awt.event.MouseEvent" handler="ZMinus5MouseReleased"/>
+        <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="buttonActionPerformed"/>
       </Events>
     </Component>
     <Component class="javax.swing.JButton" name="ZMinus10">
@@ -263,7 +262,7 @@
         <Property name="name" type="java.lang.String" value="ZMinus10" noResource="true"/>
       </Properties>
       <Events>
-        <EventHandler event="mouseReleased" listener="java.awt.event.MouseListener" parameters="java.awt.event.MouseEvent" handler="ZMinus10MouseReleased"/>
+        <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="buttonActionPerformed"/>
       </Events>
     </Component>
     <Component class="javax.swing.JSeparator" name="jSeparator1">
@@ -327,7 +326,7 @@
                 <Property name="name" type="java.lang.String" value="LXMinus10" noResource="true"/>
               </Properties>
               <Events>
-                <EventHandler event="mouseReleased" listener="java.awt.event.MouseListener" parameters="java.awt.event.MouseEvent" handler="XMinus10MouseReleased"/>
+                <EventHandler event="mouseReleased" listener="java.awt.event.MouseListener" parameters="java.awt.event.MouseEvent" handler="lableMouseReleased"/>
               </Events>
             </Component>
           </SubComponents>
@@ -362,7 +361,7 @@
                 <Property name="name" type="java.lang.String" value="LXMinus1" noResource="true"/>
               </Properties>
               <Events>
-                <EventHandler event="mouseReleased" listener="java.awt.event.MouseListener" parameters="java.awt.event.MouseEvent" handler="XMinus1MouseReleased"/>
+                <EventHandler event="mouseReleased" listener="java.awt.event.MouseListener" parameters="java.awt.event.MouseEvent" handler="lableMouseReleased"/>
               </Events>
             </Component>
           </SubComponents>
@@ -397,7 +396,7 @@
                 <Property name="name" type="java.lang.String" value="LXMinus01" noResource="true"/>
               </Properties>
               <Events>
-                <EventHandler event="mouseReleased" listener="java.awt.event.MouseListener" parameters="java.awt.event.MouseEvent" handler="XMinus01MouseReleased"/>
+                <EventHandler event="mouseReleased" listener="java.awt.event.MouseListener" parameters="java.awt.event.MouseEvent" handler="lableMouseReleased"/>
               </Events>
             </Component>
           </SubComponents>
@@ -440,7 +439,7 @@
             <Property name="name" type="java.lang.String" value="BHomeX" noResource="true"/>
           </Properties>
           <Events>
-            <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="HomeXActionPerformed"/>
+            <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="buttonActionPerformed"/>
           </Events>
         </Component>
       </SubComponents>
@@ -481,7 +480,7 @@
             <Property name="name" type="java.lang.String" value="BHomeY" noResource="true"/>
           </Properties>
           <Events>
-            <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="HomeYActionPerformed"/>
+            <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="buttonActionPerformed"/>
           </Events>
         </Component>
       </SubComponents>
@@ -544,7 +543,7 @@
                 <Property name="name" type="java.lang.String" value="LYPlus10" noResource="true"/>
               </Properties>
               <Events>
-                <EventHandler event="mouseReleased" listener="java.awt.event.MouseListener" parameters="java.awt.event.MouseEvent" handler="YPlus10MouseReleased"/>
+                <EventHandler event="mouseReleased" listener="java.awt.event.MouseListener" parameters="java.awt.event.MouseEvent" handler="lableMouseReleased"/>
               </Events>
             </Component>
           </SubComponents>
@@ -560,9 +559,6 @@
               <Dimension value="[38, 124]"/>
             </Property>
           </Properties>
-          <Events>
-            <EventHandler event="mouseReleased" listener="java.awt.event.MouseListener" parameters="java.awt.event.MouseEvent" handler="jPanel19MouseReleased"/>
-          </Events>
 
           <Layout>
             <DimensionLayout dim="0">
@@ -584,7 +580,7 @@
                 <Property name="name" type="java.lang.String" value="LYPlus01" noResource="true"/>
               </Properties>
               <Events>
-                <EventHandler event="mouseReleased" listener="java.awt.event.MouseListener" parameters="java.awt.event.MouseEvent" handler="YPlus01MouseReleased"/>
+                <EventHandler event="mouseReleased" listener="java.awt.event.MouseListener" parameters="java.awt.event.MouseEvent" handler="lableMouseReleased"/>
               </Events>
             </Component>
           </SubComponents>
@@ -619,7 +615,7 @@
                 <Property name="name" type="java.lang.String" value="LYPlus1" noResource="true"/>
               </Properties>
               <Events>
-                <EventHandler event="mouseReleased" listener="java.awt.event.MouseListener" parameters="java.awt.event.MouseEvent" handler="YPlus1MouseReleased"/>
+                <EventHandler event="mouseReleased" listener="java.awt.event.MouseListener" parameters="java.awt.event.MouseEvent" handler="lableMouseReleased"/>
               </Events>
             </Component>
           </SubComponents>
@@ -636,7 +632,7 @@
       <Layout>
         <DimensionLayout dim="0">
           <Group type="103" groupAlignment="0" attributes="0">
-              <Component id="jLabel2" max="32767" attributes="0"/>
+              <Component id="jLabel2" pref="130" max="32767" attributes="0"/>
               <Component id="jLabel3" max="32767" attributes="0"/>
               <Group type="102" alignment="0" attributes="0">
                   <Component id="jLabel4" min="-2" pref="17" max="-2" attributes="0"/>
@@ -719,7 +715,7 @@
                 <Property name="text" type="java.lang.String" value="Home X Y"/>
               </Properties>
               <Events>
-                <EventHandler event="mouseReleased" listener="java.awt.event.MouseListener" parameters="java.awt.event.MouseEvent" handler="HomeXYMouseReleased"/>
+                <EventHandler event="mouseReleased" listener="java.awt.event.MouseListener" parameters="java.awt.event.MouseEvent" handler="lableMouseReleased"/>
               </Events>
             </Component>
           </SubComponents>
@@ -762,7 +758,7 @@
             <Property name="name" type="java.lang.String" value="BHomeAll" noResource="true"/>
           </Properties>
           <Events>
-            <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="HomeAllActionPerformed"/>
+            <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="buttonActionPerformed"/>
           </Events>
         </Component>
       </SubComponents>
@@ -825,7 +821,7 @@
                 <Property name="name" type="java.lang.String" value="LYMinus01" noResource="true"/>
               </Properties>
               <Events>
-                <EventHandler event="mouseReleased" listener="java.awt.event.MouseListener" parameters="java.awt.event.MouseEvent" handler="YMinus01MouseReleased"/>
+                <EventHandler event="mouseReleased" listener="java.awt.event.MouseListener" parameters="java.awt.event.MouseEvent" handler="lableMouseReleased"/>
               </Events>
             </Component>
           </SubComponents>
@@ -860,7 +856,7 @@
                 <Property name="name" type="java.lang.String" value="LYMinus1" noResource="true"/>
               </Properties>
               <Events>
-                <EventHandler event="mouseReleased" listener="java.awt.event.MouseListener" parameters="java.awt.event.MouseEvent" handler="YMinus1MouseReleased"/>
+                <EventHandler event="mouseReleased" listener="java.awt.event.MouseListener" parameters="java.awt.event.MouseEvent" handler="lableMouseReleased"/>
               </Events>
             </Component>
           </SubComponents>
@@ -897,7 +893,7 @@
                 <Property name="name" type="java.lang.String" value="LYMinus10" noResource="true"/>
               </Properties>
               <Events>
-                <EventHandler event="mouseReleased" listener="java.awt.event.MouseListener" parameters="java.awt.event.MouseEvent" handler="YMinus10MouseReleased"/>
+                <EventHandler event="mouseReleased" listener="java.awt.event.MouseListener" parameters="java.awt.event.MouseEvent" handler="lableMouseReleased"/>
               </Events>
             </Component>
           </SubComponents>
@@ -940,7 +936,7 @@
             <Property name="name" type="java.lang.String" value="BHomeZ" noResource="true"/>
           </Properties>
           <Events>
-            <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="HomeZ2ActionPerformed"/>
+            <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="buttonActionPerformed"/>
           </Events>
         </Component>
       </SubComponents>
@@ -999,7 +995,7 @@
                 <Property name="name" type="java.lang.String" value="LXPlus01" noResource="true"/>
               </Properties>
               <Events>
-                <EventHandler event="mouseReleased" listener="java.awt.event.MouseListener" parameters="java.awt.event.MouseEvent" handler="XPlus01MouseReleased"/>
+                <EventHandler event="mouseReleased" listener="java.awt.event.MouseListener" parameters="java.awt.event.MouseEvent" handler="lableMouseReleased"/>
               </Events>
             </Component>
           </SubComponents>
@@ -1034,7 +1030,7 @@
                 <Property name="name" type="java.lang.String" value="LXPlus10" noResource="true"/>
               </Properties>
               <Events>
-                <EventHandler event="mouseReleased" listener="java.awt.event.MouseListener" parameters="java.awt.event.MouseEvent" handler="XPlus10MouseReleased"/>
+                <EventHandler event="mouseReleased" listener="java.awt.event.MouseListener" parameters="java.awt.event.MouseEvent" handler="lableMouseReleased"/>
               </Events>
             </Component>
           </SubComponents>
@@ -1069,7 +1065,7 @@
                 <Property name="name" type="java.lang.String" value="LXPlus1" noResource="true"/>
               </Properties>
               <Events>
-                <EventHandler event="mouseReleased" listener="java.awt.event.MouseListener" parameters="java.awt.event.MouseEvent" handler="XPlus1MouseReleased"/>
+                <EventHandler event="mouseReleased" listener="java.awt.event.MouseListener" parameters="java.awt.event.MouseEvent" handler="lableMouseReleased"/>
               </Events>
             </Component>
           </SubComponents>
@@ -1087,8 +1083,7 @@
         <Property name="name" type="java.lang.String" value="BMotorsOff" noResource="true"/>
       </Properties>
       <Events>
-        <EventHandler event="mouseReleased" listener="java.awt.event.MouseListener" parameters="java.awt.event.MouseEvent" handler="MotorsOffMouseReleased"/>
-        <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="MotorsOffActionPerformed"/>
+        <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="buttonActionPerformed"/>
       </Events>
     </Component>
     <Component class="javax.swing.JLabel" name="CurrentPos">
@@ -1104,7 +1099,9 @@
           <Group type="103" groupAlignment="0" attributes="0">
               <Group type="102" attributes="0">
                   <Component id="FilterOk" min="-2" max="-2" attributes="0"/>
-                  <EmptySpace max="32767" attributes="0"/>
+                  <EmptySpace pref="31" max="32767" attributes="0"/>
+                  <Component id="jBCancel" min="-2" max="-2" attributes="0"/>
+                  <EmptySpace max="-2" attributes="0"/>
                   <Component id="ClearConsole" min="-2" max="-2" attributes="0"/>
               </Group>
               <Component id="jScrollPane1" alignment="1" max="32767" attributes="0"/>
@@ -1118,6 +1115,7 @@
                   <Group type="103" groupAlignment="3" attributes="0">
                       <Component id="ClearConsole" alignment="3" min="-2" max="-2" attributes="0"/>
                       <Component id="FilterOk" alignment="3" min="-2" max="-2" attributes="0"/>
+                      <Component id="jBCancel" alignment="3" min="-2" max="-2" attributes="0"/>
                   </Group>
               </Group>
           </Group>
@@ -1152,9 +1150,14 @@
             <Property name="selected" type="boolean" value="true"/>
             <Property name="label" type="java.lang.String" value="Filter &quot;OK&quot; Feedbacks"/>
           </Properties>
-          <AccessibilityProperties>
-            <Property name="AccessibleContext.accessibleName" type="java.lang.String" value="Filter &quot;OK&quot; Feedbacks"/>
-          </AccessibilityProperties>
+        </Component>
+        <Component class="javax.swing.JButton" name="jBCancel">
+          <Properties>
+            <Property name="text" type="java.lang.String" value="Cancel"/>
+          </Properties>
+          <Events>
+            <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="jBCancelActionPerformed"/>
+          </Events>
         </Component>
       </SubComponents>
     </Container>
@@ -1163,8 +1166,7 @@
         <Property name="text" type="java.lang.String" value="Motors On"/>
       </Properties>
       <Events>
-        <EventHandler event="mouseReleased" listener="java.awt.event.MouseListener" parameters="java.awt.event.MouseEvent" handler="MotorsOnMouseReleased"/>
-        <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="MotorsOnActionPerformed"/>
+        <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="buttonActionPerformed"/>
       </Events>
     </Component>
   </SubComponents>

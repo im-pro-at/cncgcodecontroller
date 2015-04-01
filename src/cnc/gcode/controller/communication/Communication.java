@@ -11,7 +11,6 @@ import cnc.gcode.controller.Tools;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.LinkedList;
-import java.util.Random;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.SwingUtilities;

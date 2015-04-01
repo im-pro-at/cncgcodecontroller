@@ -11,5 +11,5 @@ package cnc.gcode.controller;
 public interface IEvent {
 
     public void fired();
-    
+     
 }

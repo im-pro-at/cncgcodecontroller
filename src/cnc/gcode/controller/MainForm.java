@@ -30,18 +30,18 @@ public final class MainForm extends javax.swing.JFrame implements IGUIEvent{
         }
         
         initComponents();
-        JBasicControls basicControlView = new cnc.gcode.controller.JBasicControls();
+        JPanelSimpleControls basicControlView = new cnc.gcode.controller.JPanelSimpleControls();
         
         
         //Settings scroll speed
         jSscrollPaneSettings.getVerticalScrollBar().setUnitIncrement(14);
         //GuiUpdateHandler
-        final IGUIEvent[] panels = new IGUIEvent[]{this,jPanelControl,jPanelAutoLevel1,jPanelCNCMilling,jPanelCommunication,jPanelSettings, jBasicControls1};
+        final IGUIEvent[] panels = new IGUIEvent[]{this,jPanelAdvancedControl,jPanelAutoLevel1,jPanelCNCMilling,jPanelCommunication,jPanelSettings, jPanelBasicControls};
         IEvent updateGUI = new IEvent() {
             @Override
             public void fired() {
                 for(IGUIEvent panel:panels)
-                    panel.updateGUI(Communication.isConnected(), jPanelCNCMilling.isRunning() || jPanelAutoLevel1.isWorking());
+                    panel.updateGUI(Communication.isConnected(), jPanelCNCMilling.isRunning() || jPanelAutoLevel1.isWorking()||jPanelBasicControls.isRunning());
             }
         };
         for(IGUIEvent panel:panels)
@@ -147,8 +147,8 @@ public final class MainForm extends javax.swing.JFrame implements IGUIEvent{
     private void initComponents() {
 
         jTabbedPane2 = new javax.swing.JTabbedPane();
-        jBasicControls1 = new cnc.gcode.controller.JBasicControls();
-        jPanelControl = new cnc.gcode.controller.JPanelControl();
+        jPanelBasicControls = new cnc.gcode.controller.JPanelSimpleControls();
+        jPanelAdvancedControl = new cnc.gcode.controller.JPanelAdvancedControl();
         jPanelAutoLevel1 = new cnc.gcode.controller.JPanelAutoLevel();
         jPanelCNCMilling = new cnc.gcode.controller.JPanelCNCMilling();
         jPanelCommunication = new cnc.gcode.controller.JPanelCommunication();
@@ -170,8 +170,8 @@ public final class MainForm extends javax.swing.JFrame implements IGUIEvent{
         });
 
         jTabbedPane2.setName("JSimpleControlPane"); // NOI18N
-        jTabbedPane2.addTab("Simple Controls", jBasicControls1);
-        jTabbedPane2.addTab("Advanced Controls", jPanelControl);
+        jTabbedPane2.addTab("Simple Controls", jPanelBasicControls);
+        jTabbedPane2.addTab("Advanced Controls", jPanelAdvancedControl);
         jTabbedPane2.addTab("Auto Level", jPanelAutoLevel1);
         jTabbedPane2.addTab("CNC Milling", jPanelCNCMilling);
         jTabbedPane2.addTab("Communication", jPanelCommunication);
@@ -255,15 +255,15 @@ public final class MainForm extends javax.swing.JFrame implements IGUIEvent{
     
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton jBConnect;
-    private cnc.gcode.controller.JBasicControls jBasicControls1;
     private javax.swing.JComboBox jCBPort;
     private javax.swing.JComboBox jCBSpeed;
     private javax.swing.JLabel jLStatus;
     private javax.swing.JLabel jLabel6;
+    private cnc.gcode.controller.JPanelAdvancedControl jPanelAdvancedControl;
     private cnc.gcode.controller.JPanelAutoLevel jPanelAutoLevel1;
+    private cnc.gcode.controller.JPanelSimpleControls jPanelBasicControls;
     private cnc.gcode.controller.JPanelCNCMilling jPanelCNCMilling;
     private cnc.gcode.controller.JPanelCommunication jPanelCommunication;
-    private cnc.gcode.controller.JPanelControl jPanelControl;
     private cnc.gcode.controller.JPanelSettings jPanelSettings;
     private javax.swing.JScrollPane jSscrollPaneSettings;
     private javax.swing.JTabbedPane jTabbedPane2;

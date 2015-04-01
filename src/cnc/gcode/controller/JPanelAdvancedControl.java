@@ -28,7 +28,7 @@ import javax.swing.JOptionPane;
  *
  * @author patrick
  */
-public class JPanelControl extends javax.swing.JPanel implements IGUIEvent{
+public class JPanelAdvancedControl extends javax.swing.JPanel implements IGUIEvent{
 
     private IEvent GUIEvent=null;
 
@@ -38,16 +38,16 @@ public class JPanelControl extends javax.swing.JPanel implements IGUIEvent{
         double axes[][] = new double[4][2];
 
         public PrintableElement() {
-            arc = JPanelControl.this.jCBarc.isSelected();
-            ccw = JPanelControl.this.jCBarcCCW.isSelected();
-            diameter=JPanelControl.this.axes[4][0].getdsave();
+            arc = JPanelAdvancedControl.this.jCBarc.isSelected();
+            ccw = JPanelAdvancedControl.this.jCBarcCCW.isSelected();
+            diameter=JPanelAdvancedControl.this.axes[4][0].getdsave();
             for(int i = 0;i < 2;i++)
             {
-                axes[i][0] = JPanelControl.this.axes[i][0].getdsave();
-                axes[i][1] = JPanelControl.this.axes[i][2].getdsave();
+                axes[i][0] = JPanelAdvancedControl.this.axes[i][0].getdsave();
+                axes[i][1] = JPanelAdvancedControl.this.axes[i][2].getdsave();
             }
-            axes[2][0] = JPanelControl.this.axes[3][0].getdsave();
-            axes[2][1] = JPanelControl.this.axes[3][1].getdsave();
+            axes[2][0] = JPanelAdvancedControl.this.axes[3][0].getdsave();
+            axes[2][1] = JPanelAdvancedControl.this.axes[3][1].getdsave();
         }
 
         public void print(Graphics2D g, Point point, double scale) {
@@ -178,7 +178,7 @@ public class JPanelControl extends javax.swing.JPanel implements IGUIEvent{
     /**
      * Creates new form JPanelControl
      */
-    public JPanelControl() {
+    public JPanelAdvancedControl() {
         initComponents();
 
         //Init Fields:
@@ -240,11 +240,11 @@ public class JPanelControl extends javax.swing.JPanel implements IGUIEvent{
                                 axes[j][0].set(values[j]);  
                                 axes[j][0].dispatchEvent();
                             }
-                            JOptionPane.showMessageDialog(JPanelControl.this, "Update done!");
+                            JOptionPane.showMessageDialog(JPanelAdvancedControl.this, "Update done!");
                         }
                         else
                         {
-                            JOptionPane.showMessageDialog(JPanelControl.this, "Error reading position");
+                            JOptionPane.showMessageDialog(JPanelAdvancedControl.this, "Error reading position");
                        }
                     }
                 }
@@ -1122,7 +1122,7 @@ public class JPanelControl extends javax.swing.JPanel implements IGUIEvent{
                         .addComponent(jBPowerON)
                         .addComponent(jBPowerOFF))
                     .addComponent(jLabel18))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 11, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 22, Short.MAX_VALUE)
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(jPanel1Layout.createSequentialGroup()
                         .addGap(3, 3, 3)
@@ -1136,7 +1136,7 @@ public class JPanelControl extends javax.swing.JPanel implements IGUIEvent{
                             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
                                 .addGap(15, 15, 15)
                                 .addComponent(jPXYname, javax.swing.GroupLayout.PREFERRED_SIZE, 54, javax.swing.GroupLayout.PREFERRED_SIZE)))))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 16, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 23, Short.MAX_VALUE)
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(jLabel7)
                     .addGroup(jPanel1Layout.createSequentialGroup()
@@ -1146,7 +1146,7 @@ public class JPanelControl extends javax.swing.JPanel implements IGUIEvent{
                         .addGap(7, 7, 7)
                         .addComponent(jBPosRem))
                     .addComponent(jScrollPane4, javax.swing.GroupLayout.PREFERRED_SIZE, 88, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 13, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 20, Short.MAX_VALUE)
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(jLabel11)
                     .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
@@ -1154,20 +1154,20 @@ public class JPanelControl extends javax.swing.JPanel implements IGUIEvent{
                         .addComponent(jPZname, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, 31, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addComponent(jPZakt, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                     .addComponent(jPZnew, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 12, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 19, Short.MAX_VALUE)
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                         .addComponent(jPYdiameter, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                         .addComponent(jPdiameter, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                         .addComponent(jPXdiameter, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                     .addComponent(jLabel14))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 12, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 19, Short.MAX_VALUE)
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
                         .addComponent(jBMove, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                         .addComponent(jPoptions, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                     .addComponent(jLabel21))
-                .addContainerGap(16, Short.MAX_VALUE))
+                .addContainerGap(23, Short.MAX_VALUE))
         );
 
         jScrollPane2.setViewportView(jPanel1);
@@ -1184,7 +1184,7 @@ public class JPanelControl extends javax.swing.JPanel implements IGUIEvent{
         jPPaint.setLayout(jPPaintLayout);
         jPPaintLayout.setHorizontalGroup(
             jPPaintLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 450, Short.MAX_VALUE)
+            .addGap(0, 349, Short.MAX_VALUE)
         );
         jPPaintLayout.setVerticalGroup(
             jPPaintLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -1203,9 +1203,9 @@ public class JPanelControl extends javax.swing.JPanel implements IGUIEvent{
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 555, Short.MAX_VALUE)
+            .addGap(0, 557, Short.MAX_VALUE)
             .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                .addComponent(jSplitPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 555, Short.MAX_VALUE))
+                .addComponent(jSplitPane1))
         );
     }// </editor-fold>//GEN-END:initComponents
 
@@ -1218,7 +1218,7 @@ public class JPanelControl extends javax.swing.JPanel implements IGUIEvent{
         try {
             Communication.send("G28 X Y Z");
         } catch (ComInterruptException ex) {
-            Logger.getLogger(JPanelControl.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(JPanelAdvancedControl.class.getName()).log(Level.SEVERE, null, ex);
             return;
         }
         jPPaint.setRepaintEnable(false);
@@ -1239,7 +1239,7 @@ public class JPanelControl extends javax.swing.JPanel implements IGUIEvent{
         try {
             Communication.send("M80");
         } catch (ComInterruptException ex) {
-            Logger.getLogger(JPanelControl.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(JPanelAdvancedControl.class.getName()).log(Level.SEVERE, null, ex);
         }
     }//GEN-LAST:event_jBPowerONActionPerformed
 
@@ -1252,7 +1252,7 @@ public class JPanelControl extends javax.swing.JPanel implements IGUIEvent{
         try {
             Communication.send("M81");
         } catch (ComInterruptException ex) {
-            Logger.getLogger(JPanelControl.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(JPanelAdvancedControl.class.getName()).log(Level.SEVERE, null, ex);
         }
     }//GEN-LAST:event_jBPowerOFFActionPerformed
 
@@ -1287,7 +1287,7 @@ public class JPanelControl extends javax.swing.JPanel implements IGUIEvent{
             try {
                 Communication.send(cmd);
             } catch (ComInterruptException ex) {
-                Logger.getLogger(JPanelControl.class.getName()).log(Level.SEVERE, null, ex);
+                Logger.getLogger(JPanelAdvancedControl.class.getName()).log(Level.SEVERE, null, ex);
             }
             jPPaint.setRepaintEnable(true);
         }
@@ -1304,7 +1304,7 @@ public class JPanelControl extends javax.swing.JPanel implements IGUIEvent{
         try {
             Communication.send("M114");
         } catch (ComInterruptException ex) {
-            Logger.getLogger(JPanelControl.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(JPanelAdvancedControl.class.getName()).log(Level.SEVERE, null, ex);
         }
     }//GEN-LAST:event_jBGetPosActionPerformed
 
@@ -1535,7 +1535,7 @@ public class JPanelControl extends javax.swing.JPanel implements IGUIEvent{
         try {
             Communication.send(cmd);
         } catch (ComInterruptException ex) {
-            Logger.getLogger(JPanelControl.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(JPanelAdvancedControl.class.getName()).log(Level.SEVERE, null, ex);
             JOptionPane.showMessageDialog(this, "Cannot send command to the printer! (" + ex.getMessage() + ")");
             jPPaint.setRepaintEnable(true);
             return;

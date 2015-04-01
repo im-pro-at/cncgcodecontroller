@@ -5,25 +5,21 @@
  */
 
 package cnc.gcode.controller;
-import cnc.gcode.controller.communication.ComInterruptException;
 import cnc.gcode.controller.communication.Communication;
 import cnc.gcode.controller.communication.IReceivedLines;
 import java.text.DecimalFormat;
 import java.text.ParseException;
+import java.util.ArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import javax.swing.JOptionPane;
 /**
  *
  * @author Nutz95
  */
-public class JBasicControls extends javax.swing.JPanel implements IGUIEvent{
-
-    /**
-     * Creates new form JBasicControls
-     */
+public class JPanelSimpleControls extends javax.swing.JPanel implements IGUIEvent{
     //private boolean parseNextSerial = false;
     private IEvent GUIEvent=null;
+    private MySwingWorker worker=null;
     
     
     //X:2.00Y:0.00Z:0.00E:0.00 Count X: 1.01Y:0.00Z:0.00
@@ -61,7 +57,7 @@ public class JBasicControls extends javax.swing.JPanel implements IGUIEvent{
         }
         return position;
     }
-    public JBasicControls() {
+    public JPanelSimpleControls() {
         initComponents();
         
         Communication.addReceiveEvent(new IReceivedLines() {
@@ -92,11 +88,13 @@ public class JBasicControls extends javax.swing.JPanel implements IGUIEvent{
     
     private void appendToConsole(String text)
     {
-        if(ConsoleOutput.getLineCount() > 19)
-        {
-            ConsoleOutput.setText("");
-        }
-        ConsoleOutput.append(text + "\r\n");
+        String[] lines=ConsoleOutput.getText().split("\n\r");
+        String newtext="";
+        for(int i=Math.max(0, lines.length-18);i<lines.length;i++)
+            if(!lines[i].equals(""))
+                newtext+=lines[i]+"\n\r";
+        newtext+=text;
+        ConsoleOutput.setText(newtext);
     }
     /**
      * This method is called from within the constructor to initialize the form.
@@ -170,15 +168,16 @@ public class JBasicControls extends javax.swing.JPanel implements IGUIEvent{
         ConsoleOutput = new javax.swing.JTextArea();
         ClearConsole = new javax.swing.JButton();
         FilterOk = new javax.swing.JCheckBox();
+        jBCancel = new javax.swing.JButton();
         MotorsOn = new javax.swing.JButton();
 
         setName("jBasicControls"); // NOI18N
 
         ZPlus10.setText("+10");
         ZPlus10.setName("ZPlus10"); // NOI18N
-        ZPlus10.addMouseListener(new java.awt.event.MouseAdapter() {
-            public void mouseReleased(java.awt.event.MouseEvent evt) {
-                ZPlus10MouseReleased(evt);
+        ZPlus10.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                buttonActionPerformed(evt);
             }
         });
 
@@ -190,30 +189,25 @@ public class JBasicControls extends javax.swing.JPanel implements IGUIEvent{
 
         ZPlus5.setLabel("+5");
         ZPlus5.setName("ZPlus5"); // NOI18N
-        ZPlus5.addMouseListener(new java.awt.event.MouseAdapter() {
-            public void mouseReleased(java.awt.event.MouseEvent evt) {
-                ZPlus5MouseReleased(evt);
+        ZPlus5.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                buttonActionPerformed(evt);
             }
         });
 
         ZPlus1.setLabel("+1");
         ZPlus1.setName("ZPlus1"); // NOI18N
-        ZPlus1.addMouseListener(new java.awt.event.MouseAdapter() {
-            public void mouseReleased(java.awt.event.MouseEvent evt) {
-                ZPlus1MouseReleased(evt);
+        ZPlus1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                buttonActionPerformed(evt);
             }
         });
 
         ZPlus01.setLabel("+0.1");
         ZPlus01.setName("ZPlus01"); // NOI18N
-        ZPlus01.addMouseListener(new java.awt.event.MouseAdapter() {
-            public void mouseReleased(java.awt.event.MouseEvent evt) {
-                ZPlus01MouseReleased(evt);
-            }
-        });
         ZPlus01.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                ZPlus01ActionPerformed(evt);
+                buttonActionPerformed(evt);
             }
         });
 
@@ -222,39 +216,39 @@ public class JBasicControls extends javax.swing.JPanel implements IGUIEvent{
         HomeZ.setName("HomeZ"); // NOI18N
         HomeZ.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                HomeZActionPerformed(evt);
+                buttonActionPerformed(evt);
             }
         });
 
         ZMinus01.setLabel("-0.1");
         ZMinus01.setName("ZMinus01"); // NOI18N
-        ZMinus01.addMouseListener(new java.awt.event.MouseAdapter() {
-            public void mouseReleased(java.awt.event.MouseEvent evt) {
-                ZMinus01MouseReleased(evt);
+        ZMinus01.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                buttonActionPerformed(evt);
             }
         });
 
         ZMinus1.setLabel("-1");
         ZMinus1.setName("ZMinus1"); // NOI18N
-        ZMinus1.addMouseListener(new java.awt.event.MouseAdapter() {
-            public void mouseReleased(java.awt.event.MouseEvent evt) {
-                ZMinus1MouseReleased(evt);
+        ZMinus1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                buttonActionPerformed(evt);
             }
         });
 
         ZMinus5.setLabel("-5");
         ZMinus5.setName("ZMinus5"); // NOI18N
-        ZMinus5.addMouseListener(new java.awt.event.MouseAdapter() {
-            public void mouseReleased(java.awt.event.MouseEvent evt) {
-                ZMinus5MouseReleased(evt);
+        ZMinus5.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                buttonActionPerformed(evt);
             }
         });
 
         ZMinus10.setLabel("-10");
         ZMinus10.setName("ZMinus10"); // NOI18N
-        ZMinus10.addMouseListener(new java.awt.event.MouseAdapter() {
-            public void mouseReleased(java.awt.event.MouseEvent evt) {
-                ZMinus10MouseReleased(evt);
+        ZMinus10.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                buttonActionPerformed(evt);
             }
         });
 
@@ -268,7 +262,7 @@ public class JBasicControls extends javax.swing.JPanel implements IGUIEvent{
         XMinus10.setName("LXMinus10"); // NOI18N
         XMinus10.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseReleased(java.awt.event.MouseEvent evt) {
-                XMinus10MouseReleased(evt);
+                lableMouseReleased(evt);
             }
         });
 
@@ -291,7 +285,7 @@ public class JBasicControls extends javax.swing.JPanel implements IGUIEvent{
         XMinus1.setName("LXMinus1"); // NOI18N
         XMinus1.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseReleased(java.awt.event.MouseEvent evt) {
-                XMinus1MouseReleased(evt);
+                lableMouseReleased(evt);
             }
         });
 
@@ -314,7 +308,7 @@ public class JBasicControls extends javax.swing.JPanel implements IGUIEvent{
         XMinus01.setName("LXMinus01"); // NOI18N
         XMinus01.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseReleased(java.awt.event.MouseEvent evt) {
-                XMinus01MouseReleased(evt);
+                lableMouseReleased(evt);
             }
         });
 
@@ -358,7 +352,7 @@ public class JBasicControls extends javax.swing.JPanel implements IGUIEvent{
         HomeX.setName("BHomeX"); // NOI18N
         HomeX.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                HomeXActionPerformed(evt);
+                buttonActionPerformed(evt);
             }
         });
 
@@ -383,7 +377,7 @@ public class JBasicControls extends javax.swing.JPanel implements IGUIEvent{
         HomeY.setName("BHomeY"); // NOI18N
         HomeY.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                HomeYActionPerformed(evt);
+                buttonActionPerformed(evt);
             }
         });
 
@@ -406,7 +400,7 @@ public class JBasicControls extends javax.swing.JPanel implements IGUIEvent{
         YPlus10.setName("LYPlus10"); // NOI18N
         YPlus10.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseReleased(java.awt.event.MouseEvent evt) {
-                YPlus10MouseReleased(evt);
+                lableMouseReleased(evt);
             }
         });
 
@@ -425,18 +419,13 @@ public class JBasicControls extends javax.swing.JPanel implements IGUIEvent{
         jPanel19.setToolTipText("");
         jPanel19.setName(""); // NOI18N
         jPanel19.setPreferredSize(new java.awt.Dimension(38, 124));
-        jPanel19.addMouseListener(new java.awt.event.MouseAdapter() {
-            public void mouseReleased(java.awt.event.MouseEvent evt) {
-                jPanel19MouseReleased(evt);
-            }
-        });
 
         YPlus01.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         YPlus01.setText("+0.1");
         YPlus01.setName("LYPlus01"); // NOI18N
         YPlus01.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseReleased(java.awt.event.MouseEvent evt) {
-                YPlus01MouseReleased(evt);
+                lableMouseReleased(evt);
             }
         });
 
@@ -459,7 +448,7 @@ public class JBasicControls extends javax.swing.JPanel implements IGUIEvent{
         YPlus1.setName("LYPlus1"); // NOI18N
         YPlus1.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseReleased(java.awt.event.MouseEvent evt) {
-                YPlus1MouseReleased(evt);
+                lableMouseReleased(evt);
             }
         });
 
@@ -516,7 +505,7 @@ public class JBasicControls extends javax.swing.JPanel implements IGUIEvent{
         HomeXY.setText("Home X Y");
         HomeXY.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseReleased(java.awt.event.MouseEvent evt) {
-                HomeXYMouseReleased(evt);
+                lableMouseReleased(evt);
             }
         });
 
@@ -535,7 +524,7 @@ public class JBasicControls extends javax.swing.JPanel implements IGUIEvent{
         jPanel7.setLayout(jPanel7Layout);
         jPanel7Layout.setHorizontalGroup(
             jPanel7Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jLabel2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+            .addComponent(jLabel2, javax.swing.GroupLayout.DEFAULT_SIZE, 130, Short.MAX_VALUE)
             .addComponent(jLabel3, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
             .addGroup(jPanel7Layout.createSequentialGroup()
                 .addComponent(jLabel4, javax.swing.GroupLayout.PREFERRED_SIZE, 17, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -567,7 +556,7 @@ public class JBasicControls extends javax.swing.JPanel implements IGUIEvent{
         HomeAll.setName("BHomeAll"); // NOI18N
         HomeAll.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                HomeAllActionPerformed(evt);
+                buttonActionPerformed(evt);
             }
         });
 
@@ -590,7 +579,7 @@ public class JBasicControls extends javax.swing.JPanel implements IGUIEvent{
         YMinus01.setName("LYMinus01"); // NOI18N
         YMinus01.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseReleased(java.awt.event.MouseEvent evt) {
-                YMinus01MouseReleased(evt);
+                lableMouseReleased(evt);
             }
         });
 
@@ -613,7 +602,7 @@ public class JBasicControls extends javax.swing.JPanel implements IGUIEvent{
         YMinus1.setName("LYMinus1"); // NOI18N
         YMinus1.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseReleased(java.awt.event.MouseEvent evt) {
-                YMinus1MouseReleased(evt);
+                lableMouseReleased(evt);
             }
         });
 
@@ -638,7 +627,7 @@ public class JBasicControls extends javax.swing.JPanel implements IGUIEvent{
         YMinus10.setName("LYMinus10"); // NOI18N
         YMinus10.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseReleased(java.awt.event.MouseEvent evt) {
-                YMinus10MouseReleased(evt);
+                lableMouseReleased(evt);
             }
         });
 
@@ -684,7 +673,7 @@ public class JBasicControls extends javax.swing.JPanel implements IGUIEvent{
         HomeZ2.setName("BHomeZ"); // NOI18N
         HomeZ2.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                HomeZ2ActionPerformed(evt);
+                buttonActionPerformed(evt);
             }
         });
 
@@ -707,7 +696,7 @@ public class JBasicControls extends javax.swing.JPanel implements IGUIEvent{
         XPlus01.setName("LXPlus01"); // NOI18N
         XPlus01.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseReleased(java.awt.event.MouseEvent evt) {
-                XPlus01MouseReleased(evt);
+                lableMouseReleased(evt);
             }
         });
 
@@ -730,7 +719,7 @@ public class JBasicControls extends javax.swing.JPanel implements IGUIEvent{
         XPlus10.setName("LXPlus10"); // NOI18N
         XPlus10.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseReleased(java.awt.event.MouseEvent evt) {
-                XPlus10MouseReleased(evt);
+                lableMouseReleased(evt);
             }
         });
 
@@ -753,7 +742,7 @@ public class JBasicControls extends javax.swing.JPanel implements IGUIEvent{
         XPlus1.setName("LXPlus1"); // NOI18N
         XPlus1.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseReleased(java.awt.event.MouseEvent evt) {
-                XPlus1MouseReleased(evt);
+                lableMouseReleased(evt);
             }
         });
 
@@ -791,14 +780,9 @@ public class JBasicControls extends javax.swing.JPanel implements IGUIEvent{
 
         MotorsOff.setText("Motors Off");
         MotorsOff.setName("BMotorsOff"); // NOI18N
-        MotorsOff.addMouseListener(new java.awt.event.MouseAdapter() {
-            public void mouseReleased(java.awt.event.MouseEvent evt) {
-                MotorsOffMouseReleased(evt);
-            }
-        });
         MotorsOff.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                MotorsOffActionPerformed(evt);
+                buttonActionPerformed(evt);
             }
         });
 
@@ -819,13 +803,22 @@ public class JBasicControls extends javax.swing.JPanel implements IGUIEvent{
         FilterOk.setSelected(true);
         FilterOk.setLabel("Filter \"OK\" Feedbacks");
 
+        jBCancel.setText("Cancel");
+        jBCancel.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jBCancelActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout jPanel5Layout = new javax.swing.GroupLayout(jPanel5);
         jPanel5.setLayout(jPanel5Layout);
         jPanel5Layout.setHorizontalGroup(
             jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel5Layout.createSequentialGroup()
                 .addComponent(FilterOk)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 31, Short.MAX_VALUE)
+                .addComponent(jBCancel)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(ClearConsole))
             .addComponent(jScrollPane1, javax.swing.GroupLayout.Alignment.TRAILING)
         );
@@ -836,20 +829,14 @@ public class JBasicControls extends javax.swing.JPanel implements IGUIEvent{
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(ClearConsole)
-                    .addComponent(FilterOk)))
+                    .addComponent(FilterOk)
+                    .addComponent(jBCancel)))
         );
 
-        FilterOk.getAccessibleContext().setAccessibleName("Filter \"OK\" Feedbacks");
-
         MotorsOn.setText("Motors On");
-        MotorsOn.addMouseListener(new java.awt.event.MouseAdapter() {
-            public void mouseReleased(java.awt.event.MouseEvent evt) {
-                MotorsOnMouseReleased(evt);
-            }
-        });
         MotorsOn.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                MotorsOnActionPerformed(evt);
+                buttonActionPerformed(evt);
             }
         });
 
@@ -975,180 +962,209 @@ public class JBasicControls extends javax.swing.JPanel implements IGUIEvent{
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
     }// </editor-fold>//GEN-END:initComponents
+
+    public boolean isbussy=false;
     @Override
     public void updateGUI(boolean serial, boolean isworking) {
         setEnableAllControls(!isworking && serial);
+        isbussy=isworking;
     }
-    private void jPanel19MouseReleased(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jPanel19MouseReleased
-        // TODO add your handling code here:
-    }//GEN-LAST:event_jPanel19MouseReleased
-
     private void ClearConsoleActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_ClearConsoleActionPerformed
         ConsoleOutput.setText("");
     }//GEN-LAST:event_ClearConsoleActionPerformed
 
-    private void HomeAllActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_HomeAllActionPerformed
-        ExecuteSingleAction("G28 X Y Z");
-        ExecuteSingleAction("M114");
-    }//GEN-LAST:event_HomeAllActionPerformed
-
-    private void HomeXActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_HomeXActionPerformed
-        ExecuteSingleAction("G28 X");
-        ExecuteSingleAction("M114");
-    }//GEN-LAST:event_HomeXActionPerformed
-
-    private void HomeYActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_HomeYActionPerformed
-        ExecuteSingleAction("G28 Y");
-        ExecuteSingleAction("M114");
-    }//GEN-LAST:event_HomeYActionPerformed
-
-    private void HomeZ2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_HomeZ2ActionPerformed
-        ExecuteSingleAction("G28 Z");
-        ExecuteSingleAction("M114");
-    }//GEN-LAST:event_HomeZ2ActionPerformed
-
-    private void HomeZActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_HomeZActionPerformed
-        HomeZ2.doClick();
-    }//GEN-LAST:event_HomeZActionPerformed
-
-    private void MotorsOnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_MotorsOnActionPerformed
-        ExecuteSingleAction("M17");
-    }//GEN-LAST:event_MotorsOnActionPerformed
-
-    private void MotorsOffActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_MotorsOffActionPerformed
-        ExecuteSingleAction("M18");
-    }//GEN-LAST:event_MotorsOffActionPerformed
-
-    private void ZPlus01ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_ZPlus01ActionPerformed
-        PerformSimpleMove(0.1,Axis.Z, Double.valueOf(Database.MAXFEEDRATE.get()).intValue());
-    }//GEN-LAST:event_ZPlus01ActionPerformed
-
-    private void XMinus01MouseReleased(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_XMinus01MouseReleased
-        PerformSimpleMove(-0.1,Axis.X, Double.valueOf(Database.MAXFEEDRATE.get()).intValue());
-    }//GEN-LAST:event_XMinus01MouseReleased
-
-    private void XMinus1MouseReleased(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_XMinus1MouseReleased
-        PerformSimpleMove(-1,Axis.X, Double.valueOf(Database.MAXFEEDRATE.get()).intValue());
-    }//GEN-LAST:event_XMinus1MouseReleased
-
-    private void XMinus10MouseReleased(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_XMinus10MouseReleased
-        PerformSimpleMove(-10,Axis.X, Double.valueOf(Database.MAXFEEDRATE.get()).intValue());
-    }//GEN-LAST:event_XMinus10MouseReleased
-
-    private void XPlus01MouseReleased(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_XPlus01MouseReleased
-        PerformSimpleMove(0.1,Axis.X, Double.valueOf(Database.MAXFEEDRATE.get()).intValue());
-    }//GEN-LAST:event_XPlus01MouseReleased
-
-    private void XPlus1MouseReleased(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_XPlus1MouseReleased
-        PerformSimpleMove(1,Axis.X, Double.valueOf(Database.MAXFEEDRATE.get()).intValue());
-    }//GEN-LAST:event_XPlus1MouseReleased
-
-    private void XPlus10MouseReleased(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_XPlus10MouseReleased
-        PerformSimpleMove(10,Axis.X, Double.valueOf(Database.MAXFEEDRATE.get()).intValue());
-    }//GEN-LAST:event_XPlus10MouseReleased
-
-    private void YPlus01MouseReleased(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_YPlus01MouseReleased
-        PerformSimpleMove(0.1,Axis.Y, Double.valueOf(Database.MAXFEEDRATE.get()).intValue());
-    }//GEN-LAST:event_YPlus01MouseReleased
-
-    private void YPlus1MouseReleased(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_YPlus1MouseReleased
-        PerformSimpleMove(1,Axis.Y, Double.valueOf(Database.MAXFEEDRATE.get()).intValue());
-    }//GEN-LAST:event_YPlus1MouseReleased
-
-    private void YPlus10MouseReleased(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_YPlus10MouseReleased
-        PerformSimpleMove(10,Axis.Y, Double.valueOf(Database.MAXFEEDRATE.get()).intValue());
-    }//GEN-LAST:event_YPlus10MouseReleased
-
-    private void YMinus01MouseReleased(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_YMinus01MouseReleased
-        PerformSimpleMove(-0.1,Axis.Y, Double.valueOf(Database.MAXFEEDRATE.get()).intValue());
-    }//GEN-LAST:event_YMinus01MouseReleased
-
-    private void YMinus1MouseReleased(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_YMinus1MouseReleased
-        PerformSimpleMove(-1,Axis.Y, Double.valueOf(Database.MAXFEEDRATE.get()).intValue());
-    }//GEN-LAST:event_YMinus1MouseReleased
-
-    private void YMinus10MouseReleased(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_YMinus10MouseReleased
-        PerformSimpleMove(-10,Axis.Y, Double.valueOf(Database.MAXFEEDRATE.get()).intValue());
-    }//GEN-LAST:event_YMinus10MouseReleased
-
-    private void ZPlus01MouseReleased(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_ZPlus01MouseReleased
-        PerformSimpleMove(0.1,Axis.Z, Double.valueOf(Database.MAXFEEDRATE.get()).intValue());
-    }//GEN-LAST:event_ZPlus01MouseReleased
-
-    private void ZPlus1MouseReleased(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_ZPlus1MouseReleased
-        PerformSimpleMove(1,Axis.Z, Double.valueOf(Database.MAXFEEDRATE.get()).intValue());
-    }//GEN-LAST:event_ZPlus1MouseReleased
-
-    private void ZPlus5MouseReleased(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_ZPlus5MouseReleased
-        PerformSimpleMove(5,Axis.Z, Double.valueOf(Database.MAXFEEDRATE.get()).intValue());
-    }//GEN-LAST:event_ZPlus5MouseReleased
-
-    private void ZPlus10MouseReleased(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_ZPlus10MouseReleased
-        PerformSimpleMove(10,Axis.Z, Double.valueOf(Database.MAXFEEDRATE.get()).intValue());
-    }//GEN-LAST:event_ZPlus10MouseReleased
-
-    private void ZMinus01MouseReleased(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_ZMinus01MouseReleased
-        PerformSimpleMove(-0.1,Axis.Z, Double.valueOf(Database.MAXFEEDRATE.get()).intValue());
-    }//GEN-LAST:event_ZMinus01MouseReleased
-
-    private void ZMinus1MouseReleased(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_ZMinus1MouseReleased
-        PerformSimpleMove(-1,Axis.Z, Double.valueOf(Database.MAXFEEDRATE.get()).intValue());
-    }//GEN-LAST:event_ZMinus1MouseReleased
-
-    private void ZMinus5MouseReleased(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_ZMinus5MouseReleased
-        PerformSimpleMove(-5,Axis.Z, Double.valueOf(Database.MAXFEEDRATE.get()).intValue());
-    }//GEN-LAST:event_ZMinus5MouseReleased
-
-    private void ZMinus10MouseReleased(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_ZMinus10MouseReleased
-        PerformSimpleMove(-10,Axis.Z, Double.valueOf(Database.MAXFEEDRATE.get()).intValue());
-    }//GEN-LAST:event_ZMinus10MouseReleased
-
-    private void MotorsOffMouseReleased(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_MotorsOffMouseReleased
+    private void doAction(Object sender){
         
-    }//GEN-LAST:event_MotorsOffMouseReleased
-
-    private void MotorsOnMouseReleased(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_MotorsOnMouseReleased
+        if(sender.equals(HomeAll)){
+                ExecuteActions(new ArrayList<String>()    {{
+                                                        this.add("G28 X Y Z");
+                                                        this.add("M114");
+                                                    }});           
+        }
+        else if (sender.equals(HomeX)){
+                ExecuteActions(new ArrayList<String>()    {{
+                                                        this.add("G28 X");
+                                                        this.add("M114");
+                                                    }});              
+        }
+        else if (sender.equals(HomeY)){
+                ExecuteActions(new ArrayList<String>()    {{
+                                                        this.add("G28 Y");
+                                                        this.add("M114");
+                                                    }});              
+        }
+        else if (sender.equals(HomeZ) || sender.equals(HomeZ2)){
+                ExecuteActions(new ArrayList<String>()    {{
+                                                        this.add("G28 Z");
+                                                        this.add("M114");
+                                                    }});              
+        }
+        else if (sender.equals(MotorsOn)){
+                ExecuteActions(new ArrayList<String>()    {{
+                                                        this.add("M17");
+                                                    }});              
+        }
+        else if (sender.equals(MotorsOff)){
+                ExecuteActions(new ArrayList<String>()    {{
+                                                        this.add("M18");
+                                                    }});              
+        }
+        else if (sender.equals(HomeXY)){
+                ExecuteActions(new ArrayList<String>()    {{
+                                                        this.add("G28 X Y");
+                                                        this.add("M114");
+                                                    }});              
+        }
         
-    }//GEN-LAST:event_MotorsOnMouseReleased
+        else if (sender.equals(XPlus01)){
+            PerformSimpleMove(0.1,Axis.X, Double.valueOf(DatabaseV2.MAXFEEDRATE.get()).intValue());
+        }
+        else if (sender.equals(XPlus1)){
+            PerformSimpleMove(1,Axis.X, Double.valueOf(DatabaseV2.MAXFEEDRATE.get()).intValue());
+        }
+        else if (sender.equals(XPlus10)){
+            PerformSimpleMove(10,Axis.X, Double.valueOf(DatabaseV2.MAXFEEDRATE.get()).intValue());
+        }
+        else if (sender.equals(XMinus01)){
+            PerformSimpleMove(-0.1,Axis.X, Double.valueOf(DatabaseV2.MAXFEEDRATE.get()).intValue());
+        }
+        else if (sender.equals(XMinus1)){
+            PerformSimpleMove(-1,Axis.X, Double.valueOf(DatabaseV2.MAXFEEDRATE.get()).intValue());
+        }
+        else if (sender.equals(XMinus10)){
+            PerformSimpleMove(-10,Axis.X, Double.valueOf(DatabaseV2.MAXFEEDRATE.get()).intValue());
+        }
+        
+        else if (sender.equals(YPlus01)){
+            PerformSimpleMove(0.1,Axis.Y, Double.valueOf(DatabaseV2.MAXFEEDRATE.get()).intValue());
+        }
+        else if (sender.equals(YPlus1)){
+            PerformSimpleMove(1,Axis.Y, Double.valueOf(DatabaseV2.MAXFEEDRATE.get()).intValue());
+        }
+        else if (sender.equals(YPlus10)){
+            PerformSimpleMove(10,Axis.Y, Double.valueOf(DatabaseV2.MAXFEEDRATE.get()).intValue());
+        }
+        else if (sender.equals(YMinus01)){
+            PerformSimpleMove(-0.1,Axis.Y, Double.valueOf(DatabaseV2.MAXFEEDRATE.get()).intValue());
+        }
+        else if (sender.equals(YMinus1)){
+            PerformSimpleMove(-1,Axis.Y, Double.valueOf(DatabaseV2.MAXFEEDRATE.get()).intValue());
+        }
+        else if (sender.equals(YMinus10)){
+            PerformSimpleMove(-10,Axis.Y, Double.valueOf(DatabaseV2.MAXFEEDRATE.get()).intValue());
+        }
+        
+        else if (sender.equals(ZPlus01)){
+            PerformSimpleMove(0.1,Axis.Z, Double.valueOf(DatabaseV2.MAXFEEDRATE.get()).intValue());
+        }
+        else if (sender.equals(ZPlus1)){
+            PerformSimpleMove(1,Axis.Z, Double.valueOf(DatabaseV2.MAXFEEDRATE.get()).intValue());
+        }
+        else if (sender.equals(ZPlus5)){
+            PerformSimpleMove(5,Axis.Z, Double.valueOf(DatabaseV2.MAXFEEDRATE.get()).intValue());
+        }
+        else if (sender.equals(ZPlus10)){
+            PerformSimpleMove(10,Axis.Z, Double.valueOf(DatabaseV2.MAXFEEDRATE.get()).intValue());
+        }
+        else if (sender.equals(ZMinus01)){
+            PerformSimpleMove(-0.1,Axis.Z, Double.valueOf(DatabaseV2.MAXFEEDRATE.get()).intValue());
+        }
+        else if (sender.equals(ZMinus1)){
+            PerformSimpleMove(-1,Axis.Z, Double.valueOf(DatabaseV2.MAXFEEDRATE.get()).intValue());
+        }
+        else if (sender.equals(ZMinus5)){
+            PerformSimpleMove(-5,Axis.Z, Double.valueOf(DatabaseV2.MAXFEEDRATE.get()).intValue());
+        }
+        else if (sender.equals(ZMinus10)){
+            PerformSimpleMove(-10,Axis.Z, Double.valueOf(DatabaseV2.MAXFEEDRATE.get()).intValue());
+        }
 
-    private void HomeXYMouseReleased(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_HomeXYMouseReleased
-        ExecuteSingleAction("G28 X Y");
-        ExecuteSingleAction("M114");
-    }//GEN-LAST:event_HomeXYMouseReleased
+    }
+    
+    
+    private void buttonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_buttonActionPerformed
+        doAction(evt.getSource());
+    }//GEN-LAST:event_buttonActionPerformed
+
+    private void lableMouseReleased(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_lableMouseReleased
+        doAction(evt.getSource());
+    }//GEN-LAST:event_lableMouseReleased
+
+    private void jBCancelActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jBCancelActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_jBCancelActionPerformed
+
+
 
     private enum Axis
     {
         X, Y, Z, E
     }
-    private void PerformSimpleMove(double distance, Axis axis, int feedrate)
+    private void PerformSimpleMove(final double distance, final Axis axis, final int feedrate)
     {
-        ExecuteSingleAction("G91");
-        ExecuteSingleAction("G0 " + axis.toString() + new DecimalFormat("#.##").format(distance).replace(",", ".") +  " F" + feedrate);
-        ExecuteSingleAction("G90");
-        ExecuteSingleAction("M114");
+        ExecuteActions(new ArrayList<String>()    {{
+                                                this.add("G91");
+                                                this.add("G0 " + axis.toString() + new DecimalFormat("#.##").format(distance).replace(",", ".") +  " F" + feedrate);
+                                                this.add("G90");
+                                                this.add("M114");
+                                            }});          
     }
     
-    private void ExecuteSingleAction(String Gcode)
+    boolean isRunning() {
+        return worker!=null && !worker.isDone();
+    }    
+    
+    private void ExecuteActions(final ArrayList<String> gcodes)
     {
-        if(Communication.isBussy())
+        if(Communication.isBussy() || isbussy)
         {
-            appendToConsole("ERROR: Another command is in progress!");
+            appendToConsole("ERROR: Another command is in progress! Or not Connected!");
             return;
         }
-        try 
-        {
-            Communication.send(Gcode);
-            appendToConsole(Gcode);
-            while(Communication.isBussy())
-            {
-               Thread.sleep(100);
+        worker=new MySwingWorker() {
+
+            @Override
+            protected Object doInBackground() throws Exception {
+                for(String execute:gcodes)
+                {
+                    appendToConsole(execute);
+                    if(this.isCancelled())
+                    {
+                        return null;
+                    }
+
+                    while(Communication.isBussy())
+                    {
+                        if(this.isCancelled())
+                        {
+                            return null;
+                        }
+                        try
+                        {
+                            Thread.sleep(1);
+                        }
+                        catch(InterruptedException ex)
+                        {
+                            return null;
+                        }
+
+                    }
+                    Communication.send(execute);
+                }
+                return null;
             }
-        } catch (Exception ex) {
-            appendToConsole("ERROR: " + ex.getMessage());
-            Logger.getLogger(JPanelControl.class.getName()).log(Level.SEVERE, null, ex);
-            return;
-        } 
-        
+
+            @Override
+            protected void done(Object rvalue, Exception ex, boolean canceled) {
+                if(ex!=null){
+                    appendToConsole("ERROR: " + ex.getMessage());
+                    Logger.getLogger(JPanelAdvancedControl.class.getName()).log(Level.SEVERE, null, ex);
+                }
+                GUIEvent.fired();
+            }
+        };
+        worker.execute();
+        GUIEvent.fired();
     }
     
     // Variables declaration - do not modify//GEN-BEGIN:variables
@@ -1184,6 +1200,7 @@ public class JBasicControls extends javax.swing.JPanel implements IGUIEvent{
     private javax.swing.JButton ZPlus1;
     private javax.swing.JButton ZPlus10;
     private javax.swing.JButton ZPlus5;
+    private javax.swing.JButton jBCancel;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
@@ -1253,6 +1270,7 @@ public class JBasicControls extends javax.swing.JPanel implements IGUIEvent{
         this.ZPlus1.setEnabled(enable);
         this.ZPlus5.setEnabled(enable);
         this.ZPlus10.setEnabled(enable);
+        this.jBCancel.setEnabled(worker!=null && worker.isRunning());
     }
 
 }
