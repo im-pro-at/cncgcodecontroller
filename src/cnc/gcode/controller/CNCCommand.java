@@ -161,8 +161,8 @@ public class CNCCommand {
         EMPTY(Color.lightGray), 
         
         //Move
-        G0(Color.black), 
-        G1(Color.orange.darker()), 
+        G0(null), //From Settings 
+        G1(null), //From Settings
         ARC(Color.orange),
         HOMING(Color.orange), 
         SETPOS(Color.orange),
@@ -197,6 +197,12 @@ public class CNCCommand {
 
         public Color getColor() 
         {
+            switch (this){
+                case G0:
+                    return new Color(Integer.parseInt(DatabaseV2.CG0.get()));
+                case G1:
+                    return new Color(Integer.parseInt(DatabaseV2.CG1.get()));
+            }
             return color;
         }
 
@@ -204,7 +210,7 @@ public class CNCCommand {
             g.setStroke(new BasicStroke((float)DatabaseV2.TOOLSIZE.getsaved(), BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND));
             if(selected == false)
             {
-                g.setColor(new Color(color.getRed(), color.getGreen(), color.getBlue(), 200));
+                g.setColor(new Color(getColor().getRed(), getColor().getGreen(), getColor().getBlue(), 200));
             }    
             else
             {
@@ -284,24 +290,25 @@ public class CNCCommand {
         }
         else
         {
-            //Support Modal G1: X00 Y00 Z00
-            if(DatabaseV2.G1MODAL.get().equals("1"))
-            {
-                switch(p.get(0).letter)
-                {
-                    case 'G':
-                    case 'M':
-                        break;
-                    default:
-                        if(p.contains('X') || p.contains('Y') || p.contains('Z'))
+            //No G no M Command => Modal?
+            if(p.get(0).letter!='M' && p.get(0).letter!='G'){
+                if(p.contains('X') || p.contains('Y') || p.contains('Z')){
+                    if(DatabaseV2.G0MODAL.get().equals("1")){
+                        //Support Modal G0: X00 Y00 Z00
+                        if(c.lastMovetype == Type.G0)
                         {
-                            if(c.lastMovetype == Type.G1)
-                            {
-                                p.insert(0, 'G', 1, true);
-                                message += "Using modal G1! ";
-                            }
+                            p.insert(0, 'G', 0, true);
+                            message += "Using modal G0! ";
                         }
-                        break;
+                    }
+                    if(DatabaseV2.G1MODAL.get().equals("1")){
+                        //Support Modal G1: X00 Y00 Z00
+                        if(c.lastMovetype == Type.G1)
+                        {
+                            p.insert(0, 'G', 1, true);
+                            message += "Using modal G1! ";
+                        }
+                    }
                 }
             }
             

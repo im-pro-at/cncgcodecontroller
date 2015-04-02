@@ -5,6 +5,7 @@
 package cnc.gcode.controller;
 
 import cnc.gcode.controller.communication.Communication;
+import java.awt.Color;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.io.File;
@@ -65,13 +66,17 @@ public enum DatabaseV2 {
     BL1(Tools.dtostr(0.0)),
     BL2(Tools.dtostr(0.0)),
     
-    //Modal G1
+    //Modal G0/G1
+    G0MODAL("0"), //"0" == off, "1"==on
     G1MODAL("0"), //"0" == off, "1"==on
     
     //Communication Type
     COMTYPE(Communication.MARLIN.toString()),   
     
-    
+    //Color Settings:
+    CBACKGROUND(""+Color.WHITE.getRGB()),
+    CG0(""+Color.black.getRGB()),
+    CG1(""+Color.orange.darker().getRGB())
     ;
     
     private final String defaultValue;
@@ -249,5 +254,5 @@ public enum DatabaseV2 {
                 return BL2;
         }
     }
-    
+
 }

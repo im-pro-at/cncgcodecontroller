@@ -179,7 +179,7 @@ public class JPanelCNCMilling extends javax.swing.JPanel implements IGUIEvent{
                 }
                 
                 //Draw base
-                g2.setColor(Color.white);
+                g2.setColor(new Color(Integer.parseInt(DatabaseV2.CBACKGROUND.get())));
                 g2.fill(new Rectangle2D.Double(0, 0, ariawidth, ariaheight));
                                 
                 //Positioning

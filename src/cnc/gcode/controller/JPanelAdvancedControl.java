@@ -422,7 +422,7 @@ public class JPanelAdvancedControl extends javax.swing.JPanel implements IGUIEve
         }
         g2d.translate(-jPPaint.getWidth() / 2, -jPPaint.getHeight() / 2);
         
-        g2d.setColor(Color.white);
+        g2d.setColor(new Color(Integer.parseInt(DatabaseV2.CBACKGROUND.get())));
         g2d.fillRect(rect.x,
                      rect.y,
                      rect.width,

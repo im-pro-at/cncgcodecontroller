@@ -5,9 +5,11 @@
 package cnc.gcode.controller;
 
 import cnc.gcode.controller.communication.Communication;
+import java.awt.Color;
 import java.awt.Dimension;
 import java.io.File;
 import java.util.LinkedList;
+import javax.swing.JColorChooser;
 import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
 import javax.swing.JScrollPane;
@@ -71,7 +73,11 @@ public class JPanelSettings extends javax.swing.JPanel implements IGUIEvent{
             jLSBacklash.setText(jLSBacklash.getText() + CommandParsing.axesName[i] + " = " + DatabaseV2.getBacklash(i) + "   ");       
         }
         jLSmodalG1.setText(DatabaseV2.G1MODAL.get().equals("0")?"OFF":"ON");
+        jLSmodalG0.setText(DatabaseV2.G0MODAL.get().equals("0")?"OFF":"ON");
         jLSComType.setText(DatabaseV2.COMTYPE.get());
+        jLSCBack.setBackground(new Color(Integer.parseInt(DatabaseV2.CBACKGROUND.get())));
+        jLSCG0.setBackground(new Color(Integer.parseInt(DatabaseV2.CG0.get())));
+        jLSCG1.setBackground(new Color(Integer.parseInt(DatabaseV2.CG1.get())));
     }
     
     private void fireupdateGUI()
@@ -301,14 +307,26 @@ public class JPanelSettings extends javax.swing.JPanel implements IGUIEvent{
         jLabel42 = new javax.swing.JLabel();
         jBSBacklash = new javax.swing.JButton();
         jLSBacklash = new javax.swing.JLabel();
-        jBexport = new javax.swing.JButton();
-        jBImport = new javax.swing.JButton();
         jLabel43 = new javax.swing.JLabel();
         jBSmodalG1 = new javax.swing.JButton();
         jLSmodalG1 = new javax.swing.JLabel();
+        jLabel45 = new javax.swing.JLabel();
+        jBSmodalG0 = new javax.swing.JButton();
+        jLSmodalG0 = new javax.swing.JLabel();
         jLabel44 = new javax.swing.JLabel();
         jBSComType = new javax.swing.JButton();
         jLSComType = new javax.swing.JLabel();
+        jLabel46 = new javax.swing.JLabel();
+        jBSCBack = new javax.swing.JButton();
+        jLSCBack = new javax.swing.JLabel();
+        jLabel47 = new javax.swing.JLabel();
+        jBSCG0 = new javax.swing.JButton();
+        jLSCG0 = new javax.swing.JLabel();
+        jLabel48 = new javax.swing.JLabel();
+        jBSCG1 = new javax.swing.JButton();
+        jLSCG1 = new javax.swing.JLabel();
+        jBexport = new javax.swing.JButton();
+        jBImport = new javax.swing.JButton();
 
         jLabel2.setText("Homing:");
 
@@ -475,6 +493,78 @@ public class JPanelSettings extends javax.swing.JPanel implements IGUIEvent{
 
         jLSBacklash.setText("Settings Text");
 
+        jLabel43.setText("Allow modal G1:");
+
+        jBSmodalG1.setText("Change");
+        jBSmodalG1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jBSettingsActionPerformed(evt);
+            }
+        });
+
+        jLSmodalG1.setText("Settings Text");
+
+        jLabel45.setText("Allow modal G0:");
+
+        jBSmodalG0.setText("Change");
+        jBSmodalG0.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jBSettingsActionPerformed(evt);
+            }
+        });
+
+        jLSmodalG0.setText("Settings Text");
+
+        jLabel44.setText("Device connected:");
+
+        jBSComType.setText("Change");
+        jBSComType.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jBSettingsActionPerformed(evt);
+            }
+        });
+
+        jLSComType.setText("Settings Text");
+
+        jLabel46.setText("Background color:");
+
+        jBSCBack.setText("Change");
+        jBSCBack.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jBSettingsActionPerformed(evt);
+            }
+        });
+
+        jLSCBack.setText("                   ");
+        jLSCBack.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0)));
+        jLSCBack.setOpaque(true);
+
+        jLabel47.setText("G0 color:");
+
+        jBSCG0.setText("Change");
+        jBSCG0.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jBSettingsActionPerformed(evt);
+            }
+        });
+
+        jLSCG0.setText("                   ");
+        jLSCG0.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0)));
+        jLSCG0.setOpaque(true);
+
+        jLabel48.setText("G1 color:");
+
+        jBSCG1.setText("Change");
+        jBSCG1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jBSettingsActionPerformed(evt);
+            }
+        });
+
+        jLSCG1.setText("                   ");
+        jLSCG1.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0)));
+        jLSCG1.setOpaque(true);
+
         jBexport.setText("Export");
         jBexport.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -489,28 +579,6 @@ public class JPanelSettings extends javax.swing.JPanel implements IGUIEvent{
             }
         });
 
-        jLabel43.setText("Allow modal G1:");
-
-        jBSmodalG1.setText("Change");
-        jBSmodalG1.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jBSettingsActionPerformed(evt);
-            }
-        });
-
-        jLSmodalG1.setText("Settings Text");
-
-        jLabel44.setText("Device connected:");
-
-        jBSComType.setText("Change");
-        jBSComType.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jBSettingsActionPerformed(evt);
-            }
-        });
-
-        jLSComType.setText("Settings Text");
-
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
         layout.setHorizontalGroup(
@@ -518,46 +586,64 @@ public class JPanelSettings extends javax.swing.JPanel implements IGUIEvent{
             .addGroup(layout.createSequentialGroup()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(layout.createSequentialGroup()
+                        .addGap(10, 10, 10)
+                        .addComponent(jLabel43))
+                    .addGroup(layout.createSequentialGroup()
                         .addContainerGap()
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(jLabel39)
-                            .addComponent(jLabel2)
-                            .addComponent(jLabel19)
-                            .addComponent(jLabel20)
-                            .addComponent(jLabel32)
-                            .addComponent(jLabel35)
-                            .addComponent(jLabel36)
-                            .addComponent(jLabel33)
-                            .addComponent(jLabel34)
-                            .addComponent(jLabel21)
-                            .addComponent(jLabel37)
-                            .addComponent(jLabel38)
-                            .addComponent(jLabel41)
-                            .addComponent(jLabel40)
-                            .addComponent(jLabel42))
+                            .addGroup(layout.createSequentialGroup()
+                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                    .addComponent(jLabel39)
+                                    .addComponent(jLabel2)
+                                    .addComponent(jLabel19)
+                                    .addComponent(jLabel20)
+                                    .addComponent(jLabel32)
+                                    .addComponent(jLabel35)
+                                    .addComponent(jLabel36)
+                                    .addComponent(jLabel33)
+                                    .addComponent(jLabel34)
+                                    .addComponent(jLabel21)
+                                    .addComponent(jLabel37)
+                                    .addComponent(jLabel38)
+                                    .addComponent(jLabel41)
+                                    .addComponent(jLabel40)
+                                    .addComponent(jLabel42))
+                                .addGap(50, 50, 50)
+                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                    .addComponent(jBSWorkSpace)
+                                    .addComponent(jBSFastFeedrate)
+                                    .addComponent(jBSHoming)
+                                    .addComponent(jBSCNCStart)
+                                    .addComponent(jBSCNCToolChange)
+                                    .addComponent(jBSCNCSpindleON)
+                                    .addComponent(jBSCNCSpindleOFF)
+                                    .addComponent(jBSCNCG0Feedrate)
+                                    .addComponent(jBSCNCToolSize)
+                                    .addComponent(jBSCNCOptimiserTime)
+                                    .addComponent(jBSALOptions)
+                                    .addComponent(jBSALDistance)
+                                    .addComponent(jBSALStart)
+                                    .addComponent(jBSARC)
+                                    .addComponent(jBSBacklash)
+                                    .addComponent(jBSmodalG1)
+                                    .addComponent(jBSmodalG0)
+                                    .addComponent(jBSComType)
+                                    .addComponent(jBSCBack)
+                                    .addComponent(jBSCG0)
+                                    .addComponent(jBSCG1)))
+                            .addComponent(jLabel45)
+                            .addComponent(jLabel44)
+                            .addGroup(layout.createSequentialGroup()
+                                .addComponent(jBexport)
+                                .addGap(18, 18, 18)
+                                .addComponent(jBImport))
+                            .addComponent(jLabel46)
+                            .addComponent(jLabel47)
+                            .addComponent(jLabel48))
                         .addGap(50, 50, 50)
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(jBSWorkSpace)
-                            .addComponent(jBSFastFeedrate)
-                            .addComponent(jBSHoming)
-                            .addComponent(jBSCNCStart)
-                            .addComponent(jBSCNCToolChange)
-                            .addComponent(jBSCNCSpindleON)
-                            .addComponent(jBSCNCSpindleOFF)
-                            .addComponent(jBSCNCG0Feedrate)
-                            .addComponent(jBSCNCToolSize)
-                            .addComponent(jBSCNCOptimiserTime)
-                            .addComponent(jBSALOptions)
-                            .addComponent(jBSALDistance)
-                            .addComponent(jBSALStart)
-                            .addComponent(jBSARC)
-                            .addComponent(jBSBacklash)
-                            .addComponent(jBSmodalG1)
-                            .addComponent(jBSComType))
-                        .addGap(50, 50, 50)
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(jLSCBack)
                             .addComponent(jLSHomeing)
-                            .addComponent(jLSComType)
                             .addComponent(jLSFastFeedrate)
                             .addComponent(jLSWorkSpace)
                             .addComponent(jLSCNCStart)
@@ -572,18 +658,11 @@ public class JPanelSettings extends javax.swing.JPanel implements IGUIEvent{
                             .addComponent(jLSALStart)
                             .addComponent(jLSARC)
                             .addComponent(jLSBacklash)
-                            .addComponent(jLSmodalG1)))
-                    .addGroup(layout.createSequentialGroup()
-                        .addGap(10, 10, 10)
-                        .addComponent(jLabel44))
-                    .addGroup(layout.createSequentialGroup()
-                        .addGap(10, 10, 10)
-                        .addComponent(jLabel43))
-                    .addGroup(layout.createSequentialGroup()
-                        .addGap(10, 10, 10)
-                        .addComponent(jBexport)
-                        .addGap(18, 18, 18)
-                        .addComponent(jBImport)))
+                            .addComponent(jLSmodalG1)
+                            .addComponent(jLSmodalG0)
+                            .addComponent(jLSComType)
+                            .addComponent(jLSCG0)
+                            .addComponent(jLSCG1))))
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
@@ -671,14 +750,34 @@ public class JPanelSettings extends javax.swing.JPanel implements IGUIEvent{
                     .addComponent(jBSmodalG1))
                 .addGap(18, 18, 18)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jLabel44)
-                    .addComponent(jLSComType)
-                    .addComponent(jBSComType))
+                    .addComponent(jLabel45)
+                    .addComponent(jBSmodalG0)
+                    .addComponent(jLSmodalG0))
                 .addGap(18, 18, 18)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jLabel44)
+                    .addComponent(jBSComType)
+                    .addComponent(jLSComType))
+                .addGap(18, 18, 18)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jLabel46)
+                    .addComponent(jBSCBack)
+                    .addComponent(jLSCBack))
+                .addGap(18, 18, 18)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jLabel47)
+                    .addComponent(jBSCG0)
+                    .addComponent(jLSCG0))
+                .addGap(18, 18, 18)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jLabel48)
+                    .addComponent(jBSCG1)
+                    .addComponent(jLSCG1))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jBexport)
                     .addComponent(jBImport))
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addContainerGap())
         );
     }// </editor-fold>//GEN-END:initComponents
 
@@ -904,6 +1003,23 @@ public class JPanelSettings extends javax.swing.JPanel implements IGUIEvent{
                 DatabaseV2.G1MODAL.set("" + options);
             }
         }
+
+        //Modal G1
+        if(evt.getSource() == jBSmodalG0)
+        {
+            int options = JOptionPane.showOptionDialog(this,
+                                                       "Select G0 modal mode:",
+                                                       "Modal G0",
+                                                       JOptionPane.YES_NO_CANCEL_OPTION,
+                                                       JOptionPane.INFORMATION_MESSAGE,
+                                                       null,
+                                                       new String[] {"OFF", "ON"},
+                                                       0);
+            if(options != JOptionPane.CLOSED_OPTION)
+            {
+                DatabaseV2.G0MODAL.set("" + options);
+            }
+        }
         
         //ComType
         if(evt.getSource() == jBSComType)
@@ -920,6 +1036,26 @@ public class JPanelSettings extends javax.swing.JPanel implements IGUIEvent{
             {
                 DatabaseV2.COMTYPE.set(Communication.values()[options].toString());
             }
+        }
+        
+        //Colors
+        if(evt.getSource() == jBSCBack)
+        {
+            Color c=JColorChooser.showDialog(this, "Set the background color for the visualisation", new Color(Integer.parseInt(DatabaseV2.CBACKGROUND.get())));
+            if(c!=null)
+                DatabaseV2.CBACKGROUND.set(""+c.getRGB());
+        }
+        if(evt.getSource() == jBSCG0)
+        {
+            Color c=JColorChooser.showDialog(this, "Set the color for G0", new Color(Integer.parseInt(DatabaseV2.CG0.get())));
+            if(c!=null)
+                DatabaseV2.CG0.set(""+c.getRGB());
+        }
+        if(evt.getSource() == jBSCG1)
+        {
+            Color c=JColorChooser.showDialog(this, "Set the color for G1", new Color(Integer.parseInt(DatabaseV2.CG1.get())));
+            if(c!=null)
+                DatabaseV2.CG1.set(""+c.getRGB());
         }
         
         fireupdateGUI();
@@ -1000,6 +1136,9 @@ public class JPanelSettings extends javax.swing.JPanel implements IGUIEvent{
     private javax.swing.JButton jBSALStart;
     private javax.swing.JButton jBSARC;
     private javax.swing.JButton jBSBacklash;
+    private javax.swing.JButton jBSCBack;
+    private javax.swing.JButton jBSCG0;
+    private javax.swing.JButton jBSCG1;
     private javax.swing.JButton jBSCNCG0Feedrate;
     private javax.swing.JButton jBSCNCOptimiserTime;
     private javax.swing.JButton jBSCNCSpindleOFF;
@@ -1011,6 +1150,7 @@ public class JPanelSettings extends javax.swing.JPanel implements IGUIEvent{
     private javax.swing.JButton jBSFastFeedrate;
     private javax.swing.JButton jBSHoming;
     private javax.swing.JButton jBSWorkSpace;
+    private javax.swing.JButton jBSmodalG0;
     private javax.swing.JButton jBSmodalG1;
     private javax.swing.JButton jBexport;
     private javax.swing.JLabel jLSALDistance;
@@ -1018,6 +1158,9 @@ public class JPanelSettings extends javax.swing.JPanel implements IGUIEvent{
     private javax.swing.JLabel jLSALStart;
     private javax.swing.JLabel jLSARC;
     private javax.swing.JLabel jLSBacklash;
+    private javax.swing.JLabel jLSCBack;
+    private javax.swing.JLabel jLSCG0;
+    private javax.swing.JLabel jLSCG1;
     private javax.swing.JLabel jLSCNCG0Feedrate;
     private javax.swing.JLabel jLSCNCOptimiserTime;
     private javax.swing.JLabel jLSCNCSpindleOFF;
@@ -1029,6 +1172,7 @@ public class JPanelSettings extends javax.swing.JPanel implements IGUIEvent{
     private javax.swing.JLabel jLSFastFeedrate;
     private javax.swing.JLabel jLSHomeing;
     private javax.swing.JLabel jLSWorkSpace;
+    private javax.swing.JLabel jLSmodalG0;
     private javax.swing.JLabel jLSmodalG1;
     private javax.swing.JLabel jLabel19;
     private javax.swing.JLabel jLabel2;
@@ -1047,5 +1191,9 @@ public class JPanelSettings extends javax.swing.JPanel implements IGUIEvent{
     private javax.swing.JLabel jLabel42;
     private javax.swing.JLabel jLabel43;
     private javax.swing.JLabel jLabel44;
+    private javax.swing.JLabel jLabel45;
+    private javax.swing.JLabel jLabel46;
+    private javax.swing.JLabel jLabel47;
+    private javax.swing.JLabel jLabel48;
     // End of variables declaration//GEN-END:variables
 }

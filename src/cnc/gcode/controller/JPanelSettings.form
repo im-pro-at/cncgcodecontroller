@@ -19,48 +19,70 @@
           <Group type="102" attributes="0">
               <Group type="103" groupAlignment="0" attributes="0">
                   <Group type="102" attributes="0">
+                      <EmptySpace min="10" pref="10" max="-2" attributes="0"/>
+                      <Component id="jLabel43" min="-2" max="-2" attributes="0"/>
+                  </Group>
+                  <Group type="102" attributes="0">
                       <EmptySpace max="-2" attributes="0"/>
                       <Group type="103" groupAlignment="0" attributes="0">
-                          <Component id="jLabel39" min="-2" max="-2" attributes="0"/>
-                          <Component id="jLabel2" alignment="0" min="-2" max="-2" attributes="0"/>
-                          <Component id="jLabel19" alignment="0" min="-2" max="-2" attributes="0"/>
-                          <Component id="jLabel20" alignment="0" min="-2" max="-2" attributes="0"/>
-                          <Component id="jLabel32" alignment="0" min="-2" max="-2" attributes="0"/>
-                          <Component id="jLabel35" alignment="0" min="-2" max="-2" attributes="0"/>
-                          <Component id="jLabel36" alignment="0" min="-2" max="-2" attributes="0"/>
-                          <Component id="jLabel33" alignment="0" min="-2" max="-2" attributes="0"/>
-                          <Component id="jLabel34" alignment="0" min="-2" max="-2" attributes="0"/>
-                          <Component id="jLabel21" alignment="0" min="-2" max="-2" attributes="0"/>
-                          <Component id="jLabel37" alignment="0" min="-2" max="-2" attributes="0"/>
-                          <Component id="jLabel38" alignment="0" min="-2" max="-2" attributes="0"/>
-                          <Component id="jLabel41" alignment="0" min="-2" max="-2" attributes="0"/>
-                          <Component id="jLabel40" alignment="0" min="-2" max="-2" attributes="0"/>
-                          <Component id="jLabel42" alignment="0" min="-2" max="-2" attributes="0"/>
+                          <Group type="102" alignment="0" attributes="0">
+                              <Group type="103" groupAlignment="0" attributes="0">
+                                  <Component id="jLabel39" min="-2" max="-2" attributes="0"/>
+                                  <Component id="jLabel2" alignment="0" min="-2" max="-2" attributes="0"/>
+                                  <Component id="jLabel19" alignment="0" min="-2" max="-2" attributes="0"/>
+                                  <Component id="jLabel20" alignment="0" min="-2" max="-2" attributes="0"/>
+                                  <Component id="jLabel32" alignment="0" min="-2" max="-2" attributes="0"/>
+                                  <Component id="jLabel35" alignment="0" min="-2" max="-2" attributes="0"/>
+                                  <Component id="jLabel36" alignment="0" min="-2" max="-2" attributes="0"/>
+                                  <Component id="jLabel33" alignment="0" min="-2" max="-2" attributes="0"/>
+                                  <Component id="jLabel34" alignment="0" min="-2" max="-2" attributes="0"/>
+                                  <Component id="jLabel21" alignment="0" min="-2" max="-2" attributes="0"/>
+                                  <Component id="jLabel37" alignment="0" min="-2" max="-2" attributes="0"/>
+                                  <Component id="jLabel38" alignment="0" min="-2" max="-2" attributes="0"/>
+                                  <Component id="jLabel41" alignment="0" min="-2" max="-2" attributes="0"/>
+                                  <Component id="jLabel40" alignment="0" min="-2" max="-2" attributes="0"/>
+                                  <Component id="jLabel42" alignment="0" min="-2" max="-2" attributes="0"/>
+                              </Group>
+                              <EmptySpace min="-2" pref="50" max="-2" attributes="0"/>
+                              <Group type="103" groupAlignment="0" attributes="0">
+                                  <Component id="jBSWorkSpace" alignment="0" min="-2" max="-2" attributes="0"/>
+                                  <Component id="jBSFastFeedrate" alignment="0" min="-2" max="-2" attributes="0"/>
+                                  <Component id="jBSHoming" alignment="0" min="-2" max="-2" attributes="0"/>
+                                  <Component id="jBSCNCStart" alignment="0" min="-2" max="-2" attributes="0"/>
+                                  <Component id="jBSCNCToolChange" alignment="0" min="-2" max="-2" attributes="0"/>
+                                  <Component id="jBSCNCSpindleON" alignment="0" min="-2" max="-2" attributes="0"/>
+                                  <Component id="jBSCNCSpindleOFF" alignment="0" min="-2" max="-2" attributes="0"/>
+                                  <Component id="jBSCNCG0Feedrate" alignment="0" min="-2" max="-2" attributes="0"/>
+                                  <Component id="jBSCNCToolSize" alignment="0" min="-2" max="-2" attributes="0"/>
+                                  <Component id="jBSCNCOptimiserTime" alignment="0" min="-2" max="-2" attributes="0"/>
+                                  <Component id="jBSALOptions" alignment="0" min="-2" max="-2" attributes="0"/>
+                                  <Component id="jBSALDistance" alignment="0" min="-2" max="-2" attributes="0"/>
+                                  <Component id="jBSALStart" alignment="0" min="-2" max="-2" attributes="0"/>
+                                  <Component id="jBSARC" alignment="0" min="-2" max="-2" attributes="0"/>
+                                  <Component id="jBSBacklash" alignment="0" min="-2" max="-2" attributes="0"/>
+                                  <Component id="jBSmodalG1" alignment="0" min="-2" max="-2" attributes="0"/>
+                                  <Component id="jBSmodalG0" alignment="0" min="-2" max="-2" attributes="0"/>
+                                  <Component id="jBSComType" alignment="0" min="-2" max="-2" attributes="0"/>
+                                  <Component id="jBSCBack" alignment="0" min="-2" max="-2" attributes="0"/>
+                                  <Component id="jBSCG0" alignment="0" min="-2" max="-2" attributes="0"/>
+                                  <Component id="jBSCG1" alignment="0" min="-2" max="-2" attributes="0"/>
+                              </Group>
+                          </Group>
+                          <Component id="jLabel45" alignment="0" min="-2" max="-2" attributes="0"/>
+                          <Component id="jLabel44" alignment="0" min="-2" max="-2" attributes="0"/>
+                          <Group type="102" alignment="0" attributes="0">
+                              <Component id="jBexport" min="-2" max="-2" attributes="0"/>
+                              <EmptySpace min="-2" pref="18" max="-2" attributes="0"/>
+                              <Component id="jBImport" min="-2" max="-2" attributes="0"/>
+                          </Group>
+                          <Component id="jLabel46" alignment="0" min="-2" max="-2" attributes="0"/>
+                          <Component id="jLabel47" alignment="0" min="-2" max="-2" attributes="0"/>
+                          <Component id="jLabel48" alignment="0" min="-2" max="-2" attributes="0"/>
                       </Group>
                       <EmptySpace min="-2" pref="50" max="-2" attributes="0"/>
                       <Group type="103" groupAlignment="0" attributes="0">
-                          <Component id="jBSWorkSpace" alignment="0" min="-2" max="-2" attributes="0"/>
-                          <Component id="jBSFastFeedrate" alignment="0" min="-2" max="-2" attributes="0"/>
-                          <Component id="jBSHoming" alignment="0" min="-2" max="-2" attributes="0"/>
-                          <Component id="jBSCNCStart" alignment="0" min="-2" max="-2" attributes="0"/>
-                          <Component id="jBSCNCToolChange" alignment="0" min="-2" max="-2" attributes="0"/>
-                          <Component id="jBSCNCSpindleON" alignment="0" min="-2" max="-2" attributes="0"/>
-                          <Component id="jBSCNCSpindleOFF" alignment="0" min="-2" max="-2" attributes="0"/>
-                          <Component id="jBSCNCG0Feedrate" alignment="0" min="-2" max="-2" attributes="0"/>
-                          <Component id="jBSCNCToolSize" alignment="0" min="-2" max="-2" attributes="0"/>
-                          <Component id="jBSCNCOptimiserTime" alignment="0" min="-2" max="-2" attributes="0"/>
-                          <Component id="jBSALOptions" alignment="0" min="-2" max="-2" attributes="0"/>
-                          <Component id="jBSALDistance" alignment="0" min="-2" max="-2" attributes="0"/>
-                          <Component id="jBSALStart" alignment="0" min="-2" max="-2" attributes="0"/>
-                          <Component id="jBSARC" alignment="0" min="-2" max="-2" attributes="0"/>
-                          <Component id="jBSBacklash" alignment="0" min="-2" max="-2" attributes="0"/>
-                          <Component id="jBSmodalG1" alignment="0" min="-2" max="-2" attributes="0"/>
-                          <Component id="jBSComType" alignment="0" min="-2" max="-2" attributes="0"/>
-                      </Group>
-                      <EmptySpace min="-2" pref="50" max="-2" attributes="0"/>
-                      <Group type="103" groupAlignment="0" attributes="0">
+                          <Component id="jLSCBack" min="-2" max="-2" attributes="0"/>
                           <Component id="jLSHomeing" alignment="0" min="-2" max="-2" attributes="0"/>
-                          <Component id="jLSComType" alignment="0" min="-2" max="-2" attributes="0"/>
                           <Component id="jLSFastFeedrate" alignment="0" min="-2" max="-2" attributes="0"/>
                           <Component id="jLSWorkSpace" alignment="0" min="-2" max="-2" attributes="0"/>
                           <Component id="jLSCNCStart" alignment="0" min="-2" max="-2" attributes="0"/>
@@ -76,21 +98,11 @@
                           <Component id="jLSARC" alignment="0" min="-2" max="-2" attributes="0"/>
                           <Component id="jLSBacklash" alignment="0" min="-2" max="-2" attributes="0"/>
                           <Component id="jLSmodalG1" alignment="0" min="-2" max="-2" attributes="0"/>
+                          <Component id="jLSmodalG0" alignment="0" min="-2" max="-2" attributes="0"/>
+                          <Component id="jLSComType" min="-2" max="-2" attributes="0"/>
+                          <Component id="jLSCG0" min="-2" max="-2" attributes="0"/>
+                          <Component id="jLSCG1" min="-2" max="-2" attributes="0"/>
                       </Group>
-                  </Group>
-                  <Group type="102" alignment="0" attributes="0">
-                      <EmptySpace min="10" pref="10" max="-2" attributes="0"/>
-                      <Component id="jLabel44" min="-2" max="-2" attributes="0"/>
-                  </Group>
-                  <Group type="102" attributes="0">
-                      <EmptySpace min="10" pref="10" max="-2" attributes="0"/>
-                      <Component id="jLabel43" min="-2" max="-2" attributes="0"/>
-                  </Group>
-                  <Group type="102" alignment="0" attributes="0">
-                      <EmptySpace min="10" pref="10" max="-2" attributes="0"/>
-                      <Component id="jBexport" min="-2" max="-2" attributes="0"/>
-                      <EmptySpace min="-2" pref="18" max="-2" attributes="0"/>
-                      <Component id="jBImport" min="-2" max="-2" attributes="0"/>
                   </Group>
               </Group>
               <EmptySpace max="32767" attributes="0"/>
@@ -198,16 +210,40 @@
               </Group>
               <EmptySpace type="separate" max="-2" attributes="0"/>
               <Group type="103" groupAlignment="3" attributes="0">
-                  <Component id="jLabel44" alignment="3" min="-2" max="-2" attributes="0"/>
-                  <Component id="jLSComType" alignment="3" min="-2" max="-2" attributes="0"/>
-                  <Component id="jBSComType" alignment="3" min="-2" max="-2" attributes="0"/>
+                  <Component id="jLabel45" alignment="3" min="-2" max="-2" attributes="0"/>
+                  <Component id="jBSmodalG0" alignment="3" min="-2" max="-2" attributes="0"/>
+                  <Component id="jLSmodalG0" alignment="3" min="-2" max="-2" attributes="0"/>
               </Group>
               <EmptySpace type="separate" max="-2" attributes="0"/>
+              <Group type="103" groupAlignment="3" attributes="0">
+                  <Component id="jLabel44" alignment="3" min="-2" max="-2" attributes="0"/>
+                  <Component id="jBSComType" alignment="3" min="-2" max="-2" attributes="0"/>
+                  <Component id="jLSComType" alignment="3" min="-2" max="-2" attributes="0"/>
+              </Group>
+              <EmptySpace type="separate" max="-2" attributes="0"/>
+              <Group type="103" groupAlignment="3" attributes="0">
+                  <Component id="jLabel46" alignment="3" min="-2" max="-2" attributes="0"/>
+                  <Component id="jBSCBack" alignment="3" min="-2" max="-2" attributes="0"/>
+                  <Component id="jLSCBack" alignment="3" min="-2" max="-2" attributes="0"/>
+              </Group>
+              <EmptySpace type="separate" max="-2" attributes="0"/>
+              <Group type="103" groupAlignment="3" attributes="0">
+                  <Component id="jLabel47" alignment="3" min="-2" max="-2" attributes="0"/>
+                  <Component id="jBSCG0" alignment="3" min="-2" max="-2" attributes="0"/>
+                  <Component id="jLSCG0" alignment="3" min="-2" max="-2" attributes="0"/>
+              </Group>
+              <EmptySpace type="separate" max="-2" attributes="0"/>
+              <Group type="103" groupAlignment="3" attributes="0">
+                  <Component id="jLabel48" alignment="3" min="-2" max="-2" attributes="0"/>
+                  <Component id="jBSCG1" alignment="3" min="-2" max="-2" attributes="0"/>
+                  <Component id="jLSCG1" alignment="3" min="-2" max="-2" attributes="0"/>
+              </Group>
+              <EmptySpace max="32767" attributes="0"/>
               <Group type="103" groupAlignment="3" attributes="0">
                   <Component id="jBexport" alignment="3" min="-2" max="-2" attributes="0"/>
                   <Component id="jBImport" alignment="3" min="-2" max="-2" attributes="0"/>
               </Group>
-              <EmptySpace max="32767" attributes="0"/>
+              <EmptySpace max="-2" attributes="0"/>
           </Group>
       </Group>
     </DimensionLayout>
@@ -483,22 +519,6 @@
         <Property name="text" type="java.lang.String" value="Settings Text"/>
       </Properties>
     </Component>
-    <Component class="javax.swing.JButton" name="jBexport">
-      <Properties>
-        <Property name="text" type="java.lang.String" value="Export"/>
-      </Properties>
-      <Events>
-        <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="jBexportActionPerformed"/>
-      </Events>
-    </Component>
-    <Component class="javax.swing.JButton" name="jBImport">
-      <Properties>
-        <Property name="text" type="java.lang.String" value="Import"/>
-      </Properties>
-      <Events>
-        <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="jBImportActionPerformed"/>
-      </Events>
-    </Component>
     <Component class="javax.swing.JLabel" name="jLabel43">
       <Properties>
         <Property name="text" type="java.lang.String" value="Allow modal G1:"/>
@@ -513,6 +533,24 @@
       </Events>
     </Component>
     <Component class="javax.swing.JLabel" name="jLSmodalG1">
+      <Properties>
+        <Property name="text" type="java.lang.String" value="Settings Text"/>
+      </Properties>
+    </Component>
+    <Component class="javax.swing.JLabel" name="jLabel45">
+      <Properties>
+        <Property name="text" type="java.lang.String" value="Allow modal G0:"/>
+      </Properties>
+    </Component>
+    <Component class="javax.swing.JButton" name="jBSmodalG0">
+      <Properties>
+        <Property name="text" type="java.lang.String" value="Change"/>
+      </Properties>
+      <Events>
+        <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="jBSettingsActionPerformed"/>
+      </Events>
+    </Component>
+    <Component class="javax.swing.JLabel" name="jLSmodalG0">
       <Properties>
         <Property name="text" type="java.lang.String" value="Settings Text"/>
       </Properties>
@@ -534,6 +572,94 @@
       <Properties>
         <Property name="text" type="java.lang.String" value="Settings Text"/>
       </Properties>
+    </Component>
+    <Component class="javax.swing.JLabel" name="jLabel46">
+      <Properties>
+        <Property name="text" type="java.lang.String" value="Background color:"/>
+      </Properties>
+    </Component>
+    <Component class="javax.swing.JButton" name="jBSCBack">
+      <Properties>
+        <Property name="text" type="java.lang.String" value="Change"/>
+      </Properties>
+      <Events>
+        <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="jBSettingsActionPerformed"/>
+      </Events>
+    </Component>
+    <Component class="javax.swing.JLabel" name="jLSCBack">
+      <Properties>
+        <Property name="text" type="java.lang.String" value="                   "/>
+        <Property name="border" type="javax.swing.border.Border" editor="org.netbeans.modules.form.editors2.BorderEditor">
+          <Border info="org.netbeans.modules.form.compat2.border.LineBorderInfo">
+            <LineBorder/>
+          </Border>
+        </Property>
+        <Property name="opaque" type="boolean" value="true"/>
+      </Properties>
+    </Component>
+    <Component class="javax.swing.JLabel" name="jLabel47">
+      <Properties>
+        <Property name="text" type="java.lang.String" value="G0 color:"/>
+      </Properties>
+    </Component>
+    <Component class="javax.swing.JButton" name="jBSCG0">
+      <Properties>
+        <Property name="text" type="java.lang.String" value="Change"/>
+      </Properties>
+      <Events>
+        <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="jBSettingsActionPerformed"/>
+      </Events>
+    </Component>
+    <Component class="javax.swing.JLabel" name="jLSCG0">
+      <Properties>
+        <Property name="text" type="java.lang.String" value="                   "/>
+        <Property name="border" type="javax.swing.border.Border" editor="org.netbeans.modules.form.editors2.BorderEditor">
+          <Border info="org.netbeans.modules.form.compat2.border.LineBorderInfo">
+            <LineBorder/>
+          </Border>
+        </Property>
+        <Property name="opaque" type="boolean" value="true"/>
+      </Properties>
+    </Component>
+    <Component class="javax.swing.JLabel" name="jLabel48">
+      <Properties>
+        <Property name="text" type="java.lang.String" value="G1 color:"/>
+      </Properties>
+    </Component>
+    <Component class="javax.swing.JButton" name="jBSCG1">
+      <Properties>
+        <Property name="text" type="java.lang.String" value="Change"/>
+      </Properties>
+      <Events>
+        <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="jBSettingsActionPerformed"/>
+      </Events>
+    </Component>
+    <Component class="javax.swing.JLabel" name="jLSCG1">
+      <Properties>
+        <Property name="text" type="java.lang.String" value="                   "/>
+        <Property name="border" type="javax.swing.border.Border" editor="org.netbeans.modules.form.editors2.BorderEditor">
+          <Border info="org.netbeans.modules.form.compat2.border.LineBorderInfo">
+            <LineBorder/>
+          </Border>
+        </Property>
+        <Property name="opaque" type="boolean" value="true"/>
+      </Properties>
+    </Component>
+    <Component class="javax.swing.JButton" name="jBexport">
+      <Properties>
+        <Property name="text" type="java.lang.String" value="Export"/>
+      </Properties>
+      <Events>
+        <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="jBexportActionPerformed"/>
+      </Events>
+    </Component>
+    <Component class="javax.swing.JButton" name="jBImport">
+      <Properties>
+        <Property name="text" type="java.lang.String" value="Import"/>
+      </Properties>
+      <Events>
+        <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="jBImportActionPerformed"/>
+      </Events>
     </Component>
   </SubComponents>
 </Form>

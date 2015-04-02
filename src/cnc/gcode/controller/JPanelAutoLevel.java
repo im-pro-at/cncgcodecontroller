@@ -133,7 +133,7 @@ public class JPanelAutoLevel extends javax.swing.JPanel implements IGUIEvent {
                 g2.scale(scalex, scaley);
                 
                 //Draw base
-                g2.setColor(Color.white);
+                g2.setColor(new Color(Integer.parseInt(DatabaseV2.CBACKGROUND.get())));
                 g2.fill(new Rectangle2D.Double(0, 0, ariawidth, ariaheight));
                 
                 try {
