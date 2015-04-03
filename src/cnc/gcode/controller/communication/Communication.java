@@ -7,7 +7,9 @@ package cnc.gcode.controller.communication;
 import cnc.gcode.controller.DatabaseV2;
 import cnc.gcode.controller.IEvent;
 import cnc.gcode.controller.MyException;
+import cnc.gcode.controller.ObjectProxy;
 import cnc.gcode.controller.Tools;
+import java.lang.reflect.InvocationTargetException;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.LinkedList;
@@ -341,7 +343,7 @@ public enum Communication {
         }
 
         @Override
-        protected void internal_receive(String line) throws MyException{
+        protected void internal_receive(final String line) throws MyException{
             int rs = 0;
             if(line.length() >= 2 && line.substring(0, 2).equals("ok"))
             {
@@ -354,8 +356,23 @@ public enum Communication {
  
                 Communication.class.notify();
             }
+            
+            final ObjectProxy<Boolean> status= new ObjectProxy<>();
+            
             if(line.length()>=5 && line.substring(0,5).equals("error")){
-                if(JOptionPane.showConfirmDialog(null,"GRBL message: "+line+"\n\r Continue?","Error",JOptionPane.OK_CANCEL_OPTION,JOptionPane.ERROR_MESSAGE)==JOptionPane.OK_OPTION){
+                
+                try {
+                    SwingUtilities.invokeAndWait(new Runnable() {
+                        @Override
+                        public void run() {
+                            status.set(JOptionPane.showConfirmDialog(null,"GRBL message: "+line+"\n\r Continue?","Error",JOptionPane.OK_CANCEL_OPTION,JOptionPane.ERROR_MESSAGE)==JOptionPane.OK_OPTION);
+                        }
+                    });
+                } catch (Exception ex) {
+                    throw new MyException(ex.getMessage());
+                }
+                
+                if(status.get()==true){
                     resivecount++;
 
                     if(resivecount > sendcount)
