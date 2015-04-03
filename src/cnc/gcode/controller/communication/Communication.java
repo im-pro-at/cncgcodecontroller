@@ -10,9 +10,11 @@ import cnc.gcode.controller.MyException;
 import cnc.gcode.controller.Tools;
 import java.text.ParseException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.swing.JOptionPane;
 import javax.swing.SwingUtilities;
 
 /**
@@ -290,6 +292,118 @@ public enum Communication {
         }
         
     },
+    GRBL{
+        private int sendcount   = 0;
+        private int resivecount = 0;
+
+        @Override
+        protected void internal_connect() throws MyException,InterruptedException{
+            internal_reset();
+
+            //Wait for GRBL to reset (1 secound)
+            Communication.doChangedEvent("Wait for GRBL Reset ...");   
+            Communication.class.wait(3000);
+
+            //SET absolute
+            internal_send("$X");
+            doSendEvent("$X");
+            
+            //2 secound Timout for answer
+            synchronized(Communication.class){
+                for (int i = 0;i < 20;i++)
+                {
+                    Communication.class.wait(100);       //give data the possibility to enter internal_receive!
+                    if(!core.isConnected())
+                    {
+                        throw new MyException("Lost connection!");
+                    }
+                    if (!internal_isbusy()) 
+                    {
+                        break;
+                    }
+                }
+            }
+            if(internal_isbusy())
+            {
+                throw new MyException("Printer did not answer to $I!");
+            }
+        }
+        
+        @Override
+        protected void internal_reset(){
+            sendcount   = 0;
+            resivecount = 0;
+        }
+       
+        @Override
+        protected void internal_send(String command) throws MyException{
+            core.send(command);
+            sendcount++;
+        }
+
+        @Override
+        protected void internal_receive(String line) throws MyException{
+            int rs = 0;
+            if(line.length() >= 2 && line.substring(0, 2).equals("ok"))
+            {
+                resivecount++;
+            
+                if(resivecount > sendcount)
+                {
+                    throw new MyException("More OK than send commands!");
+                }
+ 
+                Communication.class.notify();
+            }
+            if(line.length()>=5 && line.substring(0,5).equals("error")){
+                if(JOptionPane.showConfirmDialog(null,"GRBL message: "+line+"\n\r Continue?","Error",JOptionPane.OK_CANCEL_OPTION,JOptionPane.ERROR_MESSAGE)==JOptionPane.OK_OPTION){
+                    resivecount++;
+
+                    if(resivecount > sendcount)
+                    {
+                        throw new MyException("More OK than send commands!");
+                    }
+
+                    Communication.class.notify();                    
+                }
+                else{
+                    //Kill conection
+                    if(!initThread.isAlive())
+                    {
+                        throw new MyException("Error!");
+                    }
+                }
+            }
+            // "start" line after reset
+            if(line.length() >= 5 && line.substring(0, 5).equals("start"))
+            {
+                if(!initThread.isAlive())
+                {
+                    throw new MyException("Controler reset detected!");
+                }
+            }
+        }
+        @Override
+        protected boolean internal_isbusy(){
+            return sendcount > resivecount;
+        }
+        @Override
+        protected boolean internal_isConnected(){
+            return resivecount != 0;            
+        }
+        @Override
+        protected Double internal_ZEndStopHit(String line){
+            if(line.contains("endstops") && line.contains("hit") && line.contains("Z:")){
+                try {
+                    return Tools.strtod(line.substring(line.indexOf("Z:") + 2));
+                } catch (ParseException ex) {
+                    Logger.getLogger(Communication.class.getName()).log(Level.SEVERE, null, ex);
+                }
+            }
+            return null;
+        }
+        
+    },
     ;
   
     //internal Function (have to be overrided
@@ -471,6 +585,13 @@ public enum Communication {
     }
 
     private static synchronized void receive(String[] lines) {
+        //remove emty lines
+        ArrayList<String> l= new ArrayList<>();
+        for(String s:lines)
+            if(!s.equals(""))
+                l.add(s);
+        lines=l.toArray(new String[0]);
+        
         doResiveEvent(lines);
         
         for(String line:lines){

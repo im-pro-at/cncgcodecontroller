@@ -75,7 +75,8 @@
     <target name="-post-jar">  
         <jar jarfile="dist/CNC-GCode-Controller_libs.jar">  
             <zipfileset src="${dist.jar}" excludes="META-INF/*" />  
-            <zipfileset src="dist/lib/nrjavaserial-3.8.8.jar" excludes="META-INF/*" />  
+            <zipfileset src="dist/lib/nrjavaserial-3.9.3.jar" excludes="META-INF/*" />  
+            <zipfileset src="dist/lib/jssc.jar" excludes="META-INF/*" />  
             <manifest>  
                 <attribute name="Main-Class" value="cnc.gcode.controller.CNCGCodeController"/>  
             </manifest>  

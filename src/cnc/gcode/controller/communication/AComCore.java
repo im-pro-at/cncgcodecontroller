@@ -49,20 +49,31 @@ abstract class AComCore {
     public static ArrayList<String> getPortsNames(){
         return new ArrayList<String>(){
             {
-                this.addAll(ComCoreNRSerialPort.getPortsNames());
+                ArrayList<String> l;
+                
+                l=ComCoreNRSerialPort.getPortsNames();
+                for(String s:l)
+                    this.add("NR:"+s);
+                
+                l=ComCoreJSSC.getPortsNames();
+                for(String s:l)
+                    this.add("JS:"+s);
                 this.add("SIM");
             }
         };
     }
     public static ArrayList<Integer> getPortsSpeeds(){
-        return ComCoreNRSerialPort.getPortsSpeeds();
+        return ComCoreJSSC.getPortsSpeeds();
     }
     
     public static AComCore openPort(IReceivedLines resivedlines, IDisconnect disconnect, String name, int speed) throws Exception{
-        if(name.equals("SIM"))
+        if(name.substring(0, 3).equals("NR:"))
+            return new ComCoreNRSerialPort(resivedlines, disconnect, name.substring(3,name.length()), speed);
+        else if(name.substring(0, 3).equals("JS:"))
+            return new ComCoreJSSC(resivedlines, disconnect, name.substring(3,name.length()), speed);
+        else 
             return new ComCoreSIM(resivedlines, disconnect);
-        else
-            return new ComCoreNRSerialPort(resivedlines, disconnect, name, speed);
+            
     }
 
     
