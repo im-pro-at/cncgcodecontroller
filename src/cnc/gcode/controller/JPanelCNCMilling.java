@@ -436,6 +436,11 @@ public class JPanelCNCMilling extends javax.swing.JPanel implements IGUIEvent{
 
         jLabel12.setText("Mirroring:");
 
+        jPPaint.addMouseWheelListener(new java.awt.event.MouseWheelListener() {
+            public void mouseWheelMoved(java.awt.event.MouseWheelEvent evt) {
+                jPPaintMouseWheelMoved(evt);
+            }
+        });
         jPPaint.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseClicked(java.awt.event.MouseEvent evt) {
                 jPPaintMouseClicked(evt);
@@ -657,6 +662,7 @@ public class JPanelCNCMilling extends javax.swing.JPanel implements IGUIEvent{
 
         jSZoom.setMaximum(19);
         jSZoom.setMinimum(1);
+        jSZoom.setMinorTickSpacing(1);
         jSZoom.setSnapToTicks(true);
         jSZoom.setValue(10);
         jSZoom.addChangeListener(new javax.swing.event.ChangeListener() {
@@ -1448,6 +1454,34 @@ public class JPanelCNCMilling extends javax.swing.JPanel implements IGUIEvent{
 
 
     }//GEN-LAST:event_jBScaleActionPerformed
+
+    private void jPPaintMouseWheelMoved(java.awt.event.MouseWheelEvent evt) {//GEN-FIRST:event_jPPaintMouseWheelMoved
+        if (evt.getWheelRotation() > 0 )//mouse wheel was rotated up/away from the user
+        {
+            int iNewValue = jSZoom.getValue() - jSZoom.getMinorTickSpacing()  ;
+            if (iNewValue >= jSZoom.getMinimum())
+            {
+                jSZoom.setValue(iNewValue);
+            }
+            else
+            {
+                jSZoom.setValue(0);
+            }
+        }
+        else
+        {
+            int iNewValue = jSZoom.getValue() + jSZoom.getMinorTickSpacing()  ;
+            if (iNewValue <= jSZoom.getMaximum())
+            {
+                jSZoom.setValue(iNewValue);
+            }
+            else
+            {
+                jSZoom.setValue(jSZoom.getMaximum());
+            }
+        }    
+
+    }//GEN-LAST:event_jPPaintMouseWheelMoved
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton jBAbrote;
