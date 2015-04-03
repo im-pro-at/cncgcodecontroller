@@ -76,6 +76,8 @@ public class JPanelSettings extends javax.swing.JPanel implements IGUIEvent{
         jLSmodalG0.setText(DatabaseV2.G0MODAL.get().equals("0")?"OFF":"ON");
         jLSComType.setText(DatabaseV2.COMTYPE.get());
         jLSCBack.setBackground(new Color(Integer.parseInt(DatabaseV2.CBACKGROUND.get())));
+        jLSCGrid.setBackground(new Color(Integer.parseInt(DatabaseV2.CGRID.get())));
+        jLSCGridDis.setText(DatabaseV2.CGRIDDISTANCE.getsaved()>0?""+DatabaseV2.CGRIDDISTANCE.get():"OFF");        
         jLSCG0.setBackground(new Color(Integer.parseInt(DatabaseV2.CG0.get())));
         jLSCG1.setBackground(new Color(Integer.parseInt(DatabaseV2.CG1.get())));
     }
@@ -319,6 +321,12 @@ public class JPanelSettings extends javax.swing.JPanel implements IGUIEvent{
         jLabel46 = new javax.swing.JLabel();
         jBSCBack = new javax.swing.JButton();
         jLSCBack = new javax.swing.JLabel();
+        jLabel49 = new javax.swing.JLabel();
+        jBSCGrid = new javax.swing.JButton();
+        jLSCGrid = new javax.swing.JLabel();
+        jLabel50 = new javax.swing.JLabel();
+        jBSCGridDis = new javax.swing.JButton();
+        jLSCGridDis = new javax.swing.JLabel();
         jLabel47 = new javax.swing.JLabel();
         jBSCG0 = new javax.swing.JButton();
         jLSCG0 = new javax.swing.JLabel();
@@ -539,6 +547,30 @@ public class JPanelSettings extends javax.swing.JPanel implements IGUIEvent{
         jLSCBack.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0)));
         jLSCBack.setOpaque(true);
 
+        jLabel49.setText("Grid color:");
+
+        jBSCGrid.setText("Change");
+        jBSCGrid.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jBSettingsActionPerformed(evt);
+            }
+        });
+
+        jLSCGrid.setText("                   ");
+        jLSCGrid.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0)));
+        jLSCGrid.setOpaque(true);
+
+        jLabel50.setText("Grid distance:");
+
+        jBSCGridDis.setText("Change");
+        jBSCGridDis.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jBSettingsActionPerformed(evt);
+            }
+        });
+
+        jLSCGridDis.setText("Settings Text");
+
         jLabel47.setText("G0 color:");
 
         jBSCG0.setText("Change");
@@ -629,6 +661,8 @@ public class JPanelSettings extends javax.swing.JPanel implements IGUIEvent{
                                     .addComponent(jBSmodalG0)
                                     .addComponent(jBSComType)
                                     .addComponent(jBSCBack)
+                                    .addComponent(jBSCGrid)
+                                    .addComponent(jBSCGridDis)
                                     .addComponent(jBSCG0)
                                     .addComponent(jBSCG1)))
                             .addComponent(jLabel45)
@@ -638,6 +672,8 @@ public class JPanelSettings extends javax.swing.JPanel implements IGUIEvent{
                                 .addGap(18, 18, 18)
                                 .addComponent(jBImport))
                             .addComponent(jLabel46)
+                            .addComponent(jLabel49)
+                            .addComponent(jLabel50)
                             .addComponent(jLabel47)
                             .addComponent(jLabel48))
                         .addGap(50, 50, 50)
@@ -661,6 +697,8 @@ public class JPanelSettings extends javax.swing.JPanel implements IGUIEvent{
                             .addComponent(jLSmodalG1)
                             .addComponent(jLSmodalG0)
                             .addComponent(jLSComType)
+                            .addComponent(jLSCGrid)
+                            .addComponent(jLSCGridDis)
                             .addComponent(jLSCG0)
                             .addComponent(jLSCG1))))
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
@@ -765,6 +803,16 @@ public class JPanelSettings extends javax.swing.JPanel implements IGUIEvent{
                     .addComponent(jLSCBack))
                 .addGap(18, 18, 18)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jLabel49)
+                    .addComponent(jBSCGrid)
+                    .addComponent(jLSCGrid))
+                .addGap(18, 18, 18)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jLabel50)
+                    .addComponent(jBSCGridDis)
+                    .addComponent(jLSCGridDis))
+                .addGap(18, 18, 18)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel47)
                     .addComponent(jBSCG0)
                     .addComponent(jLSCG0))
@@ -773,7 +821,7 @@ public class JPanelSettings extends javax.swing.JPanel implements IGUIEvent{
                     .addComponent(jLabel48)
                     .addComponent(jBSCG1)
                     .addComponent(jLSCG1))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 16, Short.MAX_VALUE)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jBexport)
                     .addComponent(jBImport))
@@ -1045,6 +1093,23 @@ public class JPanelSettings extends javax.swing.JPanel implements IGUIEvent{
             if(c!=null)
                 DatabaseV2.CBACKGROUND.set(""+c.getRGB());
         }
+        if(evt.getSource() == jBSCGrid)
+        {
+            Color c=JColorChooser.showDialog(this, "Set the background color for the visualisation", new Color(Integer.parseInt(DatabaseV2.CGRID.get())));
+            if(c!=null)
+                DatabaseV2.CGRID.set(""+c.getRGB());
+        }
+        if(evt.getSource() == jBSCGridDis)
+        {
+            Double[] d = Tools.getValues(new String[]{"Set the distace for the Grid (0==off):"},
+                                        new Double[]{DatabaseV2.CGRIDDISTANCE.getsaved()},
+                                        new Double[]{Double.MAX_VALUE},
+                                        new Double[]{0.0});
+            if(d != null) 
+            {
+                DatabaseV2.CGRIDDISTANCE.set(Tools.dtostr(d[0]));
+            }
+        }
         if(evt.getSource() == jBSCG0)
         {
             Color c=JColorChooser.showDialog(this, "Set the color for G0", new Color(Integer.parseInt(DatabaseV2.CG0.get())));
@@ -1139,6 +1204,8 @@ public class JPanelSettings extends javax.swing.JPanel implements IGUIEvent{
     private javax.swing.JButton jBSCBack;
     private javax.swing.JButton jBSCG0;
     private javax.swing.JButton jBSCG1;
+    private javax.swing.JButton jBSCGrid;
+    private javax.swing.JButton jBSCGridDis;
     private javax.swing.JButton jBSCNCG0Feedrate;
     private javax.swing.JButton jBSCNCOptimiserTime;
     private javax.swing.JButton jBSCNCSpindleOFF;
@@ -1161,6 +1228,8 @@ public class JPanelSettings extends javax.swing.JPanel implements IGUIEvent{
     private javax.swing.JLabel jLSCBack;
     private javax.swing.JLabel jLSCG0;
     private javax.swing.JLabel jLSCG1;
+    private javax.swing.JLabel jLSCGrid;
+    private javax.swing.JLabel jLSCGridDis;
     private javax.swing.JLabel jLSCNCG0Feedrate;
     private javax.swing.JLabel jLSCNCOptimiserTime;
     private javax.swing.JLabel jLSCNCSpindleOFF;
@@ -1195,5 +1264,7 @@ public class JPanelSettings extends javax.swing.JPanel implements IGUIEvent{
     private javax.swing.JLabel jLabel46;
     private javax.swing.JLabel jLabel47;
     private javax.swing.JLabel jLabel48;
+    private javax.swing.JLabel jLabel49;
+    private javax.swing.JLabel jLabel50;
     // End of variables declaration//GEN-END:variables
 }

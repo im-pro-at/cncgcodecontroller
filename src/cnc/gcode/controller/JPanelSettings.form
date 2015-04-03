@@ -64,6 +64,8 @@
                                   <Component id="jBSmodalG0" alignment="0" min="-2" max="-2" attributes="0"/>
                                   <Component id="jBSComType" alignment="0" min="-2" max="-2" attributes="0"/>
                                   <Component id="jBSCBack" alignment="0" min="-2" max="-2" attributes="0"/>
+                                  <Component id="jBSCGrid" alignment="0" min="-2" max="-2" attributes="0"/>
+                                  <Component id="jBSCGridDis" alignment="0" min="-2" max="-2" attributes="0"/>
                                   <Component id="jBSCG0" alignment="0" min="-2" max="-2" attributes="0"/>
                                   <Component id="jBSCG1" alignment="0" min="-2" max="-2" attributes="0"/>
                               </Group>
@@ -76,6 +78,8 @@
                               <Component id="jBImport" min="-2" max="-2" attributes="0"/>
                           </Group>
                           <Component id="jLabel46" alignment="0" min="-2" max="-2" attributes="0"/>
+                          <Component id="jLabel49" alignment="0" min="-2" max="-2" attributes="0"/>
+                          <Component id="jLabel50" alignment="0" min="-2" max="-2" attributes="0"/>
                           <Component id="jLabel47" alignment="0" min="-2" max="-2" attributes="0"/>
                           <Component id="jLabel48" alignment="0" min="-2" max="-2" attributes="0"/>
                       </Group>
@@ -100,7 +104,9 @@
                           <Component id="jLSmodalG1" alignment="0" min="-2" max="-2" attributes="0"/>
                           <Component id="jLSmodalG0" alignment="0" min="-2" max="-2" attributes="0"/>
                           <Component id="jLSComType" min="-2" max="-2" attributes="0"/>
-                          <Component id="jLSCG0" min="-2" max="-2" attributes="0"/>
+                          <Component id="jLSCGrid" min="-2" max="-2" attributes="0"/>
+                          <Component id="jLSCGridDis" min="-2" max="-2" attributes="0"/>
+                          <Component id="jLSCG0" alignment="0" min="-2" max="-2" attributes="0"/>
                           <Component id="jLSCG1" min="-2" max="-2" attributes="0"/>
                       </Group>
                   </Group>
@@ -228,6 +234,18 @@
               </Group>
               <EmptySpace type="separate" max="-2" attributes="0"/>
               <Group type="103" groupAlignment="3" attributes="0">
+                  <Component id="jLabel49" alignment="3" min="-2" max="-2" attributes="0"/>
+                  <Component id="jBSCGrid" alignment="3" min="-2" max="-2" attributes="0"/>
+                  <Component id="jLSCGrid" alignment="3" min="-2" max="-2" attributes="0"/>
+              </Group>
+              <EmptySpace type="separate" max="-2" attributes="0"/>
+              <Group type="103" groupAlignment="3" attributes="0">
+                  <Component id="jLabel50" alignment="3" min="-2" max="-2" attributes="0"/>
+                  <Component id="jBSCGridDis" alignment="3" min="-2" max="-2" attributes="0"/>
+                  <Component id="jLSCGridDis" alignment="3" min="-2" max="-2" attributes="0"/>
+              </Group>
+              <EmptySpace type="separate" max="-2" attributes="0"/>
+              <Group type="103" groupAlignment="3" attributes="0">
                   <Component id="jLabel47" alignment="3" min="-2" max="-2" attributes="0"/>
                   <Component id="jBSCG0" alignment="3" min="-2" max="-2" attributes="0"/>
                   <Component id="jLSCG0" alignment="3" min="-2" max="-2" attributes="0"/>
@@ -238,7 +256,7 @@
                   <Component id="jBSCG1" alignment="3" min="-2" max="-2" attributes="0"/>
                   <Component id="jLSCG1" alignment="3" min="-2" max="-2" attributes="0"/>
               </Group>
-              <EmptySpace max="32767" attributes="0"/>
+              <EmptySpace pref="16" max="32767" attributes="0"/>
               <Group type="103" groupAlignment="3" attributes="0">
                   <Component id="jBexport" alignment="3" min="-2" max="-2" attributes="0"/>
                   <Component id="jBImport" alignment="3" min="-2" max="-2" attributes="0"/>
@@ -595,6 +613,48 @@
           </Border>
         </Property>
         <Property name="opaque" type="boolean" value="true"/>
+      </Properties>
+    </Component>
+    <Component class="javax.swing.JLabel" name="jLabel49">
+      <Properties>
+        <Property name="text" type="java.lang.String" value="Grid color:"/>
+      </Properties>
+    </Component>
+    <Component class="javax.swing.JButton" name="jBSCGrid">
+      <Properties>
+        <Property name="text" type="java.lang.String" value="Change"/>
+      </Properties>
+      <Events>
+        <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="jBSettingsActionPerformed"/>
+      </Events>
+    </Component>
+    <Component class="javax.swing.JLabel" name="jLSCGrid">
+      <Properties>
+        <Property name="text" type="java.lang.String" value="                   "/>
+        <Property name="border" type="javax.swing.border.Border" editor="org.netbeans.modules.form.editors2.BorderEditor">
+          <Border info="org.netbeans.modules.form.compat2.border.LineBorderInfo">
+            <LineBorder/>
+          </Border>
+        </Property>
+        <Property name="opaque" type="boolean" value="true"/>
+      </Properties>
+    </Component>
+    <Component class="javax.swing.JLabel" name="jLabel50">
+      <Properties>
+        <Property name="text" type="java.lang.String" value="Grid distance:"/>
+      </Properties>
+    </Component>
+    <Component class="javax.swing.JButton" name="jBSCGridDis">
+      <Properties>
+        <Property name="text" type="java.lang.String" value="Change"/>
+      </Properties>
+      <Events>
+        <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="jBSettingsActionPerformed"/>
+      </Events>
+    </Component>
+    <Component class="javax.swing.JLabel" name="jLSCGridDis">
+      <Properties>
+        <Property name="text" type="java.lang.String" value="Settings Text"/>
       </Properties>
     </Component>
     <Component class="javax.swing.JLabel" name="jLabel47">

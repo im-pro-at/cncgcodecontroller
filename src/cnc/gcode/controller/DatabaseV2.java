@@ -75,6 +75,8 @@ public enum DatabaseV2 {
     
     //Color Settings:
     CBACKGROUND(""+Color.WHITE.getRGB()),
+    CGRID(""+Color.lightGray.getRGB()),
+    CGRIDDISTANCE(Tools.dtostr(10.0)),
     CG0(""+Color.black.getRGB()),
     CG1(""+Color.orange.darker().getRGB())
     ;
