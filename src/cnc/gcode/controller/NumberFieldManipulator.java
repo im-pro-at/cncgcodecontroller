@@ -78,7 +78,7 @@ class NumberFieldManipulator {
             element.addKeyListener(k);
         }
     }
-
+  
     public void setFocus() 
     {
         element.requestFocusInWindow();

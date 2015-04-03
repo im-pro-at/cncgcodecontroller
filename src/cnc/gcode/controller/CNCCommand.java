@@ -74,6 +74,13 @@ public class CNCCommand {
             this.e = e;
             this.t = t;
         }
+        
+        public void scalexy(double[] scale){
+            for(int i=0;i<2;i++){
+                s[i]=s[i]*scale[i];
+                e[i]=e[i]*scale[i];
+            }
+        }
 
         public double[] getStart() {
             return s;
@@ -228,9 +235,16 @@ public class CNCCommand {
     private Calchelper cout;
     private CommandParsing p;
     private String message = "";
+    private double[] scale={1,1};
 
     public CNCCommand(String command) {
         this.command = command;  
+    }
+    
+    private CNCCommand(String command, double scalex, double scaley) {
+        this.command = command;  
+        this.scale[0]=scalex;
+        this.scale[1]=scaley;
     }
     
     public static CNCCommand getStartCommand()
@@ -239,6 +253,7 @@ public class CNCCommand {
         c.type = Type.STARTCOMMAND;
         return c;
     }
+    
     public static CNCCommand getALStartCommand()
     {
         CNCCommand c = new CNCCommand("(Autoleveler Start Command)");
@@ -257,7 +272,20 @@ public class CNCCommand {
         {
             return getALStartCommand();
         }
-        return new CNCCommand(command);
+        return new CNCCommand(command,scale[0],scale[1]);
+    }
+    
+    public CNCCommand clone(double scalex, double scaley)
+    {
+        if(type == Type.STARTCOMMAND)
+        {
+            return getStartCommand();
+        }
+        if(type == Type.ALSTARTCOMMAND)
+        {
+            return getALStartCommand();
+        }
+        return new CNCCommand(command,scalex,scaley);
     }
     
     public State calcCommand(Calchelper c)
@@ -707,6 +735,12 @@ public class CNCCommand {
                 
                 break;
         }
+        
+        //Scale Moves:
+        for(Move move:moves){
+            move.scalexy(scale);
+        }
+        
         return moves.toArray(new Move[0]);
     }
 
