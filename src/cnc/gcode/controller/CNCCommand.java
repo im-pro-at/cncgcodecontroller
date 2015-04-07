@@ -24,12 +24,14 @@ public class CNCCommand {
     {
         private final double movex;
         private final double movey;
+        private final double movez;
         private final boolean mirrorx;
         private final boolean mirrory;
 
-        public Transform(double movex, double movey, boolean mirrorx, boolean mirrory) {
+        public Transform(double movex, double movey, double movez, boolean mirrorx, boolean mirrory) {
             this.movex = movex;
             this.movey = movey;
+            this.movez = movez;
             this.mirrorx = mirrorx;
             this.mirrory = mirrory;
         }
@@ -42,6 +44,10 @@ public class CNCCommand {
         private double y(double y)
         {
             return movey + y * (mirrory ? -1:1);
+        }
+        
+        private double z(double z){
+            return z+movez;
         }
 
         private double t(int i, double d) 
@@ -57,6 +63,8 @@ public class CNCCommand {
                     return x(d);
                 case 1:
                     return y(d);
+                case 2:
+                    return z(d);
             }
             return d;
         }
@@ -758,7 +766,7 @@ public class CNCCommand {
                 //Do Repositoning
                 for(Move move:moves)
                 {
-                    for(int i = 0;i < 2;i++) //X,Y,Z
+                    for(int i = 0;i < 3;i++) //X,Y,Z
                     {
                         move.s[i] = t.t(i,move.s[i]);
                         move.e[i] = t.t(i,move.e[i]);

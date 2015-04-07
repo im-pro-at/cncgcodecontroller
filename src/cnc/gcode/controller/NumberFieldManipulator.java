@@ -147,7 +147,13 @@ class NumberFieldManipulator {
         // with the good text
         toolTip.setTipText(text);
         // get JComponent position
-        Point point = element.getLocationOnScreen();
+        Point point;
+        try{
+            point = element.getLocationOnScreen();
+        }
+        catch(Exception e){
+            point = new Point();
+        }
         final Popup popup = PopupFactory.getSharedInstance().getPopup(element,
                                                                       toolTip,
                                                                       point.x ,

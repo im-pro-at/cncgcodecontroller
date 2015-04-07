@@ -244,7 +244,8 @@ public class JPanelCNCMilling extends javax.swing.JPanel implements IGUIEvent{
                     }
             }        
         });
-        NumberFieldManipulator.IAxesEvent numberevent= new NumberFieldManipulator.IAxesEvent() {
+        
+        NumberFieldManipulator.IAxesEvent numbereventxy= new NumberFieldManipulator.IAxesEvent() {
             @Override
             public void fired(NumberFieldManipulator axis) {
                 Double value;
@@ -259,19 +260,73 @@ public class JPanelCNCMilling extends javax.swing.JPanel implements IGUIEvent{
                 //Write back Value
                 axis.set(value);
                 
+                jCBPerview.setModel(new DefaultComboBoxModel(layers.getLayers(positioningMove[2].getdsave()))); //Clear Layers
                 painter.trigger();
                 
             }
         };
+        NumberFieldManipulator.IAxesEvent numbereventz= new NumberFieldManipulator.IAxesEvent() {
+            @Override
+            public void fired(NumberFieldManipulator axis) {
+                Double value;
+                try {
+                   value = axis.getd();
+                } catch (ParseException ex) {
+                    axis.popUpToolTip(ex.toString());
+                    axis.setFocus();
+                    return;
+                }
         
-        positioningMove = new NumberFieldManipulator[] {new NumberFieldManipulator(jTFmoveX, numberevent), new NumberFieldManipulator(jTFmoveY, numberevent)};
+                //Write back Value
+                axis.set(value);
+                
+                jCBPerview.setModel(new DefaultComboBoxModel(layers.getLayers(positioningMove[2].getdsave()))); //Clear Layers
+                painter.trigger();
+                
+            }
+        };
+        NumberFieldManipulator.IAxesEvent numberevents= new NumberFieldManipulator.IAxesEvent() {
+            @Override
+            public void fired(NumberFieldManipulator axis) {
+                Double value;
+                try {
+                   value = axis.getd();
+                } catch (ParseException ex) {
+                    axis.popUpToolTip(ex.toString());
+                    axis.setFocus();
+                    return;
+                }
+        
+                if(value==0){
+                    axis.popUpToolTip("Scale cannot be 0");
+                    axis.setFocus();
+                    return;
+                }
+                
+                //Write back Value
+                axis.set(value);
+
+                if(jCBScalleXY.isSelected()){
+                    for(NumberFieldManipulator fild:positioningScale)
+                    {
+                        fild.set(value);
+                    }
+                }
+                
+                painter.trigger();
+                
+            }
+        };
+
+        
+        positioningMove = new NumberFieldManipulator[] {new NumberFieldManipulator(jTFmoveX, numbereventxy), new NumberFieldManipulator(jTFmoveY, numbereventxy), new NumberFieldManipulator(jTFmoveZ, numbereventz)};
         
         for(NumberFieldManipulator fild:positioningMove)
         {
             fild.set(0.0);
         }
 
-        positioningScale = new NumberFieldManipulator[] {new NumberFieldManipulator(jTFscaleX, numberevent), new NumberFieldManipulator(jTFscaleY, numberevent)};
+        positioningScale = new NumberFieldManipulator[] {new NumberFieldManipulator(jTFscaleX, numberevents), new NumberFieldManipulator(jTFscaleY, numberevents)};
 
         for(NumberFieldManipulator fild:positioningScale)
         {
@@ -422,6 +477,8 @@ public class JPanelCNCMilling extends javax.swing.JPanel implements IGUIEvent{
         jTFscaleX = new javax.swing.JTextField();
         jTFscaleY = new javax.swing.JTextField();
         jBScale = new javax.swing.JButton();
+        jTFmoveZ = new javax.swing.JTextField();
+        jCBScalleXY = new javax.swing.JCheckBox();
         jPanel2 = new javax.swing.JPanel();
         jLabel5 = new javax.swing.JLabel();
         jCBPerview = new javax.swing.JComboBox();
@@ -558,11 +615,11 @@ public class JPanelCNCMilling extends javax.swing.JPanel implements IGUIEvent{
                 .addGroup(jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel1)
                     .addComponent(jLoadFile))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addGroup(jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel3)
                     .addComponent(jBOptimise))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addGroup(jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel23)
                     .addComponent(jBMilling))
@@ -594,6 +651,7 @@ public class JPanelCNCMilling extends javax.swing.JPanel implements IGUIEvent{
         jLabel8.setText("Move:");
 
         jCBAutoLeveling.setText("AutoLeveling");
+        jCBAutoLeveling.setToolTipText("");
 
         jLabel10.setText("Z");
 
@@ -606,38 +664,45 @@ public class JPanelCNCMilling extends javax.swing.JPanel implements IGUIEvent{
             }
         });
 
+        jCBScalleXY.setText("X=Y");
+        jCBScalleXY.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jCBScalleXYActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout jPanel4Layout = new javax.swing.GroupLayout(jPanel4);
         jPanel4.setLayout(jPanel4Layout);
         jPanel4Layout.setHorizontalGroup(
             jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel4Layout.createSequentialGroup()
+                .addContainerGap()
                 .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(jPanel4Layout.createSequentialGroup()
-                        .addContainerGap()
-                        .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                            .addComponent(jLabel2)
-                            .addComponent(jLabel6))
+                        .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                                .addComponent(jLabel2)
+                                .addComponent(jLabel6))
+                            .addComponent(jLabel10))
                         .addGap(18, 18, 18)
                         .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.CENTER)
+                            .addComponent(jLabel8)
                             .addComponent(jTFmoveX, javax.swing.GroupLayout.PREFERRED_SIZE, 66, javax.swing.GroupLayout.PREFERRED_SIZE)
                             .addComponent(jTFmoveY, javax.swing.GroupLayout.PREFERRED_SIZE, 66, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(jLabel8))
+                            .addComponent(jTFmoveZ, javax.swing.GroupLayout.PREFERRED_SIZE, 66, javax.swing.GroupLayout.PREFERRED_SIZE))
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.CENTER)
-                            .addComponent(jLabel7)
                             .addComponent(jCBmirroX)
-                            .addComponent(jCBmirroY))
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.CENTER)
-                            .addComponent(jLabel13)
-                            .addComponent(jTFscaleX, javax.swing.GroupLayout.PREFERRED_SIZE, 47, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(jTFscaleY, javax.swing.GroupLayout.PREFERRED_SIZE, 47, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(jBScale)))
-                    .addGroup(jPanel4Layout.createSequentialGroup()
-                        .addGap(10, 10, 10)
-                        .addComponent(jLabel10)
-                        .addGap(18, 18, 18)
-                        .addComponent(jCBAutoLeveling)))
+                            .addComponent(jLabel7)
+                            .addComponent(jCBmirroY)))
+                    .addComponent(jCBAutoLeveling))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.CENTER)
+                    .addComponent(jCBScalleXY)
+                    .addComponent(jBScale)
+                    .addComponent(jTFscaleY, javax.swing.GroupLayout.PREFERRED_SIZE, 47, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jTFscaleX, javax.swing.GroupLayout.PREFERRED_SIZE, 47, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jLabel13))
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         jPanel4Layout.setVerticalGroup(
@@ -645,15 +710,11 @@ public class JPanelCNCMilling extends javax.swing.JPanel implements IGUIEvent{
             .addGroup(jPanel4Layout.createSequentialGroup()
                 .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(jPanel4Layout.createSequentialGroup()
-                        .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addGroup(jPanel4Layout.createSequentialGroup()
-                                .addComponent(jLabel8)
-                                .addGap(8, 8, 8))
-                            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel4Layout.createSequentialGroup()
-                                .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                                    .addComponent(jLabel7)
-                                    .addComponent(jLabel13))
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)))
+                        .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                            .addComponent(jLabel7)
+                            .addComponent(jLabel13)
+                            .addComponent(jLabel8))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                         .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
                                 .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
@@ -661,7 +722,7 @@ public class JPanelCNCMilling extends javax.swing.JPanel implements IGUIEvent{
                                     .addComponent(jTFmoveX, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                                 .addComponent(jCBmirroX))
                             .addComponent(jTFscaleX, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 6, Short.MAX_VALUE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                         .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                                 .addComponent(jLabel6)
@@ -670,12 +731,16 @@ public class JPanelCNCMilling extends javax.swing.JPanel implements IGUIEvent{
                     .addGroup(jPanel4Layout.createSequentialGroup()
                         .addGap(0, 0, Short.MAX_VALUE)
                         .addComponent(jTFscaleY, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jTFmoveZ, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jCBScalleXY)
+                    .addComponent(jLabel10))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jCBAutoLeveling)
-                    .addComponent(jLabel10)
                     .addComponent(jBScale))
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addGap(0, 3, Short.MAX_VALUE))
         );
 
         jPanel2.setBorder(javax.swing.BorderFactory.createTitledBorder("Preview"));
@@ -808,9 +873,9 @@ public class JPanelCNCMilling extends javax.swing.JPanel implements IGUIEvent{
             jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel3Layout.createSequentialGroup()
                 .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                    .addComponent(jPanel4, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(jPanel5, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                .addGap(0, 0, 0)
+                    .addComponent(jPanel5, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(jPanel4, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(jPanel2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
@@ -860,7 +925,7 @@ public class JPanelCNCMilling extends javax.swing.JPanel implements IGUIEvent{
                 .addContainerGap()
                 .addComponent(jPanel3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(jScrollPane5, javax.swing.GroupLayout.DEFAULT_SIZE, 423, Short.MAX_VALUE)
+                .addComponent(jScrollPane5, javax.swing.GroupLayout.DEFAULT_SIZE, 389, Short.MAX_VALUE)
                 .addContainerGap())
         );
     }// </editor-fold>//GEN-END:initComponents
@@ -880,6 +945,7 @@ public class JPanelCNCMilling extends javax.swing.JPanel implements IGUIEvent{
         {
             String[] lines = ((CNCCommand)jLCNCCommands.getModel().getElementAt(index)).getInfos(new CNCCommand.Transform(positioningMove[0].getdsave(),
                                                                                                                           positioningMove[1].getdsave(),
+                                                                                                                          positioningMove[2].getdsave(),
                                                                                                                           jCBmirroX.isSelected(),
                                                                                                                           jCBmirroY.isSelected()),
                                                                                                                           jCBAutoLeveling.isSelected()).split("\n");
@@ -974,7 +1040,7 @@ public class JPanelCNCMilling extends javax.swing.JPanel implements IGUIEvent{
         
         
         worker= new PMySwingWorker<Object,CNCCommand>() {
-            CNCCommand.Transform t = new CNCCommand.Transform(positioningMove[0].getdsave(), positioningMove[1].getdsave(), jCBmirroX.isSelected(), jCBmirroY.isSelected());
+            CNCCommand.Transform t = new CNCCommand.Transform(positioningMove[0].getdsave(), positioningMove[1].getdsave(), positioningMove[2].getdsave(), jCBmirroX.isSelected(), jCBmirroY.isSelected());
  
             @Override
             protected Object doInBackground() throws Exception {
@@ -1258,7 +1324,7 @@ public class JPanelCNCMilling extends javax.swing.JPanel implements IGUIEvent{
                     fireupdateGUI();
                 }
                 jLCNCCommands.setModel(model);
-                jCBPerview.setModel(new DefaultComboBoxModel(layers.getLayers())); //Clear Layers
+                jCBPerview.setModel(new DefaultComboBoxModel(layers.getLayers(positioningMove[2].getdsave()))); //Clear Layers
 
                 jSZoom.setValue(10);
                 viewmove    = new Point();
@@ -1365,7 +1431,7 @@ public class JPanelCNCMilling extends javax.swing.JPanel implements IGUIEvent{
                 {
                     message = rvalue;
                     jLCNCCommands.setModel(model);
-                    jCBPerview.setModel(new DefaultComboBoxModel(layers.getLayers())); //Clear Layers
+                    jCBPerview.setModel(new DefaultComboBoxModel(layers.getLayers(positioningMove[2].getdsave()))); //Clear Layers
                     jPBar.setString("~" + Tools.formatDuration(secounds));
                     maxTime = secounds;
                     fireupdateGUI();
@@ -1481,7 +1547,7 @@ public class JPanelCNCMilling extends javax.swing.JPanel implements IGUIEvent{
                 else
                 {
                     jLCNCCommands.setModel(model);
-                    jCBPerview.setModel(new DefaultComboBoxModel(layers.getLayers())); //Clear Layers
+                    jCBPerview.setModel(new DefaultComboBoxModel(layers.getLayers(positioningMove[2].getdsave()))); //Clear Layers
                     jPBar.setString("~" + Tools.formatDuration(secounds));
                     maxTime = secounds;
                     fireupdateGUI();
@@ -1614,7 +1680,7 @@ public class JPanelCNCMilling extends javax.swing.JPanel implements IGUIEvent{
                 else
                 {
                     jLCNCCommands.setModel(model);
-                    jCBPerview.setModel(new DefaultComboBoxModel(layers.getLayers())); //Clear Layers
+                    jCBPerview.setModel(new DefaultComboBoxModel(layers.getLayers(positioningMove[2].getdsave()))); //Clear Layers
                     jPBar.setString("~" + Tools.formatDuration(secounds));
                     maxTime = secounds;
                     fireupdateGUI();
@@ -1628,6 +1694,11 @@ public class JPanelCNCMilling extends javax.swing.JPanel implements IGUIEvent{
         fireupdateGUI();
     }//GEN-LAST:event_jMIEditActionPerformed
 
+    private void jCBScalleXYActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jCBScalleXYActionPerformed
+        jTFscaleY.setEnabled(!jCBScalleXY.isSelected());
+        positioningScale[1].set(positioningScale[0].getdsave());
+    }//GEN-LAST:event_jCBScalleXYActionPerformed
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton jBAbrote;
     private javax.swing.JButton jBMilling;
@@ -1636,6 +1707,7 @@ public class JPanelCNCMilling extends javax.swing.JPanel implements IGUIEvent{
     private javax.swing.JButton jBScale;
     private javax.swing.JCheckBox jCBAutoLeveling;
     private javax.swing.JComboBox jCBPerview;
+    private javax.swing.JCheckBox jCBScalleXY;
     private javax.swing.JCheckBox jCBScroll;
     private javax.swing.JCheckBox jCBSingleStep;
     private javax.swing.JCheckBox jCBmirroX;
@@ -1669,6 +1741,7 @@ public class JPanelCNCMilling extends javax.swing.JPanel implements IGUIEvent{
     private javax.swing.JScrollPane jScrollPane5;
     private javax.swing.JTextField jTFmoveX;
     private javax.swing.JTextField jTFmoveY;
+    private javax.swing.JTextField jTFmoveZ;
     private javax.swing.JTextField jTFscaleX;
     private javax.swing.JTextField jTFscaleY;
     // End of variables declaration//GEN-END:variables

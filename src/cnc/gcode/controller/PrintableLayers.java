@@ -163,13 +163,13 @@ public class PrintableLayers {
         }
     }
 
-    public String[] getLayers() {
+    public String[] getLayers(double offset) {
         keys = layers.keySet().toArray(new Double[0]);
         Arrays.sort(keys);
         String[] slayers = new String[keys.length];
         for (int i = 0; i < keys.length; i++) 
         {
-            slayers[i] = Tools.dtostr(keys[i]);
+            slayers[i] = Tools.dtostr(keys[i]+offset);
         }
         return slayers;
     }

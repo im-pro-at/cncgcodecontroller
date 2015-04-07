@@ -135,7 +135,7 @@ public class CNCGCodeController {
             //Process new comands
             System.out.println("Export commands ...");
             PrintWriter export = new PrintWriter(fout);
-            CNCCommand.Transform t = new CNCCommand.Transform(movex, movey, mirrorx, mirrory);            
+            CNCCommand.Transform t = new CNCCommand.Transform(movex, movey, 0, mirrorx, mirrory);            
 
             for(int i = 0;i < cmds.size();i++)
             {
