@@ -162,6 +162,14 @@ public class AutoLevelSystem implements java.io.Serializable{
         {
             return 0.0;
         }
+        
+        // No interpolation if our point is outside the probed area 
+        Point2D.Double minPt = points[0][0].getPoint();
+        Point2D.Double maxPt = points[points.length - 1][points[points.length - 1].length - 1].getPoint();
+        
+        if (minPt.x - p.getX() > 0.0 || minPt.y - p.getY() > 0.0 ||
+            maxPt.x - p.getX() < 0.0 || maxPt.y - p.getY() < 0.0)
+           return 0.0;
 
         //dircet hit!
         if(Math.abs(points[p0X][p0Y].getPoint().getX() - p.getX()) < 0.00001 
