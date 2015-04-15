@@ -171,7 +171,7 @@ public class AutoLevelSystem implements java.io.Serializable{
             maxPt.x - p.getX() < 0.0 || maxPt.y - p.getY() < 0.0)
            return 0.0;
 
-        //dircet hit!
+        //direct hit!
         if(Math.abs(points[p0X][p0Y].getPoint().getX() - p.getX()) < 0.00001 
                 && Math.abs(points[p0X][p0Y].getPoint().getY() - p.getY()) < 0.00001)
         {
@@ -182,11 +182,11 @@ public class AutoLevelSystem implements java.io.Serializable{
         boolean lr = p.getX() > points[p0X][p0Y].getPoint().getX(); //l=false r=true
         boolean lu = p.getY() > points[p0X][p0Y].getPoint().getY(); //l=false u=true
 
-        //calc neighbor coorinats
+        //calc neighbor coordinates
         int p1X = p0X + (lr ? 1:-1);
         int p1Y = p0Y + (lu ? 1:-1);
         
-        //Test if there exists neighbor
+        //Check if the neighbor exists
         boolean neighborX_exists = p1X < points.length && p1X >= 0;
         boolean neighborY_exists = p1Y < points[p0X].length && p1Y >= 0;
         
