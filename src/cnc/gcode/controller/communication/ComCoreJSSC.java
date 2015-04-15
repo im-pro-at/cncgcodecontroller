@@ -129,6 +129,6 @@ class ComCoreJSSC extends AComCore {
         return new ArrayList<String>(Arrays.asList(SerialPortList.getPortNames())); 
     }
     public static ArrayList<Integer> getPortsSpeeds(){
-        return new ArrayList<Integer>(Arrays.asList(new Integer[]{110,300,600,1200,4800,9600,14400,19200,38400,57600,115200,128000,256000}));
+        return new ArrayList<Integer>(Arrays.asList(new Integer[]{110,300,600,1200,4800,9600,14400,19200,38400,57600,115200,128000,250000,256000}));
     }
 }
