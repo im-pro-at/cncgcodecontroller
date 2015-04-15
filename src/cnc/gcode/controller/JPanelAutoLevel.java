@@ -137,22 +137,6 @@ public class JPanelAutoLevel extends javax.swing.JPanel implements IGUIEvent {
                 g2.setColor(new Color(Integer.parseInt(DatabaseV2.CBACKGROUND.get())));
                 g2.fill(new Rectangle2D.Double(0, 0, ariawidth, ariaheight));
 
-                //Draw Koardinates
-                if(DatabaseV2.CGRIDDISTANCE.getsaved()>0){
-                    g2.setColor(new Color(Integer.parseInt(DatabaseV2.CGRID.get())));
-
-                    g2.setStroke(new BasicStroke((float)(1/scalex)));
-                    for(int x=1;x<ariawidth/DatabaseV2.CGRIDDISTANCE.getsaved();x++){
-                        g2.drawLine((int)(x*DatabaseV2.CGRIDDISTANCE.getsaved()),0,(int)(x*DatabaseV2.CGRIDDISTANCE.getsaved()), (int)(ariaheight));
-                    }
-
-                    g2.setStroke(new BasicStroke((float)(1/scaley)));
-                    for(int y=1;y<ariaheight/DatabaseV2.CGRIDDISTANCE.getsaved();y++){
-                        g2.drawLine(0,(int)(y*DatabaseV2.CGRIDDISTANCE.getsaved()),(int)(ariawidth),(int)(y*DatabaseV2.CGRIDDISTANCE.getsaved()));
-                    }
-                }
-                
-                
                 try {
                     AffineTransform t = g2.getTransform();
                     t.invert();
@@ -228,6 +212,9 @@ public class JPanelAutoLevel extends javax.swing.JPanel implements IGUIEvent {
                                     90,
                                     zh - 4);
                     }
+                    
+                    g2.translate(rect.x, rect.y);
+                    g2.scale(scalex, scaley);
                 }
                 else
                 {
@@ -246,6 +233,22 @@ public class JPanelAutoLevel extends javax.swing.JPanel implements IGUIEvent {
 
                     }
                 }
+                
+                //Draw coordinate plane
+                if(DatabaseV2.CGRIDDISTANCE.getsaved()>0){
+                    g2.setColor(new Color(Integer.parseInt(DatabaseV2.CGRID.get())));
+
+                    g2.setStroke(new BasicStroke((float)(1/scalex)));
+                    for(int x=1;x<ariawidth/DatabaseV2.CGRIDDISTANCE.getsaved();x++){
+                        g2.drawLine((int)(x*DatabaseV2.CGRIDDISTANCE.getsaved()),0,(int)(x*DatabaseV2.CGRIDDISTANCE.getsaved()), (int)(ariaheight));
+                    }
+
+                    g2.setStroke(new BasicStroke((float)(1/scaley)));
+                    for(int y=1;y<ariaheight/DatabaseV2.CGRIDDISTANCE.getsaved();y++){
+                        g2.drawLine(0,(int)(y*DatabaseV2.CGRIDDISTANCE.getsaved()),(int)(ariawidth),(int)(y*DatabaseV2.CGRIDDISTANCE.getsaved()));
+                    }
+                }
+                
                 return image;
             }
 
