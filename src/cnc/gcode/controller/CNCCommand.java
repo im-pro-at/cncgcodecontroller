@@ -199,7 +199,7 @@ public class CNCCommand {
         ;
         
         /*
-         * Commands are allwoed for optimisation between the last and the first G1 move:
+         * Commands are allowed for optimisation between the last and the first G1 move:
          */
         public final static List<Type> ALLOWEDFOROPTIMISER = Collections.unmodifiableList(Arrays.asList(EMPTY, G0, G1, ARC, SPINDLEON, SPINDLEOFF, MXX, PAUSE)); 
         
@@ -442,29 +442,29 @@ public class CNCCommand {
             }
         }
         
-        //Do Nessassary Checking
+        //Do necessary checks
         switch(type)
         {
             case ARC:
                 if(p.contains('Z') || p.contains('K'))
                 {
                     state = State.ERROR;
-                    message += "ARC in Z are not Supported! ";
+                    message += "ARC in Z are not supported! ";
                 }
                 if(p.contains('P') )
                 {
                     state = State.ERROR;
-                    message += "ARC with P are not Supported! ";
+                    message += "ARC with P are not supported! ";
                 }
                 if(p.contains('R') )
                 {
                     state = State.ERROR;
-                    message += "ARC with R are not Supported! ";
+                    message += "ARC with R are not supported! ";
                 }
                 if(!p.contains('I') || !p.contains('I'))
                 {
                     state = State.ERROR;
-                    message += "ARC has to have I and J as Parameters! ";
+                    message += "ARC has to have I and J as parameters! ";
                 }
             case G0:
             case G1:
@@ -601,7 +601,7 @@ public class CNCCommand {
                         {
                             state = State.WARNING;
                         }
-                        message += "Command Without any movement! ";
+                        message += "Command without any movement! ";
                     }
                     
                     if(move.s[2] != move.e[2] && Double.isNaN(move.e[2]) == false)
@@ -813,7 +813,7 @@ public class CNCCommand {
                 }
                 
                 //Correct Backlash  (http://forums.reprap.org/read.php?154,178612 thanks to georgeflug)
-                boolean[] direction = cin.lastmovedirection.clone(); //fase positive true negative
+                boolean[] direction = cin.lastmovedirection.clone(); //false positive true negative
                 ArrayList<Move> newmoves = new ArrayList<>(moves.length);
                 for(Move move:moves)
                 {
