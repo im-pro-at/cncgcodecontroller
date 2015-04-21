@@ -16,7 +16,7 @@ import java.util.logging.Logger;
 import jssc.SerialPort;
 import jssc.SerialPortList;
 
-//Core for kommunikation
+//Core for communication
 
 class ComCoreJSSC extends AComCore {
     private final SerialPort serialPort;
@@ -37,7 +37,7 @@ class ComCoreJSSC extends AComCore {
         }
         if (!serialPort.setParams(speed,SerialPort.DATABITS_8,SerialPort.STOPBITS_1,SerialPort.PARITY_NONE))
         {
-            throw new Exception("Cannot set Parameters for selected port!");
+            throw new Exception("Cannot set parameters for selected port!");
         }
         
         receiveTimer = new Timer() {
@@ -129,6 +129,6 @@ class ComCoreJSSC extends AComCore {
         return new ArrayList<String>(Arrays.asList(SerialPortList.getPortNames())); 
     }
     public static ArrayList<Integer> getPortsSpeeds(){
-        return new ArrayList<Integer>(Arrays.asList(new Integer[]{110,300,600,1200,4800,9600,14400,19200,38400,57600,115200,128000,256000}));
+        return new ArrayList<Integer>(Arrays.asList(new Integer[]{110,300,600,1200,4800,9600,14400,19200,38400,57600,115200,128000,250000,256000}));
     }
 }
