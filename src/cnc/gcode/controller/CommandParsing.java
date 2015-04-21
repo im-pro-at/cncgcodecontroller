@@ -92,7 +92,7 @@ public class CommandParsing {
                     if (parameters.contains(p)) 
                     {
                         error = true;
-                    } else 
+                    } else if(parameters.size()!=0 || (letter!='n' && letter!='N')) //Ignor line number!
                     {
                         parameters.add(p);
                     }
