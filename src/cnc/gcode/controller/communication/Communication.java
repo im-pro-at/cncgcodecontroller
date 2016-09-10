@@ -296,18 +296,20 @@ public enum Communication {
     GRBL{
         private int sendcount   = 0;
         private int resivecount = 0;
+        private boolean whatforreset =false;
 
         @Override
         protected void internal_connect() throws MyException,InterruptedException{
             internal_reset();
 
+            Communication.class.wait(2000);
+            
+            whatforreset=true;
+            internal_send(Character.toString((char)24));
+            doSendEvent("Send ctrl-C [RESET]");
+
             //Wait for GRBL to reset (1 secound)
             Communication.doChangedEvent("Wait for GRBL Reset ...");   
-            Communication.class.wait(3000);
-
-            //SET absolute
-            internal_send("$X");
-            doSendEvent("$X");
             
             //2 secound Timout for answer
             synchronized(Communication.class){
@@ -318,15 +320,15 @@ public enum Communication {
                     {
                         throw new MyException("Lost connection!");
                     }
-                    if (!internal_isbusy()) 
+                    if (!whatforreset) 
                     {
                         break;
                     }
                 }
             }
-            if(internal_isbusy())
+            if(whatforreset)
             {
-                throw new MyException("Printer did not answer to $I!");
+                throw new MyException("Printer did not Reset!");
             }
         }
         
@@ -390,10 +392,21 @@ public enum Communication {
                     }
                 }
             }
-            // "start" line after reset
-            if(line.length() >= 5 && line.substring(0, 5).equals("start"))
-            {
+            
+            if(line.length()>=5 && line.substring(0,5).equals("ALARM")){
                 if(!initThread.isAlive())
+                {
+                    throw new MyException(line);
+                }
+            }
+            
+            // "start" line after reset
+            if(line.length() >= 4 && line.substring(0, 4).equals("Grbl"))
+            {
+                if(whatforreset){
+                    whatforreset=false;
+                }
+                else if(!initThread.isAlive())
                 {
                     throw new MyException("Controler reset detected!");
                 }

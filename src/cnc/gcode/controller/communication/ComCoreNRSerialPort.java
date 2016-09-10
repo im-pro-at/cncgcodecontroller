@@ -6,6 +6,7 @@ package cnc.gcode.controller.communication;
 
 import gnu.io.NRSerialPort;
 import gnu.io.SerialPort;
+import java.io.Console;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.ArrayList;
@@ -103,6 +104,8 @@ class ComCoreNRSerialPort extends AComCore {
 
     @Override
     public void send(String line) {
+        System.out.println("Send: "+line);
+        System.out.println("Send: "+line.getBytes()[0]);
         if(!line.endsWith("\n"))
         {
             line += "\n";
