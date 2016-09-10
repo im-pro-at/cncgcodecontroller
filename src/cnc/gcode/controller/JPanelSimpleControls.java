@@ -10,6 +10,7 @@ import cnc.gcode.controller.communication.IReceivedLines;
 import java.text.DecimalFormat;
 import java.text.ParseException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 /**
@@ -964,14 +965,10 @@ public class JPanelSimpleControls extends javax.swing.JPanel implements IGUIEven
                                                     }});              
         }
         else if (sender.equals(MotorsOn)){
-                ExecuteActions(new ArrayList<String>()    {{
-                                                        this.add(DatabaseV2.SPINDLEON.get());
-                                                    }});              
+                ExecuteActions(new ArrayList<String>(Arrays.asList(DatabaseV2.SPINDLEON.get().split("\n"))));
         }
         else if (sender.equals(MotorsOff)){
-                ExecuteActions(new ArrayList<String>()    {{
-                                                        this.add(DatabaseV2.SPINDLEOFF.get());
-                                                    }});              
+                ExecuteActions(new ArrayList<String>(Arrays.asList(DatabaseV2.SPINDLEOFF.get().split("\n"))));
         }
         else if (sender.equals(XPlus01)){
             PerformSimpleMove(0.1,Axis.X);

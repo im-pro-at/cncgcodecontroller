@@ -1208,7 +1208,8 @@ public class JPanelAdvancedControl extends javax.swing.JPanel implements IGUIEve
             return;
         }
         try {
-            Communication.send(DatabaseV2.SPINDLEON.get());
+            for(String s:DatabaseV2.SPINDLEON.get().split("\n"))
+                Communication.send(s);
         } catch (ComInterruptException ex) {
             Logger.getLogger(JPanelAdvancedControl.class.getName()).log(Level.SEVERE, null, ex);
         }
@@ -1221,7 +1222,8 @@ public class JPanelAdvancedControl extends javax.swing.JPanel implements IGUIEve
             return;
         }
         try {
-            Communication.send(DatabaseV2.SPINDLEOFF.get());
+            for(String s:DatabaseV2.SPINDLEOFF.get().split("\n"))
+                Communication.send(s);
         } catch (ComInterruptException ex) {
             Logger.getLogger(JPanelAdvancedControl.class.getName()).log(Level.SEVERE, null, ex);
         }

@@ -104,8 +104,6 @@ class ComCoreNRSerialPort extends AComCore {
 
     @Override
     public void send(String line) {
-        System.out.println("Send: "+line);
-        System.out.println("Send: "+line.getBytes()[0]);
         if(!line.endsWith("\n"))
         {
             line += "\n";
