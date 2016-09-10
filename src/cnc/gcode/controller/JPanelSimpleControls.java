@@ -23,40 +23,8 @@ public class JPanelSimpleControls extends javax.swing.JPanel implements IGUIEven
     
     
     //X:2.00Y:0.00Z:0.00E:0.00 Count X: 1.01Y:0.00Z:0.00
-    private double ExtractAxisPosition(String line, Axis axis) throws Exception
-    {
-        if(line.contains(axis.toString() + ":"))
-        {
-            int pos = line.indexOf( "" + axis.toString() + ":");
-            if(pos == -1)
-            {
-                throw new Exception("Error when extracting position of Axis " + axis.toString() + " from " + line);
-            }
-            try {
-                    String temp = line.substring(pos + 2);
-                    return Tools.strtod(temp);
-                } catch (ParseException ex) {
-                    throw new Exception("Error when extracting position of Axis " + axis.toString() + " from " + line + " exception : " + ex.getMessage());
-                }
-        }
-        throw new Exception("Error: Current line doesn not contains position information for axis " + axis.toString());
-    }
-    private XYZPosition ExtractPosFromLine(String line)
-    {
-        XYZPosition position = new XYZPosition();
-        try
-        {
-            position.setX(ExtractAxisPosition(line, Axis.X));
-            position.setY(ExtractAxisPosition(line, Axis.Y));
-            position.setZ(ExtractAxisPosition(line, Axis.Z));
-            position.setIsValidPosition(true);
-        }catch(Exception ex)
-        {
-            appendToConsole(ex.getMessage());
-            position.setIsValidPosition(false);
-        }
-        return position;
-    }
+
+
     public JPanelSimpleControls() {
         initComponents();
         
@@ -69,16 +37,6 @@ public class JPanelSimpleControls extends javax.swing.JPanel implements IGUIEven
                     if((line.toLowerCase().contains("ok") == true && FilterOk.isSelected() == true) == false )
                     {
                         appendToConsole(line);
-                    }
-                    if( line.contains(Axis.X + ":" ) && line.contains(Axis.Y + ":" ) && line.contains(Axis.Z + ":" ))
-                    {
-                        //parseNextSerial = false;
-                        XYZPosition pos = ExtractPosFromLine(in);
-                        if( pos.IsValidPosition())
-                        {
-                            CurrentPos.setText("Position: X=" + pos.getX() + " Y=" + pos.getY() + " Z=" + pos.getZ());
-                        }
-                        
                     }
                 }
             }
@@ -977,106 +935,105 @@ public class JPanelSimpleControls extends javax.swing.JPanel implements IGUIEven
         
         if(sender.equals(HomeAll)){
                 ExecuteActions(new ArrayList<String>()    {{
-                                                        this.add("G28 X Y Z");
-                                                        this.add("M114");
+                                                        this.add(Communication.getdoHomingCommand());
+                                                        this.add(Communication.getredPostionCommand());
                                                     }});           
         }
         else if (sender.equals(HomeX)){
                 ExecuteActions(new ArrayList<String>()    {{
                                                         this.add("G28 X");
-                                                        this.add("M114");
+                                                        this.add(Communication.getredPostionCommand());
                                                     }});              
         }
         else if (sender.equals(HomeY)){
                 ExecuteActions(new ArrayList<String>()    {{
                                                         this.add("G28 Y");
-                                                        this.add("M114");
+                                                        this.add(Communication.getredPostionCommand());
                                                     }});              
         }
         else if (sender.equals(HomeZ) || sender.equals(HomeZ2)){
                 ExecuteActions(new ArrayList<String>()    {{
                                                         this.add("G28 Z");
-                                                        this.add("M114");
-                                                    }});              
-        }
-        else if (sender.equals(MotorsOn)){
-                ExecuteActions(new ArrayList<String>()    {{
-                                                        this.add("M17");
-                                                    }});              
-        }
-        else if (sender.equals(MotorsOff)){
-                ExecuteActions(new ArrayList<String>()    {{
-                                                        this.add("M18");
+                                                        this.add(Communication.getredPostionCommand());
                                                     }});              
         }
         else if (sender.equals(HomeXY)){
                 ExecuteActions(new ArrayList<String>()    {{
                                                         this.add("G28 X Y");
-                                                        this.add("M114");
+                                                        this.add(Communication.getredPostionCommand());
                                                     }});              
         }
-        
+        else if (sender.equals(MotorsOn)){
+                ExecuteActions(new ArrayList<String>()    {{
+                                                        this.add(DatabaseV2.SPINDLEON.get());
+                                                    }});              
+        }
+        else if (sender.equals(MotorsOff)){
+                ExecuteActions(new ArrayList<String>()    {{
+                                                        this.add(DatabaseV2.SPINDLEOFF.get());
+                                                    }});              
+        }
         else if (sender.equals(XPlus01)){
-            PerformSimpleMove(0.1,Axis.X, Double.valueOf(DatabaseV2.MAXFEEDRATE.get()).intValue());
+            PerformSimpleMove(0.1,Axis.X);
         }
         else if (sender.equals(XPlus1)){
-            PerformSimpleMove(1,Axis.X, Double.valueOf(DatabaseV2.MAXFEEDRATE.get()).intValue());
+            PerformSimpleMove(1,Axis.X);
         }
         else if (sender.equals(XPlus10)){
-            PerformSimpleMove(10,Axis.X, Double.valueOf(DatabaseV2.MAXFEEDRATE.get()).intValue());
+            PerformSimpleMove(10,Axis.X);
         }
         else if (sender.equals(XMinus01)){
-            PerformSimpleMove(-0.1,Axis.X, Double.valueOf(DatabaseV2.MAXFEEDRATE.get()).intValue());
+            PerformSimpleMove(-0.1,Axis.X);
         }
         else if (sender.equals(XMinus1)){
-            PerformSimpleMove(-1,Axis.X, Double.valueOf(DatabaseV2.MAXFEEDRATE.get()).intValue());
+            PerformSimpleMove(-1,Axis.X);
         }
         else if (sender.equals(XMinus10)){
-            PerformSimpleMove(-10,Axis.X, Double.valueOf(DatabaseV2.MAXFEEDRATE.get()).intValue());
+            PerformSimpleMove(-10,Axis.X);
         }
         
         else if (sender.equals(YPlus01)){
-            PerformSimpleMove(0.1,Axis.Y, Double.valueOf(DatabaseV2.MAXFEEDRATE.get()).intValue());
+            PerformSimpleMove(0.1,Axis.Y);
         }
         else if (sender.equals(YPlus1)){
-            PerformSimpleMove(1,Axis.Y, Double.valueOf(DatabaseV2.MAXFEEDRATE.get()).intValue());
+            PerformSimpleMove(1,Axis.Y);
         }
         else if (sender.equals(YPlus10)){
-            PerformSimpleMove(10,Axis.Y, Double.valueOf(DatabaseV2.MAXFEEDRATE.get()).intValue());
+            PerformSimpleMove(10,Axis.Y);
         }
         else if (sender.equals(YMinus01)){
-            PerformSimpleMove(-0.1,Axis.Y, Double.valueOf(DatabaseV2.MAXFEEDRATE.get()).intValue());
+            PerformSimpleMove(-0.1,Axis.Y);
         }
         else if (sender.equals(YMinus1)){
-            PerformSimpleMove(-1,Axis.Y, Double.valueOf(DatabaseV2.MAXFEEDRATE.get()).intValue());
+            PerformSimpleMove(-1,Axis.Y);
         }
         else if (sender.equals(YMinus10)){
-            PerformSimpleMove(-10,Axis.Y, Double.valueOf(DatabaseV2.MAXFEEDRATE.get()).intValue());
+            PerformSimpleMove(-10,Axis.Y);
         }
         
         else if (sender.equals(ZPlus01)){
-            PerformSimpleMove(0.1,Axis.Z, Double.valueOf(DatabaseV2.MAXFEEDRATE.get()).intValue());
+            PerformSimpleMove(0.1,Axis.Z);
         }
         else if (sender.equals(ZPlus1)){
-            PerformSimpleMove(1,Axis.Z, Double.valueOf(DatabaseV2.MAXFEEDRATE.get()).intValue());
+            PerformSimpleMove(1,Axis.Z);
         }
         else if (sender.equals(ZPlus5)){
-            PerformSimpleMove(5,Axis.Z, Double.valueOf(DatabaseV2.MAXFEEDRATE.get()).intValue());
+            PerformSimpleMove(5,Axis.Z);
         }
         else if (sender.equals(ZPlus10)){
-            PerformSimpleMove(10,Axis.Z, Double.valueOf(DatabaseV2.MAXFEEDRATE.get()).intValue());
+            PerformSimpleMove(10,Axis.Z);
         }
         else if (sender.equals(ZMinus01)){
-            PerformSimpleMove(-0.1,Axis.Z, Double.valueOf(DatabaseV2.MAXFEEDRATE.get()).intValue());
+            PerformSimpleMove(-0.1,Axis.Z);
         }
         else if (sender.equals(ZMinus1)){
-            PerformSimpleMove(-1,Axis.Z, Double.valueOf(DatabaseV2.MAXFEEDRATE.get()).intValue());
+            PerformSimpleMove(-1,Axis.Z);
         }
         else if (sender.equals(ZMinus5)){
-            PerformSimpleMove(-5,Axis.Z, Double.valueOf(DatabaseV2.MAXFEEDRATE.get()).intValue());
+            PerformSimpleMove(-5,Axis.Z);
         }
         else if (sender.equals(ZMinus10)){
-            PerformSimpleMove(-10,Axis.Z, Double.valueOf(DatabaseV2.MAXFEEDRATE.get()).intValue());
+            PerformSimpleMove(-10,Axis.Z);
         }
 
     }
@@ -1100,13 +1057,13 @@ public class JPanelSimpleControls extends javax.swing.JPanel implements IGUIEven
     {
         X, Y, Z, E
     }
-    private void PerformSimpleMove(final double distance, final Axis axis, final int feedrate)
+    private void PerformSimpleMove(final double distance, final Axis axis)
     {
         ExecuteActions(new ArrayList<String>()    {{
                                                 this.add("G91");
-                                                this.add("G0 " + axis.toString() + new DecimalFormat("#.##").format(distance).replace(",", ".") +  " F" + feedrate);
+                                                this.add("G0 " + axis.toString() + new DecimalFormat("#.##").format(distance).replace(",", ".") +  " F" + DatabaseV2.MAXFEEDRATE.get());
                                                 this.add("G90");
-                                                this.add("M114");
+                                                this.add(Communication.getredPostionCommand());
                                             }});          
     }
     
@@ -1243,13 +1200,16 @@ public class JPanelSimpleControls extends javax.swing.JPanel implements IGUIEven
     private void setEnableAllControls(boolean enable)
     {
         this.HomeAll.setEnabled(enable);
+        
         this.HomeX.setEnabled(enable);
         this.HomeY.setEnabled(enable);
         this.HomeXY.setEnabled(enable);
         this.HomeZ.setEnabled(enable);
         this.HomeZ2.setEnabled(enable);
+        
         this.MotorsOff.setEnabled(enable);
         this.MotorsOn.setEnabled(enable);
+        
         this.XMinus01.setEnabled(enable);
         this.XMinus1.setEnabled(enable);
         this.XMinus10.setEnabled(enable);

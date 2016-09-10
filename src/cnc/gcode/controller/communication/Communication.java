@@ -202,6 +202,15 @@ public enum Communication {
 
         }
         
+        @Override
+        protected String internal_getHomingCommand(){
+            return "G28";
+        }
+
+        @Override
+        protected String internal_getredPostionCommand(){
+            return "M114";
+        }
         
     },
     GENERIC{
@@ -292,6 +301,16 @@ public enum Communication {
             return null;
         }
         
+        @Override
+        protected String internal_getHomingCommand(){
+            return "G28";
+        }
+
+        @Override
+        protected String internal_getredPostionCommand(){
+            return "M114";
+        }
+
     },
     GRBL{
         private int sendcount   = 0;
@@ -432,6 +451,17 @@ public enum Communication {
             return null;
         }
         
+        @Override
+        protected String internal_getHomingCommand(){
+            return "$H";
+        }
+        
+        @Override
+        protected String internal_getredPostionCommand(){
+            return "?";
+        }
+        
+        
     },
     ;
   
@@ -443,6 +473,9 @@ public enum Communication {
     abstract Double internal_ZEndStopHit(String line);      //is called on each line to detect endstopHit of Zacess
     abstract boolean internal_isbusy();          //Return if busy
     abstract boolean internal_isConnected();     //Returns if Connected
+    abstract String internal_getHomingCommand();  
+    abstract String internal_getredPostionCommand();  
+
     
     
     private static Thread initThread    = new Thread();
@@ -706,6 +739,14 @@ public enum Communication {
     @Override
     public String toString() {
         return name();
+    }
+    
+    public static String getdoHomingCommand(){
+        return I().internal_getHomingCommand();
+    }
+
+    public static String getredPostionCommand(){
+        return I().internal_getredPostionCommand();
     }
     
 }
