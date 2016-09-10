@@ -11,7 +11,7 @@ package cnc.gcode.controller;
 public class SendListElement {
     public enum EType {
 
-        IN, OUT
+        IN, OUT, INFO
     }
 
     EType type;
@@ -29,6 +29,14 @@ public class SendListElement {
     
     @Override
     public String toString() {
-        return (this.type == EType.IN ? "-->":"<--") + " " + this.s;
+        switch (type){
+            case IN:
+                return "--> "+ this.s;
+            case OUT:
+                return "<-- "+ this.s;
+            default:
+            case INFO:
+                return "INFO: "+ this.s;
+        }
     }    
 }

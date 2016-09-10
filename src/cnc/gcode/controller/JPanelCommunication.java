@@ -6,6 +6,7 @@ package cnc.gcode.controller;
 
 import cnc.gcode.controller.communication.ComInterruptException;
 import cnc.gcode.controller.communication.Communication;
+import cnc.gcode.controller.communication.ILocationString;
 import cnc.gcode.controller.communication.IReceivedLines;
 import cnc.gcode.controller.communication.ISend;
 import java.awt.event.ActionEvent;
@@ -31,56 +32,47 @@ public class JPanelCommunication extends javax.swing.JPanel implements IGUIEvent
     public JPanelCommunication() {
         initComponents();
         
-        Communication.addReceiveEvent(new IReceivedLines() {
-            @Override
-            public void received(String[] lines) {
-                for(String line: lines)
-                {
-                    ((DefaultComboBoxModel<SendListElement>)jLCInOut.getModel()).addElement(new SendListElement(line, SendListElement.EType.IN));
-                    if(((DefaultComboBoxModel<SendListElement>)jLCInOut.getModel()).getSize() > 100)
-                    {
-                        ((DefaultComboBoxModel<SendListElement>)jLCInOut.getModel()).removeElementAt(0);
-                    }
-                    if(!setView)
-                    {
-                        setView = true;
-                        SwingUtilities.invokeLater(new Runnable() {
-                            @Override
-                            public void run() {
-                                setView = false;
-                                jLCInOut.ensureIndexIsVisible(jLCInOut.getModel().getSize() - 1);
-                            }
-                        });
-                    }
-                }
+        Communication.addReceiveEvent((String[] lines) -> {
+            for(String line: lines)
+            {
+                communicationAddLine(line,SendListElement.EType.IN);
             }
         });
         
-        Communication.addSendEvent(new ISend() {
-            @Override
-            public void send(String cmd) {
-                //Add to list 
-                ((DefaultComboBoxModel<SendListElement>) jLCInOut.getModel()).addElement(new SendListElement(cmd, SendListElement.EType.OUT));
-                if(((DefaultComboBoxModel<SendListElement>)jLCInOut.getModel()).getSize() > 100)
-                {
-                    ((DefaultComboBoxModel<SendListElement>)jLCInOut.getModel()).removeElementAt(0);
-                }
-                if(!setView)
-                {
-                    setView = true;
-                    SwingUtilities.invokeLater(new Runnable() {
-                        @Override
-                        public void run() {
-                            setView = false;
-                            jLCInOut.ensureIndexIsVisible(jLCInOut.getModel().getSize() - 1);
-                        }
-                    });
-                }
-            }
+        Communication.addSendEvent((String cmd) -> {
+            //Add to list
+            communicationAddLine(cmd,SendListElement.EType.OUT);
+        });
+        
+        Communication.addLoacationStringEvent((double[] value) -> {
+            communicationAddLine("Received Position: X:"+Tools.dtostr(value[0])+" Y:"+Tools.dtostr(value[1])+" Z:"+Tools.dtostr(value[2]),SendListElement.EType.INFO);
+        });
+
+        Communication.addZEndstopHitEvent((double value) -> {
+            communicationAddLine("Received Zhit at: "+Tools.dtostr(value),SendListElement.EType.INFO);
         });
     }
 
     
+   private void communicationAddLine(String line,SendListElement.EType type){
+        ((DefaultComboBoxModel<SendListElement>) jLCInOut.getModel()).addElement(new SendListElement(line, type));
+        if(((DefaultComboBoxModel<SendListElement>)jLCInOut.getModel()).getSize() > 100)
+        {
+            ((DefaultComboBoxModel<SendListElement>)jLCInOut.getModel()).removeElementAt(0);
+        }
+        if(!setView)
+        {
+            setView = true;
+            SwingUtilities.invokeLater(new Runnable() {
+                @Override
+                public void run() {
+                    setView = false;
+                    jLCInOut.ensureIndexIsVisible(jLCInOut.getModel().getSize() - 1);
+                }
+            });
+        }
+    }
+     
     @Override
     public void setGUIEvent(IEvent event)
     {

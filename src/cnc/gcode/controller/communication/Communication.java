@@ -4,6 +4,7 @@
  */
 package cnc.gcode.controller.communication;
 
+import cnc.gcode.controller.CommandParsing;
 import cnc.gcode.controller.DatabaseV2;
 import cnc.gcode.controller.IEvent;
 import cnc.gcode.controller.MyException;
@@ -15,6 +16,7 @@ import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.stream.Stream;
 import javax.swing.JOptionPane;
 import javax.swing.SwingUtilities;
 
@@ -173,8 +175,27 @@ public enum Communication {
             {
                 try {
                     return Tools.strtod(line.substring(line.indexOf("Z:") + 2));
-                } catch (ParseException ex) {
-                    Logger.getLogger(Communication.class.getName()).log(Level.SEVERE, null, ex);
+                } catch (Exception e) {
+                    Logger.getLogger(Communication.class.getName()).log(Level.SEVERE, null, e);
+                }
+            }
+            return null;
+        }
+        
+        //X:0.00Y:0.00Z:0.00E:0.00 Count X: 0.00Y:0.00Z:0.00
+        @Override
+        protected Double[] internal_LocationString(String line){
+            if(line.contains("X:")&&line.contains("Y:")&&line.contains("Z:"))
+            {
+                Double[] dpos= new Double[3];
+                try {
+                    for(int i = 0;i < 3;i++)
+                    {
+                        dpos[i] = Tools.strtod(line.substring(line.indexOf( "" + CommandParsing.axesName[i] + ":")+2));
+                    }
+                    return dpos;
+                } catch (Exception e) {
+                    Logger.getLogger(Communication.class.getName()).log(Level.SEVERE, null, e);
                 }
             }
             return null;
@@ -210,6 +231,11 @@ public enum Communication {
         @Override
         protected String internal_getredPostionCommand(){
             return "M114";
+        }
+
+        @Override
+        String internal_getProbeCommand() {
+            return "G1";
         }
         
     },
@@ -291,13 +317,10 @@ public enum Communication {
         }
         @Override
         protected Double internal_ZEndStopHit(String line){
-            if(line.contains("endstops") && line.contains("hit") && line.contains("Z:")){
-                try {
-                    return Tools.strtod(line.substring(line.indexOf("Z:") + 2));
-                } catch (ParseException ex) {
-                    Logger.getLogger(Communication.class.getName()).log(Level.SEVERE, null, ex);
-                }
-            }
+            return null;
+        }
+        @Override
+        protected Double[] internal_LocationString(String line){
             return null;
         }
         
@@ -309,6 +332,11 @@ public enum Communication {
         @Override
         protected String internal_getredPostionCommand(){
             return "M114";
+        }
+
+        @Override
+        String internal_getProbeCommand() {
+            return "G1";
         }
 
     },
@@ -349,6 +377,8 @@ public enum Communication {
             {
                 throw new MyException("Printer did not Reset!");
             }
+            
+            sendcount=resivecount=1;
         }
         
         @Override
@@ -433,19 +463,40 @@ public enum Communication {
         }
         @Override
         protected boolean internal_isbusy(){
-            return sendcount > resivecount;
+            return resivecount ==0 || sendcount > resivecount;
         }
         @Override
         protected boolean internal_isConnected(){
             return resivecount != 0;            
         }
+        
+        //[PRB:0.000,0.000,1.492:1]
         @Override
         protected Double internal_ZEndStopHit(String line){
-            if(line.contains("endstops") && line.contains("hit") && line.contains("Z:")){
+            if(line.contains("PRB:")){
                 try {
-                    return Tools.strtod(line.substring(line.indexOf("Z:") + 2));
-                } catch (ParseException ex) {
-                    Logger.getLogger(Communication.class.getName()).log(Level.SEVERE, null, ex);
+                    return Tools.strtod(line.split(":")[1].split(",")[2]);
+                } catch (Exception e) {
+                    Logger.getLogger(Communication.class.getName()).log(Level.SEVERE, null, e);
+                }
+            }
+            return null;
+        }
+        
+        //<Idle,MPos:0.000,0.000,0.000,WPos:0.000,0.000,0.000,Buf:0,RX:1,Lim:111>
+        @Override
+        protected Double[] internal_LocationString(String line){
+            if(line.contains("WPos:")){
+                try
+                {
+                    Double[] dpos=new Double[3];
+                    for(int i=0;i<3;i++)
+                        dpos[i]=Tools.strtod(line.split(":")[2].split(",")[i]);
+                    
+                    return dpos;
+                }
+                catch (Exception e) {
+                    Logger.getLogger(Communication.class.getName()).log(Level.SEVERE, null, e);
                 }
             }
             return null;
@@ -460,10 +511,16 @@ public enum Communication {
         protected String internal_getredPostionCommand(){
             return "?";
         }
+
+        @Override
+        String internal_getProbeCommand() {
+            return "G38.2";
+        }
         
         
     },
     ;
+
   
     //internal Function (have to be overrided
     abstract void internal_connect() throws MyException,InterruptedException;      //No Exception means connected   
@@ -471,12 +528,14 @@ public enum Communication {
     abstract void internal_send(String command) throws MyException;            //Is Called if somthing will be send
     abstract void internal_receive(String line) throws MyException;         //Is Called if something is received
     abstract Double internal_ZEndStopHit(String line);      //is called on each line to detect endstopHit of Zacess
+    abstract Double[] internal_LocationString(String line);      //is called on each line to detect location String
     abstract boolean internal_isbusy();          //Return if busy
     abstract boolean internal_isConnected();     //Returns if Connected
     abstract String internal_getHomingCommand();  
     abstract String internal_getredPostionCommand();  
+    abstract String internal_getProbeCommand();  
 
-    
+  
     
     private static Thread initThread    = new Thread();
     private static AComCore core        = new ComCoreDummy();
@@ -484,6 +543,7 @@ public enum Communication {
     private static ArrayList<IEvent> changed        = new ArrayList<>();
     private static ArrayList<IReceivedLines> received = new ArrayList<>();
     private static ArrayList<IEndstopHit> hitEndStop= new ArrayList<>();
+    private static ArrayList<ILocationString> locationString= new ArrayList<>();    
     private static ArrayList<ISend> send            = new ArrayList<>();
 
     public static void addChangedEvent(IEvent e){
@@ -495,6 +555,9 @@ public enum Communication {
     }
     public static void addZEndstopHitEvent(IEndstopHit e){
         hitEndStop.add(e);
+    }
+    public static void addLoacationStringEvent(ILocationString e){
+        locationString.add(e);
     }
     public static void addSendEvent(ISend e){
         send.add(e);
@@ -671,6 +734,11 @@ public enum Communication {
             {
                 doEnstopHitEvent(val);
             }
+            
+            Double[] pos = I().internal_LocationString(line);
+            if(pos!=null){
+                doLoacationStringEvent(Stream.of(pos).mapToDouble(Double::doubleValue).toArray());
+            }
         }
     }
     
@@ -723,6 +791,19 @@ public enum Communication {
             });
         }
     }
+    private static void doLoacationStringEvent(final double[] value)
+    {
+        for(final ILocationString e:locationString)
+        {
+            SwingUtilities.invokeLater(new Runnable() {
+                @Override
+                public void run() {
+                    e.newLocation(value);
+                }
+            });
+        }
+    }
+
     private static void doSendEvent(final String cmd)
     {
         for(final ISend e:send)
@@ -748,5 +829,9 @@ public enum Communication {
     public static String getredPostionCommand(){
         return I().internal_getredPostionCommand();
     }
-    
+
+    public static String getProbeCommand() {
+        return I().internal_getProbeCommand();
+    }
+
 }

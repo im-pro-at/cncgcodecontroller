@@ -374,7 +374,11 @@ public class CNCCommand {
                         case 28:
                             type = Type.HOMING;
                             break;
-                        
+                        case 38:
+                            type = Type.GXX;
+                            state = State.NORMAL;
+                            message="Probing!";
+                            break;
                         case 92:
                             type = Type.SETPOS;
                             if(state == State.NORMAL)

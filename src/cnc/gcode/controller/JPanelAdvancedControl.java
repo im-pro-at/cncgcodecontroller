@@ -6,6 +6,7 @@ package cnc.gcode.controller;
 
 import cnc.gcode.controller.communication.ComInterruptException;
 import cnc.gcode.controller.communication.Communication;
+import cnc.gcode.controller.communication.ILocationString;
 import cnc.gcode.controller.communication.IReceivedLines;
 import java.awt.BasicStroke;
 import java.awt.Color;
@@ -207,48 +208,18 @@ public class JPanelAdvancedControl extends javax.swing.JPanel implements IGUIEve
         axes[5][0].set(DatabaseV2.MAXFEEDRATE.getsaved()/10);
 
         
-       Communication.addReceiveEvent(new IReceivedLines() {
-            @Override
-            public void received(String[] lines) {
-                for(String line: lines)
+       
+        Communication.addLoacationStringEvent((double[] values)->{
+            if(parseNextSerial)
+            {
+                parseNextSerial = false;
+                for(int j = 0;j < 3;j++)
                 {
-                    if(parseNextSerial)
-                    {
-                        parseNextSerial = false;
-                        String in   = line;
-                        Double[] values = new Double[3];
-                        for(int j = 0;j < 3;j++)
-                        {
-                            int pos = in.indexOf( "" + CommandParsing.axesName[j] + ":");
-                            if(pos == -1)
-                            {
-                                values = null;
-                                break;
-                            }
-                            try {
-                                String temp = in.substring(pos+2);
-                                values[j] = Tools.strtod(temp);
-                            } catch (ParseException ex) {
-                                values = null;
-                                break;
-                            }
-                        }
-                        if(values != null)
-                        {
-                            for(int j = 0;j < 3;j++)
-                            {
-                                axes[j][0].set(values[j]);  
-                                axes[j][0].dispatchEvent();
-                            }
-                            JOptionPane.showMessageDialog(JPanelAdvancedControl.this, "Update done!");
-                        }
-                        else
-                        {
-                            JOptionPane.showMessageDialog(JPanelAdvancedControl.this, "Error reading position");
-                       }
-                    }
+                    axes[j][0].set(values[j]);  
+                    axes[j][0].dispatchEvent();
                 }
-            }
+                JOptionPane.showMessageDialog(JPanelAdvancedControl.this, "Update done!");
+            }       
         });
         
         jPPaint.addPaintEventListener(new JPPaintableListener() {
@@ -545,14 +516,14 @@ public class JPanelAdvancedControl extends javax.swing.JPanel implements IGUIEve
             }
         });
 
-        jBPowerON.setText("Power ON");
+        jBPowerON.setText("Spindle ON");
         jBPowerON.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jBPowerONActionPerformed(evt);
             }
         });
 
-        jBPowerOFF.setText("Power OFF");
+        jBPowerOFF.setText("Spindle OFF");
         jBPowerOFF.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jBPowerOFFActionPerformed(evt);
@@ -1216,7 +1187,7 @@ public class JPanelAdvancedControl extends javax.swing.JPanel implements IGUIEve
             return;
         }
         try {
-            Communication.send("G28 X Y Z");
+            Communication.send(Communication.getdoHomingCommand());
         } catch (ComInterruptException ex) {
             Logger.getLogger(JPanelAdvancedControl.class.getName()).log(Level.SEVERE, null, ex);
             return;
@@ -1237,7 +1208,7 @@ public class JPanelAdvancedControl extends javax.swing.JPanel implements IGUIEve
             return;
         }
         try {
-            Communication.send("M80");
+            Communication.send(DatabaseV2.SPINDLEON.get());
         } catch (ComInterruptException ex) {
             Logger.getLogger(JPanelAdvancedControl.class.getName()).log(Level.SEVERE, null, ex);
         }
@@ -1250,7 +1221,7 @@ public class JPanelAdvancedControl extends javax.swing.JPanel implements IGUIEve
             return;
         }
         try {
-            Communication.send("M81");
+            Communication.send(DatabaseV2.SPINDLEOFF.get());
         } catch (ComInterruptException ex) {
             Logger.getLogger(JPanelAdvancedControl.class.getName()).log(Level.SEVERE, null, ex);
         }
@@ -1302,7 +1273,7 @@ public class JPanelAdvancedControl extends javax.swing.JPanel implements IGUIEve
         }
         parseNextSerial = true;
         try {
-            Communication.send("M114");
+            Communication.send(Communication.getredPostionCommand());
         } catch (ComInterruptException ex) {
             Logger.getLogger(JPanelAdvancedControl.class.getName()).log(Level.SEVERE, null, ex);
         }

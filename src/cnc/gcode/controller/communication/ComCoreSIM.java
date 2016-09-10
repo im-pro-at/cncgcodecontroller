@@ -26,7 +26,14 @@ public class ComCoreSIM extends AComCore{
         SwingUtilities.invokeLater(new Runnable() {
             @Override
             public void run() {
-                internal_receivedEvent(new String[]{"ok command: " + line});
+                if(line.contains(Character.toString((char)24))){
+                    //simulat grpl reset:
+                    internal_receivedEvent(new String[]{"Grbl SIM RESET"});
+                }
+                else
+                {
+                    internal_receivedEvent(new String[]{"ok command: " + line});
+                }                
             }
         });
     }

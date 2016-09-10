@@ -770,7 +770,8 @@ public class JPanelAutoLevel extends javax.swing.JPanel implements IGUIEvent {
                         
                         //Prope
                         cmdpropeindex[Arrays.asList(points).indexOf(aktpoint)] = cmds.size();
-                        cmds.add(new CNCCommand("G1 Z" + Tools.dtostr(DatabaseV2.ALZERO.getsaved()- DatabaseV2.ALMAXPROBDEPTH.getsaved()) + " F" + DatabaseV2.ALFEEDRATE));
+                        
+                        cmds.add(new CNCCommand(Communication.getProbeCommand()+" Z" + Tools.dtostr(DatabaseV2.ALZERO.getsaved()- DatabaseV2.ALMAXPROBDEPTH.getsaved()) + " F" + DatabaseV2.ALFEEDRATE));
                         
                         // --> Set Position + clearance is made after Propping
                         
@@ -856,7 +857,7 @@ public class JPanelAutoLevel extends javax.swing.JPanel implements IGUIEvent {
                             //Proping Done waiting for hit:
                             if(Communication.isSimulation() == false)
                             {
-                                waitForTrigger(1000 * 60 * 10);
+                                waitForTrigger(1000 * 60 * 10); //10min max
                             }
                             else{
                                 waitForTrigger(100);

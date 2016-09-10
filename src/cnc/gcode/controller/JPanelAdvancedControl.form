@@ -210,7 +210,7 @@
                 </Component>
                 <Component class="javax.swing.JButton" name="jBPowerON">
                   <Properties>
-                    <Property name="text" type="java.lang.String" value="Power ON"/>
+                    <Property name="text" type="java.lang.String" value="Spindle ON"/>
                   </Properties>
                   <Events>
                     <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="jBPowerONActionPerformed"/>
@@ -218,7 +218,7 @@
                 </Component>
                 <Component class="javax.swing.JButton" name="jBPowerOFF">
                   <Properties>
-                    <Property name="text" type="java.lang.String" value="Power OFF"/>
+                    <Property name="text" type="java.lang.String" value="Spindle OFF"/>
                   </Properties>
                   <Events>
                     <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="jBPowerOFFActionPerformed"/>
