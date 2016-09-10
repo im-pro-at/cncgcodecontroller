@@ -888,7 +888,7 @@
             <Component class="javax.swing.JLabel" name="YMinus10">
               <Properties>
                 <Property name="horizontalAlignment" type="int" value="0"/>
-                <Property name="text" type="java.lang.String" value="+10"/>
+                <Property name="text" type="java.lang.String" value="-10"/>
                 <Property name="toolTipText" type="java.lang.String" value=""/>
                 <Property name="name" type="java.lang.String" value="LYMinus10" noResource="true"/>
               </Properties>

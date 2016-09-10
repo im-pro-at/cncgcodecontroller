@@ -580,7 +580,7 @@ public class JPanelSimpleControls extends javax.swing.JPanel implements IGUIEven
         jPanel23.setPreferredSize(new java.awt.Dimension(38, 124));
 
         YMinus10.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        YMinus10.setText("+10");
+        YMinus10.setText("-10");
         YMinus10.setToolTipText("");
         YMinus10.setName("LYMinus10"); // NOI18N
         YMinus10.addMouseListener(new java.awt.event.MouseAdapter() {
