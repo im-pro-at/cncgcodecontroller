@@ -13,9 +13,11 @@ import java.awt.Graphics2D;
 import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.RenderingHints;
+import java.awt.Shape;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.geom.AffineTransform;
+import java.awt.geom.Line2D;
 import java.awt.geom.NoninvertibleTransformException;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
@@ -76,155 +78,157 @@ public class JPanelCNCMilling extends javax.swing.JPanel implements IGUIEvent{
     private AffineTransform viewmovetrans = new AffineTransform();
 
     private final TriggertSwingWorker<BufferedImage> painter = new TriggertSwingWorker<BufferedImage>() {
-            class GetDataSyncedHelper
+        class GetDataSyncedHelper
+        {
+            private int jpw;
+            private int jph;
+            private int zoom;
+            private double movex;
+            private double movey;
+            private boolean mirrorx;
+            private boolean mirrory;
+            private int index;
+            private Point2D viewmove;
+
+        }
+
+        @Override
+        protected BufferedImage doJob() throws Exception {
+
+            //Load Parameter:
+            final GetDataSyncedHelper data = new GetDataSyncedHelper();
+            SwingUtilities.invokeAndWait(new Runnable() {
+                @Override
+                public void run() {
+                    data.jpw    = jPPaint.getWidth();
+                    data.jph    = jPPaint.getHeight();
+                    data.zoom   = jSZoom.getValue();
+                    data.movex  = positioningMove[0].getdsave();
+                    data.movey  = positioningMove[1].getdsave();
+                    data.mirrorx= jCBmirroX.isSelected();
+                    data.mirrory= jCBmirroY.isSelected();
+                    data.index  = jCBPerview.getSelectedIndex();
+                    data.viewmove = viewmove;
+                }
+            });        
+
+            if(data.jpw < 1)
             {
-                private int jpw;
-                private int jph;
-                private int zoom;
-                private double movex;
-                private double movey;
-                private boolean mirrorx;
-                private boolean mirrory;
-                private int index;
-                private Point2D viewmove;
-                
+                data.jpw = 1;
             }
-            
-            @Override
-            protected BufferedImage doJob() throws Exception {
-                
-                //Load Parameter:
-                final GetDataSyncedHelper data = new GetDataSyncedHelper();
-                SwingUtilities.invokeAndWait(new Runnable() {
-                    @Override
-                    public void run() {
-                        data.jpw    = jPPaint.getWidth();
-                        data.jph    = jPPaint.getHeight();
-                        data.zoom   = jSZoom.getValue();
-                        data.movex  = positioningMove[0].getdsave();
-                        data.movey  = positioningMove[1].getdsave();
-                        data.mirrorx= jCBmirroX.isSelected();
-                        data.mirrory= jCBmirroY.isSelected();
-                        data.index  = jCBPerview.getSelectedIndex();
-                        data.viewmove = viewmove;
-                    }
-                });        
-                
-                if(data.jpw < 1)
-                {
-                    data.jpw = 1;
-                }
-                if(data.jph < 1)
-                {
-                    data.jph = 1;
-                }
-                    
-                BufferedImage image = new BufferedImage(data.jpw, data.jph, BufferedImage.TYPE_4BYTE_ABGR);
-                
-                Graphics2D g2 = image.createGraphics();
-                
-                
-                g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-                g2.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BILINEAR);
-
-                //Scalling transforming ...
-
-                //StartCorner
-                g2.translate(data.jpw / 2, data.jph / 2);
-                switch(Integer.parseInt(DatabaseV2.HOMING.get()))
-                {
-                    case 0:
-                    default:
-                        g2.scale(1,1);
-                        break;
-                    case 1:
-                       g2.scale(-1,1);
-                       break;
-                    case 2:
-                       g2.scale(1,-1);
-                       break;
-                    case 3:                
-                       g2.scale(-1,-1);
-                       break;
-                }
-                //Zoom
-                double zoom = 1;
-                if(data.zoom <= 10)
-                {
-                    zoom = data.zoom / 10.0;
-                }
-                else
-                {
-                    zoom = data.zoom - 9;
-                }
-                g2.scale(zoom, zoom);
-
-                g2.translate(-data.jpw / 2, -data.jph / 2);
-
-                //Display Position
-                double ariawidth    = DatabaseV2.WORKSPACE0.getsaved(); //x
-                double ariaheight   = DatabaseV2.WORKSPACE1.getsaved(); //y
-                Rectangle rect      = Geometrics.placeRectangle(data.jpw, data.jph, Geometrics.getRatio(ariawidth,ariaheight));
-                double scalex       = rect.width / ariawidth;
-                double scaley       = rect.height / ariaheight;
-                g2.translate(rect.x, rect.y);
-                g2.scale(scalex, scaley);
-
-                //ViewMove
-                g2.translate(data.viewmove.getX(), data.viewmove.getY());                
-                try {
-                    AffineTransform t = g2.getTransform();
-                    t.invert();
-                    viewmovetrans = t;
-                } catch (NoninvertibleTransformException ex) {
-                    viewmovetrans = new AffineTransform();
-                }
-                
-                //Draw base
-                g2.setColor(new Color(Integer.parseInt(DatabaseV2.CBACKGROUND.get())));
-                g2.fill(new Rectangle2D.Double(0, 0, ariawidth, ariaheight));
-                
-                //Draw Koardinates
-                if(DatabaseV2.CGRIDDISTANCE.getsaved()>0){
-                    g2.setColor(new Color(Integer.parseInt(DatabaseV2.CGRID.get())));
-
-                    g2.setStroke(new BasicStroke((float)(1/scalex)));
-                    for(int x=1;x<ariawidth/DatabaseV2.CGRIDDISTANCE.getsaved();x++){
-                        g2.drawLine((int)(x*DatabaseV2.CGRIDDISTANCE.getsaved()),0,(int)(x*DatabaseV2.CGRIDDISTANCE.getsaved()), (int)(ariaheight));
-                    }
-
-                    g2.setStroke(new BasicStroke((float)(1/scaley)));
-                    for(int y=1;y<ariaheight/DatabaseV2.CGRIDDISTANCE.getsaved();y++){
-                        g2.drawLine(0,(int)(y*DatabaseV2.CGRIDDISTANCE.getsaved()),(int)(ariawidth),(int)(y*DatabaseV2.CGRIDDISTANCE.getsaved()));
-                    }
-                }
-                
-                //Positioning
-                g2.translate(data.movex, data.movey);
-                g2.scale((data.mirrorx ? -1:1),
-                         (data.mirrory ? -1:1));
-                
-                try {
-                    AffineTransform t = g2.getTransform();
-                    t.invert();
-                    trans = t;
-                } catch (NoninvertibleTransformException ex) {
-                    trans = new AffineTransform();
-                }
-                
-                layers.paint(g2, data.index); 
-                
-                return image;
+            if(data.jph < 1)
+            {
+                data.jph = 1;
             }
 
-            @Override
-            protected void process(BufferedImage chunk) {
-                image = chunk;
-                
-                jPPaint.repaint();
+            BufferedImage image = new BufferedImage(data.jpw, data.jph, BufferedImage.TYPE_4BYTE_ABGR);
+
+            Graphics2D g2 = image.createGraphics();
+
+
+            g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+            g2.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BILINEAR);
+
+            //Scalling transforming ...
+
+            //StartCorner
+            g2.translate(data.jpw / 2, data.jph / 2);
+            switch(Integer.parseInt(DatabaseV2.HOMING.get()))
+            {
+                case 0:
+                default:
+                    g2.scale(1,1);
+                    break;
+                case 1:
+                   g2.scale(-1,1);
+                   break;
+                case 2:
+                   g2.scale(1,-1);
+                   break;
+                case 3:                
+                   g2.scale(-1,-1);
+                   break;
             }
-            
-        };
+            //Zoom
+            double zoom = 1;
+            if(data.zoom <= 10)
+            {
+                zoom = data.zoom / 10.0;
+            }
+            else
+            {
+                zoom = data.zoom - 9;
+            }
+            g2.scale(zoom, zoom);
+
+            g2.translate(-data.jpw / 2, -data.jph / 2);
+
+            //Display Position
+            double ariawidth    = DatabaseV2.WORKSPACE0.getsaved(); //x
+            double ariaheight   = DatabaseV2.WORKSPACE1.getsaved(); //y
+            Rectangle rect      = Geometrics.placeRectangle(data.jpw, data.jph, Geometrics.getRatio(ariawidth,ariaheight));
+            double scalex       = rect.width / ariawidth;
+            double scaley       = rect.height / ariaheight;
+            g2.translate(rect.x, rect.y);
+            g2.scale(scalex, scaley);
+
+            //ViewMove
+            g2.translate(data.viewmove.getX(), data.viewmove.getY());                
+            try {
+                AffineTransform t = g2.getTransform();
+                t.invert();
+                viewmovetrans = t;
+            } catch (NoninvertibleTransformException ex) {
+                viewmovetrans = new AffineTransform();
+            }
+
+            //Draw base
+            g2.setColor(new Color(Integer.parseInt(DatabaseV2.CBACKGROUND.get())));
+            g2.fill(new Rectangle2D.Double(0, 0, ariawidth, ariaheight));
+
+            //Draw Koardinates
+            if(DatabaseV2.CGRIDDISTANCE.getsaved()>0){
+                g2.setColor(new Color(Integer.parseInt(DatabaseV2.CGRID.get())));
+
+                g2.setStroke(new BasicStroke((float)(1/scalex)));
+                for(int x=1;x<ariawidth/DatabaseV2.CGRIDDISTANCE.getsaved();x++){
+                    Shape l = new Line2D.Double(x*DatabaseV2.CGRIDDISTANCE.getsaved(), 0, x*DatabaseV2.CGRIDDISTANCE.getsaved(), ariaheight);
+                    g2.draw(l);
+                }
+
+                g2.setStroke(new BasicStroke((float)(1/scaley)));
+                for(int y=1;y<ariaheight/DatabaseV2.CGRIDDISTANCE.getsaved();y++){
+                    Shape l = new Line2D.Double(0,(y*DatabaseV2.CGRIDDISTANCE.getsaved()),(ariawidth),(y*DatabaseV2.CGRIDDISTANCE.getsaved()));
+                    g2.draw(l);
+                }
+            }
+
+            //Positioning
+            g2.translate(data.movex, data.movey);
+            g2.scale((data.mirrorx ? -1:1),
+                     (data.mirrory ? -1:1));
+
+            try {
+                AffineTransform t = g2.getTransform();
+                t.invert();
+                trans = t;
+            } catch (NoninvertibleTransformException ex) {
+                trans = new AffineTransform();
+            }
+
+            layers.paint(g2, data.index); 
+
+            return image;
+        }
+
+        @Override
+        protected void process(BufferedImage chunk) {
+            image = chunk;
+
+            jPPaint.repaint();
+        }
+
+    };
     
     
     /**
@@ -360,13 +364,10 @@ public class JPanelCNCMilling extends javax.swing.JPanel implements IGUIEvent{
         });        
         
         
-        jPPaint.addPaintEventListener(new JPPaintableListener() {
-            @Override
-            public void paintComponent(JPPaintableEvent evt) {
-                if(image != null)
-                {
-                    evt.getGaraphics().drawImage(image, 0, 0, null);
-                }
+        jPPaint.addPaintEventListener((JPPaintableEvent evt) -> {
+            if(image != null)
+            {
+                evt.getGaraphics().drawImage(image, 0, 0, null);
             }
         });
         
@@ -415,11 +416,10 @@ public class JPanelCNCMilling extends javax.swing.JPanel implements IGUIEvent{
         jCBmirroX.setEnabled(!cncLoadedFile || !isRunning() );
         jCBmirroY.setEnabled(!cncLoadedFile || !isRunning() );
         jCBAutoLeveling.setEnabled((!cncLoadedFile || !isRunning())&& AutoLevelSystem.leveled()  );
-        /*if(AutoLevelSystem.leveled() == false)
+        if(AutoLevelSystem.leveled() == false)
         {
             jCBAutoLeveling.setSelected(false);
-        }*/
-        jCBAutoLeveling.setSelected(AutoLevelSystem.leveled());
+        }
         painter.trigger();
 
     }
@@ -517,6 +517,11 @@ public class JPanelCNCMilling extends javax.swing.JPanel implements IGUIEvent{
         });
         jMPcommand.add(jMIEdit);
 
+        jPPaint.addMouseMotionListener(new java.awt.event.MouseMotionAdapter() {
+            public void mouseDragged(java.awt.event.MouseEvent evt) {
+                jPPaintMouseDragged(evt);
+            }
+        });
         jPPaint.addMouseWheelListener(new java.awt.event.MouseWheelListener() {
             public void mouseWheelMoved(java.awt.event.MouseWheelEvent evt) {
                 jPPaintMouseWheelMoved(evt);
@@ -528,11 +533,6 @@ public class JPanelCNCMilling extends javax.swing.JPanel implements IGUIEvent{
             }
             public void mousePressed(java.awt.event.MouseEvent evt) {
                 jPPaintMousePressed(evt);
-            }
-        });
-        jPPaint.addMouseMotionListener(new java.awt.event.MouseMotionAdapter() {
-            public void mouseDragged(java.awt.event.MouseEvent evt) {
-                jPPaintMouseDragged(evt);
             }
         });
         jPPaint.addComponentListener(new java.awt.event.ComponentAdapter() {
@@ -737,7 +737,7 @@ public class JPanelCNCMilling extends javax.swing.JPanel implements IGUIEvent{
                     .addComponent(jCBScalleXY)
                     .addComponent(jLabel10))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(jCBAutoLeveling)
                     .addComponent(jBScale))
                 .addGap(0, 3, Short.MAX_VALUE))

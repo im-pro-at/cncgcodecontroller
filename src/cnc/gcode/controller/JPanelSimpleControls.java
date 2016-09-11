@@ -129,6 +129,7 @@ public class JPanelSimpleControls extends javax.swing.JPanel implements IGUIEven
         FilterOk = new javax.swing.JCheckBox();
         jBCancel = new javax.swing.JButton();
         MotorsOn = new javax.swing.JButton();
+        JBstartcode = new javax.swing.JButton();
 
         setName("jBasicControls"); // NOI18N
 
@@ -799,6 +800,13 @@ public class JPanelSimpleControls extends javax.swing.JPanel implements IGUIEven
             }
         });
 
+        JBstartcode.setText("RUN STARTCODE");
+        JBstartcode.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                buttonActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
         layout.setHorizontalGroup(
@@ -825,6 +833,8 @@ public class JPanelSimpleControls extends javax.swing.JPanel implements IGUIEven
                                 .addComponent(MotorsOff)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                                 .addComponent(MotorsOn)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(JBstartcode)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                                 .addComponent(CurrentPos))
                             .addGroup(layout.createSequentialGroup()
@@ -866,7 +876,8 @@ public class JPanelSimpleControls extends javax.swing.JPanel implements IGUIEven
                     .addComponent(jLabel1)
                     .addComponent(MotorsOff)
                     .addComponent(CurrentPos)
-                    .addComponent(MotorsOn))
+                    .addComponent(MotorsOn)
+                    .addComponent(JBstartcode))
                 .addGap(5, 5, 5)
                 .addComponent(jSeparator2, javax.swing.GroupLayout.PREFERRED_SIZE, 10, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
@@ -969,6 +980,9 @@ public class JPanelSimpleControls extends javax.swing.JPanel implements IGUIEven
         }
         else if (sender.equals(MotorsOff)){
                 ExecuteActions(new ArrayList<String>(Arrays.asList(DatabaseV2.SPINDLEOFF.get().split("\n"))));
+        }
+        else if (sender.equals(JBstartcode)){
+                ExecuteActions(new ArrayList<String>(Arrays.asList(DatabaseV2.STARTCODE.get().split("\n"))));
         }
         else if (sender.equals(XPlus01)){
             PerformSimpleMove(0.1,Axis.X);
@@ -1132,6 +1146,7 @@ public class JPanelSimpleControls extends javax.swing.JPanel implements IGUIEven
     private javax.swing.JButton HomeY;
     private javax.swing.JButton HomeZ;
     private javax.swing.JButton HomeZ2;
+    private javax.swing.JButton JBstartcode;
     private javax.swing.JButton MotorsOff;
     private javax.swing.JButton MotorsOn;
     private javax.swing.JLabel XMinus01;
@@ -1196,6 +1211,8 @@ public class JPanelSimpleControls extends javax.swing.JPanel implements IGUIEven
 
     private void setEnableAllControls(boolean enable)
     {
+        this.JBstartcode.setEnabled(enable);
+        
         this.HomeAll.setEnabled(enable);
         
         this.HomeX.setEnabled(enable);

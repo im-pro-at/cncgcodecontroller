@@ -42,6 +42,8 @@
                               <Component id="MotorsOff" min="-2" max="-2" attributes="0"/>
                               <EmptySpace max="-2" attributes="0"/>
                               <Component id="MotorsOn" min="-2" max="-2" attributes="0"/>
+                              <EmptySpace max="-2" attributes="0"/>
+                              <Component id="JBstartcode" min="-2" max="-2" attributes="0"/>
                               <EmptySpace max="32767" attributes="0"/>
                               <Component id="CurrentPos" min="-2" max="-2" attributes="0"/>
                           </Group>
@@ -99,6 +101,7 @@
                   <Component id="MotorsOff" alignment="3" min="-2" max="-2" attributes="0"/>
                   <Component id="CurrentPos" alignment="3" min="-2" max="-2" attributes="0"/>
                   <Component id="MotorsOn" alignment="3" min="-2" max="-2" attributes="0"/>
+                  <Component id="JBstartcode" alignment="3" min="-2" max="-2" attributes="0"/>
               </Group>
               <EmptySpace min="-2" pref="5" max="-2" attributes="0"/>
               <Component id="jSeparator2" min="-2" pref="10" max="-2" attributes="0"/>
@@ -1164,6 +1167,14 @@
     <Component class="javax.swing.JButton" name="MotorsOn">
       <Properties>
         <Property name="text" type="java.lang.String" value="Motors On"/>
+      </Properties>
+      <Events>
+        <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="buttonActionPerformed"/>
+      </Events>
+    </Component>
+    <Component class="javax.swing.JButton" name="JBstartcode">
+      <Properties>
+        <Property name="text" type="java.lang.String" value="RUN STARTCODE"/>
       </Properties>
       <Events>
         <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="buttonActionPerformed"/>

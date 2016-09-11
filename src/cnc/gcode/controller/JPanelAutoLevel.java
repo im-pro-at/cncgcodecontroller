@@ -14,8 +14,10 @@ import java.awt.Font;
 import java.awt.Graphics2D;
 import java.awt.Rectangle;
 import java.awt.RenderingHints;
+import java.awt.Shape;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Ellipse2D;
+import java.awt.geom.Line2D;
 import java.awt.geom.NoninvertibleTransformException;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
@@ -63,6 +65,7 @@ public class JPanelAutoLevel extends javax.swing.JPanel implements IGUIEvent {
     private BufferedImage image;
     private AffineTransform trans   = new AffineTransform();
     private boolean         hit     = false;
+    private boolean         pos     = false;
     private double          hitvalue= 0;
     
     
@@ -240,12 +243,14 @@ public class JPanelAutoLevel extends javax.swing.JPanel implements IGUIEvent {
 
                     g2.setStroke(new BasicStroke((float)(1/scalex)));
                     for(int x=1;x<ariawidth/DatabaseV2.CGRIDDISTANCE.getsaved();x++){
-                        g2.drawLine((int)(x*DatabaseV2.CGRIDDISTANCE.getsaved()),0,(int)(x*DatabaseV2.CGRIDDISTANCE.getsaved()), (int)(ariaheight));
+                        Shape l = new Line2D.Double(x*DatabaseV2.CGRIDDISTANCE.getsaved(), 0, x*DatabaseV2.CGRIDDISTANCE.getsaved(), ariaheight);
+                        g2.draw(l);
                     }
 
                     g2.setStroke(new BasicStroke((float)(1/scaley)));
                     for(int y=1;y<ariaheight/DatabaseV2.CGRIDDISTANCE.getsaved();y++){
-                        g2.drawLine(0,(int)(y*DatabaseV2.CGRIDDISTANCE.getsaved()),(int)(ariawidth),(int)(y*DatabaseV2.CGRIDDISTANCE.getsaved()));
+                        Shape l = new Line2D.Double(0,(y*DatabaseV2.CGRIDDISTANCE.getsaved()),(ariawidth),(y*DatabaseV2.CGRIDDISTANCE.getsaved()));
+                        g2.draw(l);
                     }
                 }
                 
@@ -269,51 +274,47 @@ public class JPanelAutoLevel extends javax.swing.JPanel implements IGUIEvent {
     public JPanelAutoLevel() {
         initComponents();
         
-        NumberFieldManipulator.IAxesEvent axesevent = new NumberFieldManipulator.IAxesEvent() {
-            @Override
-            public void fired(NumberFieldManipulator axis) {
-                double value;
-                try {
-                   value = axis.getd();
-                } catch (ParseException ex) {
-                    axis.popUpToolTip(ex.toString());
-                    axis.setFocus();
-                    return;
-                }
-
-                //Write back Value
-                axis.set(value);
-
-                //Check Values
-                for(int i = 0;i < 2;i++)
+        NumberFieldManipulator.IAxesEvent axesevent = (NumberFieldManipulator axis) -> {
+            double value;
+            try {
+                value = axis.getd();
+            } catch (ParseException ex) {
+                axis.popUpToolTip(ex.toString());
+                axis.setFocus();
+                return;
+            }
+            
+            //Write back Value
+            axis.set(value);
+            
+            //Check Values
+            for(int i = 0;i < 2;i++)
+            {
+                for(NumberFieldManipulator n:axes[i])
                 {
-                    for(NumberFieldManipulator n:axes[i])
+                    double v = n.getdsave();
+                    if(v < 0)
                     {
-                        double v = n.getdsave();
-                        if(v < 0)
-                        {
-                            n.set(0.0);
-                            n.setFocus();
-                            n.popUpToolTip("Value must be bigger than zero");
-                        }
-                        if(v > DatabaseV2.getWorkspace(i).getsaved())
-                        {
-                            n.set(DatabaseV2.getWorkspace(i).getsaved());
-                            n.setFocus();
-                            n.popUpToolTip("Value must be smaller than " + DatabaseV2.getWorkspace(i));
-                        }
+                        n.set(0.0);
+                        n.setFocus();
+                        n.popUpToolTip("Value must be bigger than zero");
                     }
-                    if(axes[i][0].getdsave()>axes[i][1].getdsave())
+                    if(v > DatabaseV2.getWorkspace(i).getsaved())
                     {
-                            axes[i][1].set(axes[i][0].getdsave());
-                            axes[i][1].setFocus();
-                            axes[i][1].popUpToolTip("Value must be bigger than start value");
+                        n.set(DatabaseV2.getWorkspace(i).getsaved());
+                        n.setFocus();
+                        n.popUpToolTip("Value must be smaller than " + DatabaseV2.getWorkspace(i));
                     }
                 }
-                
-                makeNewAl();
+                if(axes[i][0].getdsave()>axes[i][1].getdsave())
+                {
+                    axes[i][1].set(axes[i][0].getdsave());
+                    axes[i][1].setFocus();
+                    axes[i][1].popUpToolTip("Value must be bigger than start value");
+                }
             }
 
+            makeNewAl();
         };
         
         axes = new NumberFieldManipulator[][]{
@@ -330,26 +331,27 @@ public class JPanelAutoLevel extends javax.swing.JPanel implements IGUIEvent {
         makeNewAl();
 
         
-        jPPaint.addPaintEventListener(new JPPaintableListener() {
-            @Override
-            public void paintComponent(JPPaintableEvent evt) {
-                if(image != null)
-                {
-                    evt.getGaraphics().drawImage(image, 0, 0, null);
-                }
+        jPPaint.addPaintEventListener((JPPaintableEvent evt) -> {
+            if(image != null)
+            {
+                evt.getGaraphics().drawImage(image, 0, 0, null);
             }
         });
         
-        Communication.addZEndstopHitEvent(new IEndstopHit() {
+        Communication.addZEndstopHitEvent((double value) -> {
+            hit = true;
+            if(worker != null)
+            {
+                worker.trigger();
+            }
+        });        
 
-            @Override
-            public void endStopHit(double value) {
-                hitvalue = value;
-                hit = true;  
-                if(worker != null)
-                {
-                    worker.trigger();
-                }
+        Communication.addLoacationStringEvent((double[] value) -> {
+            hitvalue = value[2];
+            pos = true;
+            if(worker != null)
+            {
+                worker.trigger();
             }
         });        
         
@@ -842,6 +844,7 @@ public class JPanelAutoLevel extends javax.swing.JPanel implements IGUIEvent {
                             {
                                 waitForNextSend();
                                 hit = false;
+                                pos=false;
                                 try{
                                     Communication.send(execute);
                                 }
@@ -862,13 +865,35 @@ public class JPanelAutoLevel extends javax.swing.JPanel implements IGUIEvent {
                             else{
                                 waitForTrigger(100);
                                 hitvalue    = (new Random()).nextDouble();
-                                hit         = true;  
+                                hit         = true; 
+                                pos         = true;
                             }
                             
                             if(hit == false)
                             {
                                 throw new MyException("Timeout: No end stop hit!");
                             }
+                            
+                            //Read Pos
+                            while(true)
+                            {
+                                waitForNextSend();
+                                try{
+                                    Communication.send(Communication.getredPostionCommand());
+                                }
+                                catch(ComInterruptException ex){
+                                    continue;
+                                }
+                                break;
+                            }                            
+                            
+                            waitForTrigger(1000); //1s max
+
+                            if(pos == false)
+                            {
+                                throw new MyException("Timeout: No position report!");
+                            }
+                            
                             double thitValue = hitvalue;
                             
                             //Save pos
@@ -913,7 +938,7 @@ public class JPanelAutoLevel extends javax.swing.JPanel implements IGUIEvent {
                     
                     if(points.length > 2)
                     {
-                    //error correction reconstruct oder
+                        //error correction reconstruct oder
                         Integer[] keys = Arrays.copyOf(cmdpropeindex, cmdpropeindex.length); 
                         Arrays.sort(keys,0,keys.length); 
                         for(int i = 0;i < points.length - 1;i++)

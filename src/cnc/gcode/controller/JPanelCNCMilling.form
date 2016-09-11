@@ -77,10 +77,10 @@
   <SubComponents>
     <Container class="cnc.gcode.controller.JPPaintable" name="jPPaint">
       <Events>
+        <EventHandler event="mouseDragged" listener="java.awt.event.MouseMotionListener" parameters="java.awt.event.MouseEvent" handler="jPPaintMouseDragged"/>
         <EventHandler event="mouseWheelMoved" listener="java.awt.event.MouseWheelListener" parameters="java.awt.event.MouseWheelEvent" handler="jPPaintMouseWheelMoved"/>
         <EventHandler event="mouseClicked" listener="java.awt.event.MouseListener" parameters="java.awt.event.MouseEvent" handler="jPPaintMouseClicked"/>
         <EventHandler event="mousePressed" listener="java.awt.event.MouseListener" parameters="java.awt.event.MouseEvent" handler="jPPaintMousePressed"/>
-        <EventHandler event="mouseDragged" listener="java.awt.event.MouseMotionListener" parameters="java.awt.event.MouseEvent" handler="jPPaintMouseDragged"/>
         <EventHandler event="componentResized" listener="java.awt.event.ComponentListener" parameters="java.awt.event.ComponentEvent" handler="jPPaintComponentResized"/>
       </Events>
 
@@ -340,9 +340,9 @@
                           <Component id="jLabel10" alignment="3" min="-2" max="-2" attributes="0"/>
                       </Group>
                       <EmptySpace type="unrelated" max="-2" attributes="0"/>
-                      <Group type="103" groupAlignment="3" attributes="0">
+                      <Group type="103" groupAlignment="0" attributes="0">
                           <Component id="jCBAutoLeveling" alignment="0" min="-2" max="-2" attributes="0"/>
-                          <Component id="jBScale" alignment="3" min="-2" max="-2" attributes="0"/>
+                          <Component id="jBScale" min="-2" max="-2" attributes="0"/>
                       </Group>
                       <EmptySpace min="0" pref="3" max="32767" attributes="0"/>
                   </Group>
@@ -633,7 +633,7 @@
               <ComponentRef name="jMPcommand"/>
             </Property>
             <Property name="cursor" type="java.awt.Cursor" editor="org.netbeans.modules.form.editors2.CursorEditor">
-              <Color id="Default Cursor"/>
+              <Color id="Standardcursor"/>
             </Property>
           </Properties>
           <Events>

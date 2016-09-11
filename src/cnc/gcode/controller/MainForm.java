@@ -36,7 +36,7 @@ public final class MainForm extends javax.swing.JFrame implements IGUIEvent{
         //Settings scroll speed
         jSscrollPaneSettings.getVerticalScrollBar().setUnitIncrement(14);
         //GuiUpdateHandler
-        final IGUIEvent[] panels = new IGUIEvent[]{this,jPanelAdvancedControl,jPanelAutoLevel1,jPanelCNCMilling,jPanelCommunication,jPanelSettings, jPanelBasicControls};
+        final IGUIEvent[] panels = new IGUIEvent[]{this,jPanelAdvancedControl,jPanelAutoLevel1,jPanelCNCMilling,jPanelCommunication,jPanelSettings, jPanelBasicControls, jPanelArt};
         IEvent updateGUI = new IEvent() {
             @Override
             public void fired() {
@@ -151,6 +151,7 @@ public final class MainForm extends javax.swing.JFrame implements IGUIEvent{
         jPanelAdvancedControl = new cnc.gcode.controller.JPanelAdvancedControl();
         jPanelAutoLevel1 = new cnc.gcode.controller.JPanelAutoLevel();
         jPanelCNCMilling = new cnc.gcode.controller.JPanelCNCMilling();
+        jPanelArt = new cnc.gcode.controller.JPanelArt();
         jPanelCommunication = new cnc.gcode.controller.JPanelCommunication();
         jSscrollPaneSettings = new javax.swing.JScrollPane();
         jPanelSettings = new cnc.gcode.controller.JPanelSettings();
@@ -174,6 +175,7 @@ public final class MainForm extends javax.swing.JFrame implements IGUIEvent{
         jTabbedPane2.addTab("Advanced Controls", jPanelAdvancedControl);
         jTabbedPane2.addTab("Auto Level", jPanelAutoLevel1);
         jTabbedPane2.addTab("CNC Milling", jPanelCNCMilling);
+        jTabbedPane2.addTab("Art", jPanelArt);
         jTabbedPane2.addTab("Communication", jPanelCommunication);
 
         jSscrollPaneSettings.setViewportView(jPanelSettings);
@@ -260,6 +262,7 @@ public final class MainForm extends javax.swing.JFrame implements IGUIEvent{
     private javax.swing.JLabel jLStatus;
     private javax.swing.JLabel jLabel6;
     private cnc.gcode.controller.JPanelAdvancedControl jPanelAdvancedControl;
+    private cnc.gcode.controller.JPanelArt jPanelArt;
     private cnc.gcode.controller.JPanelAutoLevel jPanelAutoLevel1;
     private cnc.gcode.controller.JPanelSimpleControls jPanelBasicControls;
     private cnc.gcode.controller.JPanelCNCMilling jPanelCNCMilling;

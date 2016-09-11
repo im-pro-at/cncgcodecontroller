@@ -35,6 +35,7 @@ class NumberFieldManipulator {
     
     private final JComponent element;
     private final IAxesEvent event;
+    
 
     public NumberFieldManipulator(JComponent element, IAxesEvent event) {
         this.element    = element;
@@ -76,9 +77,9 @@ class NumberFieldManipulator {
         {
             element.addFocusListener(f);
             element.addKeyListener(k);
-        }
+        }        
     }
-  
+
     public void setFocus() 
     {
         element.requestFocusInWindow();
