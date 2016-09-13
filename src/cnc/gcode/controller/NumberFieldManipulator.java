@@ -35,11 +35,17 @@ class NumberFieldManipulator {
     
     private final JComponent element;
     private final IAxesEvent event;
+    private final Double delta;
     
-
     public NumberFieldManipulator(JComponent element, IAxesEvent event) {
+        this(element,event, 1);
+    }
+    
+    public NumberFieldManipulator(JComponent element, IAxesEvent event, double delta) {
         this.element    = element;
         this.event      = event;
+        this.delta      = delta;
+        
         FocusAdapter f = new FocusAdapter() {
             @Override
             public void focusLost(FocusEvent e) 
@@ -66,6 +72,14 @@ class NumberFieldManipulator {
                 if (e.getKeyCode() == KeyEvent.VK_ENTER) 
                 {
                     NumberFieldManipulator.this.event.fired(NumberFieldManipulator.this);
+                }
+                if(e.getKeyCode()== KeyEvent.VK_UP){
+                    NumberFieldManipulator.this.set(NumberFieldManipulator.this.getdsave()+NumberFieldManipulator.this.delta);
+                    NumberFieldManipulator.this.event.fired(NumberFieldManipulator.this);
+                }
+                if(e.getKeyCode()== KeyEvent.VK_DOWN){
+                    NumberFieldManipulator.this.set(NumberFieldManipulator.this.getdsave()-NumberFieldManipulator.this.delta);
+                    NumberFieldManipulator.this.event.fired(NumberFieldManipulator.this);                    
                 }
             }
         };

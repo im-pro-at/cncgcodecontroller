@@ -4,6 +4,7 @@
  */
 package cnc.gcode.controller;
 
+import java.awt.Color;
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
 import java.text.ParseException;
@@ -140,6 +141,8 @@ public class Tools {
         return value;
     }
     
-    
+    public static Color setAlpha(Color c,double a){
+        return new Color(c.getRed(), c.getGreen(), c.getBlue(),(int)(255*a));
+    }
 }
 

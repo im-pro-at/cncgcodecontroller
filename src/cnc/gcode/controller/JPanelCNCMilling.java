@@ -1321,7 +1321,6 @@ public class JPanelCNCMilling extends javax.swing.JPanel implements IGUIEvent{
                     cncLoadedFile = true;
                     jPBar.setString("~" + Tools.formatDuration(secounds));
                     maxTime     = secounds;
-                    fireupdateGUI();
                 }
                 jLCNCCommands.setModel(model);
                 jCBPerview.setModel(new DefaultComboBoxModel(layers.getLayers(positioningMove[2].getdsave()))); //Clear Layers

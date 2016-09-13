@@ -71,7 +71,7 @@ public class CNCCommand {
         
     }
     
-    public static class Move
+    public class Move
     {
         private double[] s;
         private double[] e;
@@ -93,7 +93,7 @@ public class CNCCommand {
         public double[] getStart() {
             return s;
         }
-        public double[] getEend() {
+        public double[] getEnd() {
             return e;
         }
         public Type getType() {
@@ -113,6 +113,10 @@ public class CNCCommand {
             double dy = s[1]- e[1];
             return Math.sqrt(dx * dx + dy * dy);
         }
+        
+        public CNCCommand getCNCCommand(){
+            return CNCCommand.this;
+        }
    }        
    
     public static class Calchelper
@@ -130,6 +134,8 @@ public class CNCCommand {
          * True is negative move
          */
         boolean[] lastmovedirection= new boolean[]{true,true,true};
+
+
         
         @Override
         protected Calchelper clone() {
@@ -147,7 +153,8 @@ public class CNCCommand {
             return "axes=" + Arrays.toString(axes) + ", lastMovetype=" + lastMovetype + ", time=" + Tools.formatDuration((long)seconds);
         }
 
-        
+        //ignor some Warings:
+        boolean ignorZMoveWaring=false;
         
     }
     
@@ -225,7 +232,8 @@ public class CNCCommand {
             g.setStroke(new BasicStroke((float)DatabaseV2.TOOLSIZE.getsaved(), BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND));
             if(selected == false)
             {
-                g.setColor(new Color(getColor().getRed(), getColor().getGreen(), getColor().getBlue(), 200));
+                
+                g.setColor(Tools.setAlpha(getColor(),0.8));
             }    
             else
             {
@@ -472,7 +480,7 @@ public class CNCCommand {
                 }
             case G0:
             case G1:
-                if((p.contains('X')|| p.contains('Y')) && p.contains('Z'))
+                if((p.contains('X')|| p.contains('Y')) && p.contains('Z') && !c.ignorZMoveWaring)
                 {
                     if(state == State.NORMAL)
                     {

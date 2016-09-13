@@ -111,7 +111,7 @@ public class PrintableLayers {
         {
             //Calc Layer
             double sz = move.getStart()[2];
-            double ez = move.getEend()[2];
+            double ez = move.getEnd()[2];
             if(Double.isNaN(sz) || Double.isNaN(ez))
             {
                 return;
@@ -131,21 +131,21 @@ public class PrintableLayers {
                 //Line
                 for(int i = 0;i < 2;i++)
                 {
-                    if(Double.isNaN(move.getStart()[i]) || Double.isNaN(move.getEend()[i]))
+                    if(Double.isNaN(move.getStart()[i]) || Double.isNaN(move.getEnd()[i]))
                     {
                         return;
                     }
                 }
-                layers.get(sz).add(new Line(index, Arrays.copyOfRange(move.getStart(), 0, 2), Arrays.copyOfRange(move.getEend(), 0, 2), move.getType()));
+                layers.get(sz).add(new Line(index, Arrays.copyOfRange(move.getStart(), 0, 2), Arrays.copyOfRange(move.getEnd(), 0, 2), move.getType()));
             } else {
                 //Two Points
                 if(!Double.isNaN(move.getStart()[0]) && !Double.isNaN(move.getStart()[1]))
                 {
                     layers.get(sz).add(new Point(index, Arrays.copyOfRange(move.getStart(), 0, 2), move.getType()));
                 }
-                if(!Double.isNaN(move.getEend()[0]) && !Double.isNaN(move.getEend()[1]))
+                if(!Double.isNaN(move.getEnd()[0]) && !Double.isNaN(move.getEnd()[1]))
                 {
-                    layers.get(ez).add(new Point(index, Arrays.copyOfRange(move.getEend(), 0, 2), move.getType()));
+                    layers.get(ez).add(new Point(index, Arrays.copyOfRange(move.getEnd(), 0, 2), move.getType()));
                 }
             }
         }
