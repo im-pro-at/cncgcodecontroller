@@ -3,73 +3,235 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-
 package cnc.gcode.controller;
 
+import java.awt.Component;
 import java.awt.GridLayout;
-import java.util.LinkedList;
-import javax.swing.JDialog;
-import javax.swing.JOptionPane;
+import java.text.ParseException;
+import javax.swing.DefaultComboBoxModel;
+import javax.swing.JComboBox;
+import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
 
 /**
  *
- * @author n.rambaud
+ * @author patrick
  */
-//javax.swing.JFrame
-public final class JSettingsDialog extends JDialog{
-    private JTextField[] valuesFields;
-    private final LinkedList<ISettingFeedback> feedbackValues;
-    private boolean formok=false;
+public class JSettingsDialog extends javax.swing.JDialog {
 
+    public static abstract class Setting{
+        private String label;
+        private Setting(String label){
+            this.label=label;
+        }
+
+        public String getLabel() {
+            return label;
+        }
+        
+        public abstract Component getElement();
+        
+        public abstract boolean isValid();
+        
+    }
+
+    public static class STextArea extends Setting{
+        JTextArea textArea; 
+        JScrollPane scrollArea; 
+
+        public STextArea(String label, String text) {
+            super(label);
+            textArea      = new JTextArea(text); 
+            scrollArea  = new JScrollPane(textArea); 
+        }
+
+        @Override
+        public Component getElement() {
+            return scrollArea;
+        }
+
+        @Override
+        public boolean isValid() {
+            return true;
+        }
+        
+        public String getText(){
+            return textArea.getText().trim();
+        }
+        
+    }
     
-    public static LinkedList<ISettingFeedback> DisplaySettingPanel(String panelTitle,
-                                                             DatabaseV2[] ids,
-                                                             double[] currentValues,
-                                                             double[] minValues,
-                                                             double[] maxValues,
-                                                             String[] descriptions)
-    {
-        if(ids.length !=  currentValues.length && currentValues.length!= descriptions.length)
-        {
-            return null;
+    public static class STextField extends Setting{
+        JTextField jTF;
+        public STextField(String label, String value) {
+            super(label);
+            jTF= new JTextField(value);
         }
         
-        LinkedList<ISettingFeedback> settings = new LinkedList<ISettingFeedback>();
-        for (int i = 0; i< currentValues.length; i++)
-        {
-            settings.add(new JSettingFeedback(ids[i],
-                                              currentValues[i],
-                                              minValues[i],
-                                              maxValues[i],
-                                              descriptions[i] ));
+        public void setValue(String value){
+            jTF.setText(value);
         }
-        JSettingsDialog form = new JSettingsDialog(settings);
-        form.setTitle(panelTitle);
-        form.pack();
-        form.setModal(true);
-        form.setVisible(true);
         
-        if(form.formok)
-        {
-            return form.feedbackValues;
+        public String getText(){
+            return jTF.getText();
         }
-        else
-        {
-            return null;
+
+        public JTextField getjTF() {
+            return jTF;
+        }
+
+        @Override
+        public Component getElement() {
+            return jTF;
+        }
+
+        @Override
+        public boolean isValid() {
+            return true;
         }
     }
 
-    private JSettingsDialog(LinkedList<ISettingFeedback> feedbackValues)
-    {
+    public static class SDouble extends STextField{
+        NumberFieldManipulator m;
+        Double dmin;
+        SDouble smin;
+        Double dmax;
+        SDouble smax;
+
+        public SDouble(String label, double value) {
+            this(label,value,1.0);
+        }
+        
+        public SDouble(String label, double value, double delta) {
+            super(label, "");
+            
+            m=new NumberFieldManipulator(super.jTF, (NumberFieldManipulator axis) -> {
+                String message=null;
+                double v;
+                try {
+                    v = axis.getd();
+                    message=getMessage(v);
+                    if(message==null){   
+                        m.set(v);
+                    }
+                } catch (ParseException ex) {
+                    message=ex.toString();
+                }
+                if(message!=null){
+                    axis.popUpToolTip(message);
+                    axis.setFocus();
+                }
+            },delta);
+            m.set(value);
+        }
+
+        public void setDmax(Double dmax) {
+            this.dmax = dmax;
+        }
+
+        public void setDmin(Double dmin) {
+            this.dmin = dmin;
+        }
+
+        public void setSmax(SDouble smax) {
+            this.smax = smax;
+        }
+
+        public void setSmin(SDouble smin) {
+            this.smin = smin;
+        }
+        
+        @Override
+        public boolean isValid() {  
+            try{
+                double v=m.getd();
+                return getMessage(v)==null;
+                
+            }
+            catch(Exception e){
+                return false;
+            }
+        }
+               
+        private String getMessage(double v){
+            if(dmin!=null && v<dmin){
+                return "Must be bigger then "+dmin;
+            }
+            else if(smin!=null && v<smin.getValue()){
+                return "Must be bigger then "+smin.getText();
+            }
+            else if(dmax!=null && v>dmax){
+                return "Must be smaler then "+dmin;
+            }
+            else if(smax!=null && v>smax.getValue()){
+                return "Must be smaler then "+smax.getText();
+            }
+            else{
+                return null;
+            }
+        }
+        
+        public double getValue(){
+            return m.getdsave();
+        }
+    }    
+
+    public static class SEnum<E extends  Enum<E>> extends Setting{
+        JComboBox<E> jCB;
+        public SEnum(String label, E e) {
+            super(label);
+            jCB= new JComboBox<>();
+            jCB.setModel(new DefaultComboBoxModel<>(((Class<E>)e.getClass()).getEnumConstants()));
+            jCB.setSelectedItem(e);
+        }
+
+        @Override
+        public Component getElement() {
+            return jCB;
+        }
+
+        @Override
+        public boolean isValid() {
+            return true;
+        }
+
+        public E getValue(){
+            return (E)jCB.getSelectedItem();
+        }
+    }
+    
+    public static boolean showSettingsDialog(String lable,Setting setting){
+        return showSettingsDialog(lable, new Setting[]{setting});
+    } 
+
+    public static boolean showSettingsDialog(String lable,Setting[] settings){
+        return new JSettingsDialog(lable, settings).ok;        
+    } 
+    
+    private final Setting[] settings;
+    private boolean ok;
+    
+    /**
+     * Creates new form JSettingsDialog2
+     */
+    private JSettingsDialog(String lable, Setting[] settings) {
         super();
-        setResizable(false);
+        this.settings=settings;
+        this.setModal(true);
         initComponents();
-        this.feedbackValues = feedbackValues;
-        configureDataToDisplay( feedbackValues);
+        this.setTitle(lable);
+        jSettingsPanel.setLayout(new GridLayout(0,1));
+        for(Setting s:settings){    
+            JTextArea description = new JTextArea(s.getLabel());
+            description.setEditable(false);
+            jSettingsPanel.add(description);
+            jSettingsPanel.add(s.getElement());
+        }
+        this.pack();
+        this.setVisible(true);
     }
-    
+
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always
@@ -79,58 +241,39 @@ public final class JSettingsDialog extends JDialog{
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
-        JSettingsPanel = new javax.swing.JPanel();
-        jPanel2 = new javax.swing.JPanel();
-        JOkButton = new javax.swing.JButton();
-        JCancelButton = new javax.swing.JButton();
+        jSettingsPanel = new javax.swing.JPanel();
+        jOkButton = new javax.swing.JButton();
+        jCancelButton = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
 
-        javax.swing.GroupLayout JSettingsPanelLayout = new javax.swing.GroupLayout(JSettingsPanel);
-        JSettingsPanel.setLayout(JSettingsPanelLayout);
-        JSettingsPanelLayout.setHorizontalGroup(
-            JSettingsPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+        javax.swing.GroupLayout jSettingsPanelLayout = new javax.swing.GroupLayout(jSettingsPanel);
+        jSettingsPanel.setLayout(jSettingsPanelLayout);
+        jSettingsPanelLayout.setHorizontalGroup(
+            jSettingsPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGap(0, 0, Short.MAX_VALUE)
         );
-        JSettingsPanelLayout.setVerticalGroup(
-            JSettingsPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 289, Short.MAX_VALUE)
+        jSettingsPanelLayout.setVerticalGroup(
+            jSettingsPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGap(0, 256, Short.MAX_VALUE)
         );
 
-        JOkButton.setText("OK");
-        JOkButton.addActionListener(new java.awt.event.ActionListener() {
+        jOkButton.setText("OK");
+        jOkButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                JOkButtonActionPerformed(evt);
+                jOkButtonActionPerformed(evt);
             }
         });
 
-        JCancelButton.setLabel("Cancel");
-        JCancelButton.addActionListener(new java.awt.event.ActionListener() {
+        jCancelButton.setLabel("Cancel");
+        jCancelButton.setMaximumSize(new java.awt.Dimension(47, 23));
+        jCancelButton.setMinimumSize(new java.awt.Dimension(47, 23));
+        jCancelButton.setPreferredSize(new java.awt.Dimension(47, 23));
+        jCancelButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                JCancelButtonActionPerformed(evt);
+                jCancelButtonActionPerformed(evt);
             }
         });
-
-        javax.swing.GroupLayout jPanel2Layout = new javax.swing.GroupLayout(jPanel2);
-        jPanel2.setLayout(jPanel2Layout);
-        jPanel2Layout.setHorizontalGroup(
-            jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel2Layout.createSequentialGroup()
-                .addContainerGap()
-                .addComponent(JOkButton, javax.swing.GroupLayout.PREFERRED_SIZE, 243, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(18, 18, 18)
-                .addComponent(JCancelButton, javax.swing.GroupLayout.DEFAULT_SIZE, 222, Short.MAX_VALUE)
-                .addContainerGap())
-        );
-        jPanel2Layout.setVerticalGroup(
-            jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel2Layout.createSequentialGroup()
-                .addContainerGap()
-                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(JOkButton)
-                    .addComponent(JCancelButton))
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-        );
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
@@ -138,137 +281,48 @@ public final class JSettingsDialog extends JDialog{
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jPanel2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(JSettingsPanel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addComponent(jSettingsPanel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addContainerGap())
+            .addGroup(layout.createSequentialGroup()
+                .addGap(34, 34, 34)
+                .addComponent(jOkButton, javax.swing.GroupLayout.PREFERRED_SIZE, 88, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 280, Short.MAX_VALUE)
+                .addComponent(jCancelButton, javax.swing.GroupLayout.PREFERRED_SIZE, 88, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(34, 34, 34))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(layout.createSequentialGroup()
-                .addContainerGap()
-                .addComponent(JSettingsPanel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jPanel2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(0, 0, 0))
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                .addGap(5, 5, 5)
+                .addComponent(jSettingsPanel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jOkButton)
+                    .addComponent(jCancelButton, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGap(6, 6, 6))
         );
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
-    private boolean ValidateNewValue(ISettingFeedback data)
-    {
-        double val = data.getSettingValue();
-        if(val < data.getSettingMinValue())
-        {
-            int answer = JOptionPane.showConfirmDialog(null,
-                                                        "Setting: " + data.getSettingId().toString() + " is invalid. min value:" + data.getSettingMinValue() + "\nDo you want to adjust this value to min value?." ,
-                                                        "Invalid setting",
-                                                         JOptionPane.YES_NO_OPTION);
-            if(answer == JOptionPane.YES_OPTION)
-            {
-               data.setSettingValue(data.getSettingMinValue());
+    private void jOkButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jOkButtonActionPerformed
+        for(Setting s:settings)
+            if(s.isValid()==false){
+                s.getElement().requestFocus();
+                return;        
             }
-            else{
-                return false;
-            }
-        }
-        else if(val > data.getSettingMaxValue())
-        {
-            int answer = JOptionPane.showConfirmDialog(null,
-                                                        "Setting: " + data.getSettingId().toString() + " is invalid. max value:" + data.getSettingMaxValue()+ "\nDo you want to adjust this value to max value?.",
-                                                        "Invalid setting",
-                                                        JOptionPane.YES_NO_OPTION);
-            if(answer == JOptionPane.YES_OPTION)
-            {
-               data.setSettingValue(data.getSettingMaxValue());
-            }
-            else{
-                return false;
-            }
-        }
-        return true;
-    }
-    
-    private void JOkButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_JOkButtonActionPerformed
-        for(int i = 0; i < feedbackValues.size();  i++)
-        {
-            try
-            {
-                feedbackValues.get(i).setSettingValue(Double.valueOf(valuesFields[i].getText())); 
-                if(!ValidateNewValue(feedbackValues.get(i)))// validating all settings before updating.
-                    return;
-            }
-            catch(Exception ex)
-            {
-                JOptionPane.showMessageDialog(null,
-                                            "Error when converting " + valuesFields[i].getText() + ".\nIt seems not to be a double value",
-                                            "Convertion error",
-                                            JOptionPane.ERROR_MESSAGE);
-                return;
-            }
-        }
-        formok=true;
+        ok=true;
         this.setVisible(false);
-        this.dispose();
-    }//GEN-LAST:event_JOkButtonActionPerformed
+    }//GEN-LAST:event_jOkButtonActionPerformed
 
-    private void JCancelButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_JCancelButtonActionPerformed
-        formok=false;
+    private void jCancelButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jCancelButtonActionPerformed
         this.setVisible(false);
-        this.dispose();
-    }//GEN-LAST:event_JCancelButtonActionPerformed
+    }//GEN-LAST:event_jCancelButtonActionPerformed
 
-
+ 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JButton JCancelButton;
-    private javax.swing.JButton JOkButton;
-    private javax.swing.JPanel JSettingsPanel;
-    private javax.swing.JPanel jPanel2;
+    private javax.swing.JButton jCancelButton;
+    private javax.swing.JButton jOkButton;
+    private javax.swing.JPanel jSettingsPanel;
     // End of variables declaration//GEN-END:variables
-
-    public boolean configureDataToDisplay(LinkedList<ISettingFeedback> feedbackValues) {
-        
-        if( feedbackValues.size() <= 0)
-        {
-            return false;
-        }
-        if( valuesFields == null)
-        {
-            valuesFields = new JTextField[feedbackValues.size()];
-        }
-        GridLayout singleGridLayout = new GridLayout(0,1);
-        JSettingsPanel.setLayout(singleGridLayout );
-        for (int i = 0; i < feedbackValues.size(); i++)
-        {
-            double min=feedbackValues.get(i).getSettingMinValue();
-            double max=feedbackValues.get(i).getSettingMaxValue();
-            JTextArea description = new JTextArea(feedbackValues.get(i).getSettingDescription() + "\n"
-                                                    + "min: " + (min==-Double.MAX_VALUE?"-inf":""+min) + " | "
-                                                    + "max: " + (max==Double.MAX_VALUE?"-inf":""+max));
-            description.setEditable(false);
-            valuesFields[i] = new JTextField(String.valueOf(feedbackValues.get(i).getSettingValue()));
-            JSettingsPanel.add(description);
-            JSettingsPanel.add(valuesFields[i]);
-        }
-        
-        return true;
-    }
-
-    private ISettingFeedback[] getUpdatedValues(ISettingFeedback[] feedbackValues) {
-        //double[] values = new double[valuesFields.length];
-        
-        for( int i = 0; i < valuesFields.length; i++)
-        {
-            try
-            {
-                feedbackValues[i].setSettingValue(Double.valueOf(valuesFields[i].getText()));
-            }
-            catch(Exception ex)
-            {
-            }
-        }
-        
-        return feedbackValues;
-    }
 }

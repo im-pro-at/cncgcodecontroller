@@ -9,8 +9,8 @@ import de.unikassel.ann.util.ColorHelper;
 import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Component;
+import java.awt.Font;
 import java.awt.Graphics2D;
-import java.awt.Image;
 import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.RenderingHints;
@@ -34,7 +34,6 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.imageio.ImageIO;
 import javax.swing.DefaultListModel;
-import javax.swing.ImageIcon;
 import javax.swing.JFileChooser;
 import javax.swing.JList;
 import javax.swing.JOptionPane;
@@ -52,9 +51,10 @@ public class JPanelArt extends javax.swing.JPanel implements IGUIEvent{
     private BufferedImage ipanel=null;
     private BufferedImage img=null;
     private NumberFieldManipulator[] positions;
-    private double zoom=1;
-    private Point2D viewmove    =  new Point();
-    private Point2D viewzoom    =  new Point();
+    private double pzoom=1;
+    private double mzoom=1;
+    private Point2D pviewmove    =  new Point();
+    private Point2D mviewmove    =  new Point();
     private Point2D viewmovelast=  new Point();
     private Point viewmovestart = new Point();
     private AffineTransform viewmovetrans = new AffineTransform();
@@ -105,8 +105,8 @@ public class JPanelArt extends javax.swing.JPanel implements IGUIEvent{
                     public void run() {
                         data.jpw        = jPPaint.getWidth();
                         data.jph        = jPPaint.getHeight();
-                        data.zoom       = zoom;
-                        data.viewmove   = viewmove;
+                        data.zoom       = moves==null?pzoom:mzoom;
+                        data.viewmove   = moves==null?pviewmove:mviewmove;
                         data.px         = positions[0].getdsave();
                         data.pxw        = positions[1].getdsave()-positions[0].getdsave();
                         data.py         = positions[2].getdsave();
@@ -140,7 +140,6 @@ public class JPanelArt extends javax.swing.JPanel implements IGUIEvent{
                         break;
                 }            
 
-                
                 if(data.jpw < 1)
                 {
                     data.jpw = 1;
@@ -158,35 +157,63 @@ public class JPanelArt extends javax.swing.JPanel implements IGUIEvent{
                 g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
                 g2.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BILINEAR);
 
-                //Scalling transforming ...
+                //Paint scall:
+                if(data.moves!=null) {
+                    data.jpw=data.jpw-100;
+                    Font font = new Font(Font.SANS_SERIF, Font.PLAIN, 16);
+                    g2.setFont(font);
+                    int zh      = (int)(font.getStringBounds(Tools.dtostr(100.0), g2.getFontRenderContext()).getHeight()) + 10;                    
+                    int elements= data.jph / zh;
+                    int dy      = (data.jph-elements * zh) / 2;
+                    for(int i = 0;i < elements && elements >= 2;i++)
+                    {
+                        double z = zmax - i * ((zmax-zmin) / (elements - 1));
+                        double relative = (z - zmin) / (zmax-zmin);
+                        relative = Tools.adjustDouble(relative, 0, 1);
 
+                        Color c = ColorHelper.numberToColorPercentage(relative);
+                        g2.setColor(c);
+                        g2.fillRect(data.jpw + 5,
+                                    dy + zh * i,
+                                    90,
+                                    zh - 4);
+                        g2.setColor(((299 * c.getRed() + 587 * c.getGreen() + 114 * c.getBlue())> 128000) ? Color.black:Color.white);
+                        g2.drawString(Tools.dtostr(z), data.jpw + 10, dy + zh * i + zh - 10);
+                        g2.setColor(Color.black);
+                        g2.drawRect(data.jpw + 5,
+                                    dy + zh * i,
+                                    90,
+                                    zh - 4);
+                    }    
+                    g2.setClip(0,0,data.jpw,data.jph);
+                }
+                               
+                //Scalling transforming ...
                 //StartCorner
                 g2.translate(data.jpw / 2, data.jph / 2);
-                switch(Integer.parseInt(DatabaseV2.HOMING.get()))
+                switch(DatabaseV2.EHoming.get()) 
                 {
-                    case 0:
+                    case UPPER_LEFT:
                     default:
-                        g2.scale(1,1);
+                        g2.scale(1,1);                
                         break;
-                    case 1:
-                       g2.scale(-1,1);
-                       break;
-                    case 2:
-                       g2.scale(1,-1);
-                       break;
-                    case 3:                
-                       g2.scale(-1,-1);
-                       break;
-                
+                    case UPPER_RIGHT:
+                        g2.scale(-1,1);
+                        break;
+                    case LOWER_LEFT:
+                        g2.scale(1,-1);
+                        break;
+                    case LOWER_RIGHT:                
+                        g2.scale(-1,-1);
+                        break;
                 }
                 
                 if(data.moves!=null) {
-                    data.zoom=Math.pow(data.zoom, 4);
                     g2.scale(data.zoom,data.zoom);
                 }
                 
                 g2.translate(-data.jpw / 2, -data.jph / 2);
-                
+                                
                 //Display Position
                 double ariawidth    = DatabaseV2.WORKSPACE0.getsaved(); //x
                 double ariaheight   = DatabaseV2.WORKSPACE1.getsaved(); //y
@@ -274,7 +301,7 @@ public class JPanelArt extends javax.swing.JPanel implements IGUIEvent{
                 }
                 else{
                     
-                    for(CNCCommand.Move move:moves){
+                    for(CNCCommand.Move move:data.moves){
                         if(move.getType()==CNCCommand.Type.G1){
                             g2.setStroke(new BasicStroke((float)data.toold,BasicStroke.CAP_ROUND,BasicStroke.JOIN_ROUND));
                             //make 10 segments
@@ -285,19 +312,16 @@ public class JPanelArt extends javax.swing.JPanel implements IGUIEvent{
                             double wy=move.getEnd()[1]-sy;
                             double wz=move.getEnd()[2]-sz;
 
-                            if(wx>0 | wy>0){
-                                for(int i=0;i<1;i++){
-                                    g2.setColor(Tools.setAlpha(ColorHelper.numberToColorPercentage( (sz+wz/10*i -zmin)/(zmax-zmin) ),1));     
-                                    g2.draw(new Line2D.Double(sx+wx/10*i, sy+wy/10*i, sx+wx/10*(i+1), sy+wy/10*(i+1)));
-                                }
+                            if(move.getDistanceXY()>0){
+                                g2.setColor(Tools.setAlpha(ColorHelper.numberToColorPercentage( Tools.adjustDouble((sz+wz/2 -zmin)/(zmax-zmin) ,0,1)),1));     
+                                g2.draw(new Line2D.Double(sx, sy, sx+wx, sy+wy));
                             }
                             
                         }                    
                     }
 
                 }
-                
-                
+
                 return ipanel;
             }
 
@@ -317,7 +341,7 @@ public class JPanelArt extends javax.swing.JPanel implements IGUIEvent{
     public JPanelArt() {
         initComponents();
         
-        NumberFieldManipulator.IAxesEvent numbereventx= (NumberFieldManipulator axis) -> {
+        NumberFieldManipulator.IChangeEvent numbereventx= (NumberFieldManipulator axis) -> {
             Double value;
             try {
                 value = axis.getd();
@@ -344,13 +368,15 @@ public class JPanelArt extends javax.swing.JPanel implements IGUIEvent{
             //Write back Value
             axis.set(value);
 
-            zoom=1;
-            viewmove=new Point();
+            pzoom=1;
+            pviewmove=new Point();
+            mzoom=1;
+            mviewmove=new Point();
             painter.trigger();            
 
         };
-        NumberFieldManipulator.IAxesEvent numbereventy= (NumberFieldManipulator axis) -> {
-            Double value;
+        NumberFieldManipulator.IChangeEvent numbereventy= (NumberFieldManipulator axis) -> {
+            double value;
             try {
                 value = axis.getd();
             } catch (ParseException ex) {
@@ -380,12 +406,14 @@ public class JPanelArt extends javax.swing.JPanel implements IGUIEvent{
             //Write back Value
             axis.set(value);
             
-            zoom=1;
-            viewmove=new Point();
+            pzoom=1;
+            pviewmove=new Point();
+            mzoom=1;
+            mviewmove=new Point();
             painter.trigger();            
         };
         
-        NumberFieldManipulator.IAxesEvent numbereventa= (NumberFieldManipulator axis) -> {
+        NumberFieldManipulator.IChangeEvent numbereventa= (NumberFieldManipulator axis) -> {
             Double value;
             try {
                 value = axis.getd();
@@ -861,8 +889,10 @@ public class JPanelArt extends javax.swing.JPanel implements IGUIEvent{
         jLCNCCommands.setModel(new DefaultListModel());
 
         
-        zoom=1;
-        viewmove=new Point();
+        pzoom=1;
+        pviewmove=new Point();
+        mzoom=1;
+        mviewmove=new Point();
         positions[4].set(0.0);
         
         fireupdateGUI();
@@ -871,24 +901,36 @@ public class JPanelArt extends javax.swing.JPanel implements IGUIEvent{
     private void jPPaintMouseDragged(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jPPaintMouseDragged
         Point2D p1 = viewmovetrans.transform(new Point2D.Double(evt.getPoint().getX(), evt.getPoint().getY()),null);        
         Point2D p2 = viewmovetrans.transform(new Point2D.Double(viewmovestart.getX(), viewmovestart.getY()),null);
-        viewmove = new Point2D.Double(viewmovelast.getX() + p1.getX()- p2.getX(), viewmovelast.getY() + p1.getY()- p2.getY());
+        if(moves==null) 
+            pviewmove = new Point2D.Double(viewmovelast.getX() + p1.getX()- p2.getX(), viewmovelast.getY() + p1.getY()- p2.getY());
+        else
+            mviewmove = new Point2D.Double(viewmovelast.getX() + p1.getX()- p2.getX(), viewmovelast.getY() + p1.getY()- p2.getY());
         painter.trigger();
     }//GEN-LAST:event_jPPaintMouseDragged
 
     private void jPPaintMousePressed(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jPPaintMousePressed
-        viewmovelast  = viewmove;
+        if(moves==null) 
+            viewmovelast  = pviewmove;
+        else
+            viewmovelast  = mviewmove;
         viewmovestart = evt.getPoint();
     }//GEN-LAST:event_jPPaintMousePressed
 
     private void jPPaintMouseWheelMoved(java.awt.event.MouseWheelEvent evt) {//GEN-FIRST:event_jPPaintMouseWheelMoved
-        viewzoom=viewmovetrans.transform(new Point2D.Double(evt.getPoint().getX(), evt.getPoint().getY()),null);
         if (evt.getWheelRotation() > 0 )//mouse wheel was rotated up/away from the user
         {
-            zoom*=1.01;
+            if(moves==null)
+                pzoom*=1.01;
+            else
+                mzoom*=1.2;
+                
         }
         else
         {
-            zoom*=0.99;
+            if(moves==null)
+                pzoom*=0.99;
+            else
+                mzoom*=0.80;
         }    
         painter.trigger();
     }//GEN-LAST:event_jPPaintMouseWheelMoved
@@ -911,34 +953,21 @@ public class JPanelArt extends javax.swing.JPanel implements IGUIEvent{
     
     private void jBGenerateActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jBGenerateActionPerformed
         
-        //Image prosessing
-        final int ires=20; //Internal resulution for calculation
-        final Color bgc=Color.WHITE; //Background Color
-        final boolean fembossing=true; //Filters
-        final boolean fedge=false;
-        final boolean flow=false;
-        final int iscale=Image.SCALE_SMOOTH; //Scale algorithem
+        ArtSettings a= new ArtSettings();
         
-        //Gcode Parameters
-        final float bit_size= 1; // Diameter of your bit.
-        final float pline=50;    // Line distance in % of bit size
-        final float psegment=50; // Sigment length in % of bit size
-        final float zmin=0;      // milling deth
-        final float zmax=-2;      
-        final float zsave=10;    // save moving hight
+        a.fromString(DatabaseV2.ARTSETTINGS.get());
         
-        final float ftravel=500; //Trefel speed
-        final float fmill=50;    //Milling speed
-        
-        final int pathtype=0;   //possible Path algorithems
-        
-        
-        worker= new PMySwingWorker<String,Object>() {
+        worker= (new PMySwingWorker<DefaultListModel<CNCCommand>,Object>() {
             
-            DefaultListModel<CNCCommand> model = new DefaultListModel<>();
-
+            private ArtSettings a=null;
+            
+            PMySwingWorker init(ArtSettings a){
+                this.a=a;
+                return this;
+            }
+            
             @Override
-            protected String doInBackground() throws Exception {
+            protected DefaultListModel<CNCCommand> doInBackground() throws Exception {
 
                 double px=positions[0].getdsave();
                 double pxw=positions[1].getdsave()-positions[0].getdsave();
@@ -947,8 +976,8 @@ public class JPanelArt extends javax.swing.JPanel implements IGUIEvent{
                 double pa=positions[4].getdsave();
                 boolean pxm=jCBmirroX.isSelected();
                 boolean pym=jCBmirroY.isSelected();            
-                int pointsx=(int)(pxw/(bit_size*pline/100))+1;
-                int pointsy=(int)(pyw/(bit_size*psegment/100))+1;
+                int pointsx=(int)(pxw/(a.bit_size*a.pline/100))+1;
+                int pointsy=(int)(pyw/(a.bit_size*a.psegment/100))+1;
 
                 Shape boarder;
                 switch (jCBShape.getSelectedIndex()){
@@ -972,40 +1001,21 @@ public class JPanelArt extends javax.swing.JPanel implements IGUIEvent{
                 
                 progress(1, "Process Image");
                 
-                BufferedImage i = new BufferedImage((int)(pxw*ires), (int)(pyw*ires), BufferedImage.TYPE_USHORT_GRAY);
+                BufferedImage i = new BufferedImage((int)(pxw*a.ires), (int)(pyw*a.ires), BufferedImage.TYPE_USHORT_GRAY);
                                 
                 Graphics2D g2 = i.createGraphics();
                 
-                g2.setColor(bgc);
+                g2.setColor(a.bgc);
                 g2.fillRect(0, 0, i.getWidth(), i.getHeight());
                 
-                //ViewMove
-                g2.translate(i.getWidth() / 2, i.getHeight() / 2);
-                switch(Integer.parseInt(DatabaseV2.HOMING.get()))
-                {
-                    case 0:
-                    default:
-                        g2.scale(1,1);
-                        break;
-                    case 1:
-                       g2.scale(-1,1);
-                       break;
-                    case 2:
-                       g2.scale(1,-1);
-                       break;
-                    case 3:                
-                       g2.scale(-1,-1);
-                       break;
-                }
-                g2.translate(-i.getWidth() / 2, -i.getHeight() / 2);
-                
-                g2.scale(ires, ires);
+                //ViewMove                
+                g2.scale(a.ires, a.ires);
                 g2.translate(-px, -py);                
                 
                 g2.setClip(boarder);
                 
                 //ViewMove
-                g2.translate(viewmove.getX(), viewmove.getY());                
+                g2.translate(pviewmove.getX(), pviewmove.getY());                
                     
                 Rectangle r=Geometrics.placeRectangle((int)(pxw*1),(int)(pyw*1),Geometrics.getRatio(img.getWidth(), img.getHeight()));
                 g2.translate(r.x+px, r.y+py);
@@ -1016,20 +1026,21 @@ public class JPanelArt extends javax.swing.JPanel implements IGUIEvent{
                 g2.translate(img.getWidth()/2,img.getHeight()/2);
                 g2.rotate(Math.PI/180*pa);
                 
-                g2.scale(zoom*(pxm?-1:1), zoom*(pym?-1:1));
+                //g2.scale(zoom*(pxm?-1:1), zoom*(pym?-1:1));
+                g2.scale(pzoom, pzoom);
                 g2.translate(-img.getWidth()/2,-img.getHeight()/2);
                     
                 g2.drawImage(img, 0, 0, null);
 
-                if(fembossing)
+                if(a.fembossing)
                     i= (new ConvolveOp(new Kernel(3, 3, new float[] { -2, 0, 0, 0, 1, 0, 0, 0, 2 }))).filter(i, null);                                
-                if(fedge)
+                if(a.fedge)
                     i= (new ConvolveOp(new Kernel(3, 3,  new float[] {-1, -1, -1,-1,8,-1,-1, -1, -1 }))).filter(i, null);
-                if(flow)
+                if(a.flow)
                     i= (new ConvolveOp(new Kernel(3, 3,  new float[] {0.1f, 0.1f, 0.1f,0.1f,0.2f,0.1f,0.1f, 0.1f, 0.1f }))).filter(i, null);
 
                 BufferedImage ti=new BufferedImage(pointsx, pointsy, BufferedImage.TYPE_USHORT_GRAY);
-                ti.getGraphics().drawImage(i.getScaledInstance(pointsx,pointsy,iscale), 0, 0, null);
+                ti.getGraphics().drawImage(i.getScaledInstance(pointsx,pointsy,a.iscale.getValue()), 0, 0, null);
                 i=ti;
 
                 System.out.println( );
@@ -1049,7 +1060,7 @@ public class JPanelArt extends javax.swing.JPanel implements IGUIEvent{
                 for(int x=0;x<pointsx;x++)
                     for(int y=0;y<pointsy;y++){
                         z[x][y]= (double)(id[x][y]-min)/(max-min);
-                        z[x][y]=zmin +z[x][y]*(zmax-zmin);
+                        z[x][y]=a.zmin +z[x][y]*(a.zmax-a.zmin);
                         dopause();
                     }                
                 
@@ -1057,8 +1068,8 @@ public class JPanelArt extends javax.swing.JPanel implements IGUIEvent{
 
                 
                 ArrayList<ArrayList<Point>> paths =new ArrayList<>();
-                switch(pathtype){
-                    case 0:
+                switch(a.pathtype){
+                    case YLINES: //ymin to ymax then x++ 
                     default:
                         for(int x=0;x<pointsx;x++){
                             ArrayList<Point> path= new ArrayList<>();
@@ -1068,15 +1079,73 @@ public class JPanelArt extends javax.swing.JPanel implements IGUIEvent{
                             paths.add(path);
                         }
                         break;
+                    case XLINES: //xmin to xmax then y++ 
+                        for(int y=0;y<pointsy;y++){
+                            ArrayList<Point> path= new ArrayList<>();
+                            for(int x=0;x<pointsx;x++){
+                                path.add(new Point(x, y));
+                            }                
+                            paths.add(path);
+                        }
+                        break;
+                    case DIAGONAL1: //diagonal +45°
+                        for (int diag = 0; diag < (pointsx +  pointsy - 1); diag++) {
+                            ArrayList<Point> path= new ArrayList<>();
+                            int row_stop = Math.max(0,  diag -  pointsx + 1);
+                            int row_start = Math.min(diag, pointsy - 1);
+                            for (int row = row_start; row >= row_stop; row--) {
+                                // on a given diagonal row + col = constant "diag"
+                                // diag labels the diagonal number
+                                int col = diag - row;
+                                path.add(new Point(col, row));
+                            }
+                            paths.add(path);
+                        }                        
+                        break;
+                    case DIAGONAL2: //diagonal -45°
+                        for (int diag = 0; diag < (pointsy +  pointsx - 1); diag++) {
+                            ArrayList<Point> path= new ArrayList<>();
+                            int row_stop = Math.max(0,  diag -  pointsy + 1);
+                            int row_start = Math.min(diag, pointsx - 1);
+                            for (int row = row_start; row >= row_stop; row--) {
+                                // on a given diagonal row + col = constant "diag"
+                                // diag labels the diagonal number
+                                int col = diag - row;
+                                path.add(new Point(row, col));
+                            }
+                            paths.add(path);
+                        }                        
+                        break;
                 }
-
+                //make sweep:
+                if(a.sweep){
+                    for(int ps=0;ps<paths.size();ps++){
+                        if(ps%2==1){
+                            //turn path around:
+                            for(int p=0;p<paths.get(ps).size()/2;p++){
+                                Point temp=paths.get(ps).get(p);
+                                int rp=paths.get(ps).size()-1-p;
+                                paths.get(ps).set(p, paths.get(ps).get(rp));
+                                paths.get(ps).set(rp, temp);                           
+                            }
+                        }
+                    }
+                }
+                //invert path axis
+                paths.stream().forEach((path) -> {path.stream().forEach((p) -> {
+                    if(a.mdirx)
+                        p.x=pointsx-1-p.x;
+                    if(a.mdiry)
+                        p.y=pointsy-1-p.y;
+                });});
+                
                 progress(1, "Generate Path");
                 
                 LinkedList<CNCCommand> cmds = new LinkedList<>();
                 
                 //Init CNC
                 cmds.add(CNCCommand.getStartCommand());                
-                cmds.add(new CNCCommand("G0 X"+Tools.dtostr(px)+" Y"+Tools.dtostr(py)+" F"+Tools.dtostr(ftravel)));
+                cmds.add(new CNCCommand("G0 X"+Tools.dtostr(px)+" Y"+Tools.dtostr(py)+" F"+Tools.dtostr(a.ftravel)));
 
                 //Start Spindel
                 cmds.add(new CNCCommand("M4"));
@@ -1091,25 +1160,25 @@ public class JPanelArt extends javax.swing.JPanel implements IGUIEvent{
                         
                         if(!boarder.contains(ap)){
                             if(down){
-                                cmds.add(new CNCCommand("G0 Z"+Tools.dtostr(zsave)+" F"+Tools.dtostr(ftravel)));
+                                cmds.add(new CNCCommand("G0 Z"+Tools.dtostr(a.zsave)+" F"+Tools.dtostr(a.ftravel)));
                                 down=false;                                
                             }
                         }
                         else
                         {
                             if(!down){
-                                cmds.add(new CNCCommand("G0 X"+Tools.dtostr(ap.x)+" Y"+Tools.dtostr(ap.y)+" F"+Tools.dtostr(ftravel)));                                
-                                cmds.add(new CNCCommand("G1 Z"+Tools.dtostr(z[p.x][p.y])+" F"+Tools.dtostr(fmill)));
+                                cmds.add(new CNCCommand("G0 X"+Tools.dtostr(ap.x)+" Y"+Tools.dtostr(ap.y)+" F"+Tools.dtostr(a.ftravel)));                                
+                                cmds.add(new CNCCommand("G1 Z"+Tools.dtostr(z[p.x][p.y])+" F"+Tools.dtostr(a.fmill)));
                                 down=true;                                
                             }
                             else{
-                                cmds.add(new CNCCommand("G1 X"+Tools.dtostr(ap.x)+" Y"+Tools.dtostr(ap.y)+" Z"+Tools.dtostr(z[p.x][p.y])+" F"+Tools.dtostr(fmill)));
+                                cmds.add(new CNCCommand("G1 X"+Tools.dtostr(ap.x)+" Y"+Tools.dtostr(ap.y)+" Z"+Tools.dtostr(z[p.x][p.y])+" F"+Tools.dtostr(a.fmill)));
                             }
                         }                        
                     }                                
                     //Move to save height
                     if(down){
-                        cmds.add(new CNCCommand("G0 Z"+Tools.dtostr(zsave)+" F"+Tools.dtostr(ftravel)));
+                        cmds.add(new CNCCommand("G0 Z"+Tools.dtostr(a.zsave)+" F"+Tools.dtostr(a.ftravel)));
                         down=false;
                     }
                     progress((int)(50.0*(count++)/(paths.size())), "Generate Path");
@@ -1123,8 +1192,9 @@ public class JPanelArt extends javax.swing.JPanel implements IGUIEvent{
 
                 CNCCommand.Calchelper c = new CNCCommand.Calchelper();
                 c.ignorZMoveWaring=true;
-                ArrayList<CNCCommand.Move> m= new ArrayList<>();
+                ArrayList<CNCCommand.Move> moves= new ArrayList<>();
 
+                DefaultListModel<CNCCommand> model = new DefaultListModel<>();
                 count=0;
                 for(CNCCommand command:cmds){
                     CNCCommand.State t = command.calcCommand(c);
@@ -1135,7 +1205,7 @@ public class JPanelArt extends javax.swing.JPanel implements IGUIEvent{
                     model.addElement(command);
                     
                     for(CNCCommand.Move tm:command.getMoves()){
-                        m.add(tm);
+                        moves.add(tm);
                     }
                     
                     progress((int)(50+50.0*(count++)/(cmds.size())), "Process Path");
@@ -1143,46 +1213,44 @@ public class JPanelArt extends javax.swing.JPanel implements IGUIEvent{
                 }
                 
                 JPanelArt.this.secounds=(long)c.seconds;
-                JPanelArt.this.moves=m;
-                JPanelArt.this.toold=bit_size;
-                JPanelArt.this.zmax=zmax;
-                JPanelArt.this.zmin=zmin;
-                return "Done";
+                JPanelArt.this.moves=moves;
+                return model;
             }
-            
-
 
             @Override
-            protected void done(String rvalue, Exception ex, boolean canceled) {
+            protected void done(DefaultListModel<CNCCommand> rvalue, Exception ex, boolean canceled) {
                 String message;
                 if(canceled)
                 {
                     message = "Canceled!";
+                    JPanelArt.this.moves=null;
                 }
                 else if(ex != null)
                 {
                     message ="Error loading File! (" + ex.getMessage() + ")";
                     Logger.getLogger(JPanelCNCMilling.class.getName()).log(Level.SEVERE, null, ex);
+                    JPanelArt.this.moves=null;
                 }
                 else
                 {
-                    message      = rvalue;
+                    message      = "Done";
                     jPBar.setString("~" + Tools.formatDuration(secounds));
+                    JPanelArt.this.toold=a.bit_size;
+                    JPanelArt.this.zmax=a.zmax;
+                    JPanelArt.this.zmin=a.zmin;
+                    jLCNCCommands.setModel(rvalue);
                 }
 
-                jLCNCCommands.setModel(model);
                 
-                img=null;
-                
-                zoom=1;
-                viewmove=new Point();
+                mzoom=1;
+                mviewmove=new Point();
                 positions[4].set(0.0);
                
                 JOptionPane.showMessageDialog(JPanelArt.this, message);
 
                 fireupdateGUI();
             }
-        };
+        }).init(a);
 
         worker.execute();
 

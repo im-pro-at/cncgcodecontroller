@@ -128,10 +128,10 @@ public class JPanelAdvancedControl extends javax.swing.JPanel implements IGUIEve
 //                    int oa=a;
 
                     //Calc mirroring + ccw
-                    switch(Integer.parseInt(DatabaseV2.get(DatabaseV2.HOMING)))
-                    {
-                        case 0:
-                        case 3:
+                    switch(DatabaseV2.EHoming.get())
+                    {      
+                        case UPPER_LEFT:
+                        case LOWER_RIGHT:
                             if(ccw)
                             {
                                 a = a - 360;
@@ -183,7 +183,7 @@ public class JPanelAdvancedControl extends javax.swing.JPanel implements IGUIEve
         initComponents();
 
         //Init Fields:
-        NumberFieldManipulator.IAxesEvent event= new NumberFieldManipulator.IAxesEvent() {
+        NumberFieldManipulator.IChangeEvent event= new NumberFieldManipulator.IChangeEvent() {
             @Override
             public void fired(NumberFieldManipulator axis) {
                 axesEvent(axis);
@@ -375,19 +375,19 @@ public class JPanelAdvancedControl extends javax.swing.JPanel implements IGUIEve
 
         //Scale for homeing position
         g2d.translate(jPPaint.getWidth() / 2, jPPaint.getHeight() / 2);
-        switch(Integer.parseInt(DatabaseV2.HOMING.get()))
+        switch(DatabaseV2.EHoming.get()) 
         {
-            case 0:
+            case UPPER_LEFT:
             default:
                 g2d.scale(1,1);                
                 break;
-            case 1:
+            case UPPER_RIGHT:
                 g2d.scale(-1,1);
                 break;
-            case 2:
+            case LOWER_LEFT:
                 g2d.scale(1,-1);
                 break;
-            case 3:                
+            case LOWER_RIGHT:                
                 g2d.scale(-1,-1);
                 break;
         }
@@ -1235,27 +1235,25 @@ public class JPanelAdvancedControl extends javax.swing.JPanel implements IGUIEve
             JOptionPane.showMessageDialog(this, "Another command is in progress!");
             return;
         }
-        Double[] values = new Double[3];
-        Double[] max    = new Double[3];
-        String[] messages = new String[3];
+        
+        JSettingsDialog.SDouble[] values= new JSettingsDialog.SDouble[3];
+        
         for(int i = 0;i < 3;i++)
         {
-            messages[i] = "Set the value for the " + CommandParsing.axesName[i] + " Axis";
-            values[i]   = axes[i][0].getdsave();
-            max[i]      = DatabaseV2.getWorkspace(i).getsaved();
-        }
+            values[i]= new JSettingsDialog.SDouble("Set the value for the " + CommandParsing.axesName[i] + " Axis",axes[i][0].getdsave());
+            values[i].setDmax(DatabaseV2.getWorkspace(i).getsaved());
+            values[i].setDmin(0.0);
+        }        
 
-        values = Tools.getValues(messages, values, max, new Double[]{0.0,0.0,0.0});
-
-        if(values!= null)
+        if(JSettingsDialog.showSettingsDialog("Set Position", values))
         {
             String cmd = "G92";
             jPPaint.setRepaintEnable(false);
             for(int i = 0;i < 3;i++)
             {
-                axes[i][0].set(values[i]);
+                axes[i][0].set(values[i].getValue());
                 axes[i][0].dispatchEvent();
-                cmd += " " + CommandParsing.axesName[i] + Tools.dtostr(values[i]);
+                cmd += " " + CommandParsing.axesName[i] + values[i].getText();
             }
             try {
                 Communication.send(cmd);
@@ -1557,15 +1555,15 @@ public class JPanelAdvancedControl extends javax.swing.JPanel implements IGUIEve
         {
             double x    = (evt.getX()- rect.x) * Geometrics.getScale(areaWidth, areaHeight, rect.width, rect.height);
             double y    = (evt.getY()- rect.y) * Geometrics.getScale(areaWidth, areaHeight, rect.width, rect.height);
-            switch(Integer.parseInt(DatabaseV2.HOMING.get()))
+            switch(DatabaseV2.EHoming.get())
             {
-                case 1:
+                case UPPER_RIGHT:
                 x   = areaWidth - x;
                 break;
-                case 2:
+                case LOWER_LEFT:
                 y   = areaHeight - y;
                 break;
-                case 3:
+                case LOWER_RIGHT:
                 x   = areaWidth - x;
                 y   = areaHeight - y;
                 break;

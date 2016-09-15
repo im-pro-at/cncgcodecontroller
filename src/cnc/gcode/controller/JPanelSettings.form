@@ -60,8 +60,7 @@
                                   <Component id="jBSALStart" alignment="0" min="-2" max="-2" attributes="0"/>
                                   <Component id="jBSARC" alignment="0" min="-2" max="-2" attributes="0"/>
                                   <Component id="jBSBacklash" alignment="0" min="-2" max="-2" attributes="0"/>
-                                  <Component id="jBSmodalG1" alignment="0" min="-2" max="-2" attributes="0"/>
-                                  <Component id="jBSmodalG0" alignment="0" min="-2" max="-2" attributes="0"/>
+                                  <Component id="jBSmodal" alignment="0" min="-2" max="-2" attributes="0"/>
                                   <Component id="jBSComType" alignment="0" min="-2" max="-2" attributes="0"/>
                                   <Component id="jBSCBack" alignment="0" min="-2" max="-2" attributes="0"/>
                                   <Component id="jBSCGrid" alignment="0" min="-2" max="-2" attributes="0"/>
@@ -70,7 +69,6 @@
                                   <Component id="jBSCG1" alignment="0" min="-2" max="-2" attributes="0"/>
                               </Group>
                           </Group>
-                          <Component id="jLabel45" alignment="0" min="-2" max="-2" attributes="0"/>
                           <Component id="jLabel44" alignment="0" min="-2" max="-2" attributes="0"/>
                           <Group type="102" alignment="0" attributes="0">
                               <Component id="jBexport" min="-2" max="-2" attributes="0"/>
@@ -101,8 +99,7 @@
                           <Component id="jLSALStart" alignment="0" min="-2" max="-2" attributes="0"/>
                           <Component id="jLSARC" alignment="0" min="-2" max="-2" attributes="0"/>
                           <Component id="jLSBacklash" alignment="0" min="-2" max="-2" attributes="0"/>
-                          <Component id="jLSmodalG1" alignment="0" min="-2" max="-2" attributes="0"/>
-                          <Component id="jLSmodalG0" alignment="0" min="-2" max="-2" attributes="0"/>
+                          <Component id="jLSmodal" alignment="0" min="-2" max="-2" attributes="0"/>
                           <Component id="jLSComType" min="-2" max="-2" attributes="0"/>
                           <Component id="jLSCGrid" min="-2" max="-2" attributes="0"/>
                           <Component id="jLSCGridDis" min="-2" max="-2" attributes="0"/>
@@ -211,14 +208,8 @@
               <EmptySpace type="separate" max="-2" attributes="0"/>
               <Group type="103" groupAlignment="3" attributes="0">
                   <Component id="jLabel43" alignment="3" min="-2" max="-2" attributes="0"/>
-                  <Component id="jLSmodalG1" alignment="3" min="-2" max="-2" attributes="0"/>
-                  <Component id="jBSmodalG1" alignment="3" min="-2" max="-2" attributes="0"/>
-              </Group>
-              <EmptySpace type="separate" max="-2" attributes="0"/>
-              <Group type="103" groupAlignment="3" attributes="0">
-                  <Component id="jLabel45" alignment="3" min="-2" max="-2" attributes="0"/>
-                  <Component id="jBSmodalG0" alignment="3" min="-2" max="-2" attributes="0"/>
-                  <Component id="jLSmodalG0" alignment="3" min="-2" max="-2" attributes="0"/>
+                  <Component id="jLSmodal" alignment="3" min="-2" max="-2" attributes="0"/>
+                  <Component id="jBSmodal" alignment="3" min="-2" max="-2" attributes="0"/>
               </Group>
               <EmptySpace type="separate" max="-2" attributes="0"/>
               <Group type="103" groupAlignment="3" attributes="0">
@@ -256,7 +247,7 @@
                   <Component id="jBSCG1" alignment="3" min="-2" max="-2" attributes="0"/>
                   <Component id="jLSCG1" alignment="3" min="-2" max="-2" attributes="0"/>
               </Group>
-              <EmptySpace pref="16" max="32767" attributes="0"/>
+              <EmptySpace pref="57" max="32767" attributes="0"/>
               <Group type="103" groupAlignment="3" attributes="0">
                   <Component id="jBexport" alignment="3" min="-2" max="-2" attributes="0"/>
                   <Component id="jBImport" alignment="3" min="-2" max="-2" attributes="0"/>
@@ -539,10 +530,10 @@
     </Component>
     <Component class="javax.swing.JLabel" name="jLabel43">
       <Properties>
-        <Property name="text" type="java.lang.String" value="Allow modal G1:"/>
+        <Property name="text" type="java.lang.String" value="Allow modal:"/>
       </Properties>
     </Component>
-    <Component class="javax.swing.JButton" name="jBSmodalG1">
+    <Component class="javax.swing.JButton" name="jBSmodal">
       <Properties>
         <Property name="text" type="java.lang.String" value="Change"/>
       </Properties>
@@ -550,25 +541,7 @@
         <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="jBSettingsActionPerformed"/>
       </Events>
     </Component>
-    <Component class="javax.swing.JLabel" name="jLSmodalG1">
-      <Properties>
-        <Property name="text" type="java.lang.String" value="Settings Text"/>
-      </Properties>
-    </Component>
-    <Component class="javax.swing.JLabel" name="jLabel45">
-      <Properties>
-        <Property name="text" type="java.lang.String" value="Allow modal G0:"/>
-      </Properties>
-    </Component>
-    <Component class="javax.swing.JButton" name="jBSmodalG0">
-      <Properties>
-        <Property name="text" type="java.lang.String" value="Change"/>
-      </Properties>
-      <Events>
-        <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="jBSettingsActionPerformed"/>
-      </Events>
-    </Component>
-    <Component class="javax.swing.JLabel" name="jLSmodalG0">
+    <Component class="javax.swing.JLabel" name="jLSmodal">
       <Properties>
         <Property name="text" type="java.lang.String" value="Settings Text"/>
       </Properties>

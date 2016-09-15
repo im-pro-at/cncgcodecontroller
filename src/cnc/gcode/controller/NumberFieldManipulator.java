@@ -28,20 +28,20 @@ import javax.swing.Timer;
  */
 class NumberFieldManipulator {
 
-    public interface IAxesEvent
+    public interface IChangeEvent
     {
         void fired(NumberFieldManipulator axis);
     }
     
     private final JComponent element;
-    private final IAxesEvent event;
+    private final IChangeEvent event;
     private final Double delta;
     
-    public NumberFieldManipulator(JComponent element, IAxesEvent event) {
+    public NumberFieldManipulator(JComponent element, IChangeEvent event) {
         this(element,event, 1);
     }
     
-    public NumberFieldManipulator(JComponent element, IAxesEvent event, double delta) {
+    public NumberFieldManipulator(JComponent element, IChangeEvent event, double delta) {
         this.element    = element;
         this.event      = event;
         this.delta      = delta;

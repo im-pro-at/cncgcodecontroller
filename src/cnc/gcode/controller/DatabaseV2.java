@@ -32,7 +32,7 @@ public enum DatabaseV2 {
     SPEED("9"),
     
     //Control
-    HOMING("0"), //Homing Point 0= upper left; 1= upper right; 2= lower left; 3= lower right;
+    HOMING(EHoming.LOWER_LEFT.name()), 
     MAXFEEDRATE(Tools.dtostr(600.0)), 
     WORKSPACE0(Tools.dtostr(200.0)),
     WORKSPACE1(Tools.dtostr(200.0)),
@@ -67,8 +67,8 @@ public enum DatabaseV2 {
     BL2(Tools.dtostr(0.0)),
     
     //Modal G0/G1
-    G0MODAL("0"), //"0" == off, "1"==on
-    G1MODAL("0"), //"0" == off, "1"==on
+    G0MODAL(EOnOff.OFF.name()), 
+    G1MODAL(EOnOff.OFF.name()), 
     
     //Communication Type
     COMTYPE(Communication.MARLIN.toString()),   
@@ -78,8 +78,50 @@ public enum DatabaseV2 {
     CGRID(""+Color.lightGray.getRGB()),
     CGRIDDISTANCE(Tools.dtostr(10.0)),
     CG0(""+Color.black.getRGB()),
-    CG1(""+Color.orange.darker().getRGB())
+    CG1(""+Color.orange.darker().getRGB()),
+    
+    //Art settings
+    ARTSETTINGS((new ArtSettings()).toString()),
     ;
+    
+    enum EHoming{
+       //Homing Point 0= upper left; 1= upper right; 2= lower left; 3= lower right;
+        UPPER_LEFT,
+        UPPER_RIGHT,
+        LOWER_LEFT,
+        LOWER_RIGHT;
+        
+        public static EHoming get(){
+            try{
+                return EHoming.valueOf(HOMING.get());
+            }
+            catch(Exception e){
+                return LOWER_LEFT;
+            }
+        }
+        
+        public void set(){
+            HOMING.set(this.name());
+        }
+    }
+    
+    enum EOnOff{
+        ON,
+        OFF;
+        
+        public static EOnOff get(DatabaseV2 d){
+            try{
+                return EOnOff.valueOf(d.get());
+            }
+            catch(Exception e){
+                return OFF;
+            }
+        }
+        
+        public void set(DatabaseV2 d){
+            d.set(this.name());
+        }
+    }
     
     private final String defaultValue;
     private final static String SETTINGSFILE = System.getProperty("user.home") + File.separator + ".cnccgcodecontroller" + File.separator + "Settings.ois";
@@ -131,6 +173,7 @@ public enum DatabaseV2 {
             }
             try (ObjectInput in = new ObjectInputStream(new FileInputStream(file))) 
             {
+                //Try new Database
                 EnumMap temp =(EnumMap)in.readObject();
                 try
                 {
@@ -140,20 +183,22 @@ public enum DatabaseV2 {
                     return true;
                 }
                 catch(Exception ex){
-                    Logger.getLogger(DatabaseV2.class.getName()).log(Level.SEVERE, null, ex); 
-                    
-                    EnumMap<Database, String> tdata =(EnumMap<Database, String>)temp;
-                    tdata.put(Database.PORT, tdata.get(Database.PORT)); //Test if Database V1 => if not exeption is thrown
-
-                    data= new EnumMap<>(DatabaseV2.class);
-                    
-                    for(Database e: Database.values()){
-                        if(tdata.containsKey(e)){
-                            data.put(e.getLink(), tdata.get(e));
-                        }
-                    }
-                    return true;
+                    Logger.getLogger(DatabaseV2.class.getName()).log(Level.SEVERE, null, ex);                     
                 }
+                
+                //Try old Database:
+                EnumMap<Database, String> tdata =(EnumMap<Database, String>)temp;
+                tdata.put(Database.PORT, tdata.get(Database.PORT)); //Test if Database V1 => if not exeption is thrown
+
+                data= new EnumMap<>(DatabaseV2.class);
+
+                for(Database e: Database.values()){
+                    if(tdata.containsKey(e)){
+                        data.put(e.getLink(), tdata.get(e));
+                    }
+                }
+                return true;
+
             }
         } catch (Exception ex) {
             Logger.getLogger(DatabaseV2.class.getName()).log(Level.SEVERE, null, ex); 

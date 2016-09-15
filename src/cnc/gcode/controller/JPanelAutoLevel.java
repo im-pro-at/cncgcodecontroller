@@ -109,23 +109,22 @@ public class JPanelAutoLevel extends javax.swing.JPanel implements IGUIEvent {
                 
                 //StartCorner
                 g2.translate(data.jpw / 2, data.jph / 2);
-                switch(Integer.parseInt(DatabaseV2.HOMING.get()))
+                switch(DatabaseV2.EHoming.get()) 
                 {
-                    case 0:
+                    case UPPER_LEFT:
                     default:
                         g2.scale(1,1);                
                         break;
-                    case 1:
+                    case UPPER_RIGHT:
                         g2.scale(-1,1);
                         break;
-                    case 2:
-                        g2.scale(1,-1); 
+                    case LOWER_LEFT:
+                        g2.scale(1,-1);
                         break;
-                    case 3:                
+                    case LOWER_RIGHT:                
                         g2.scale(-1,-1);
                         break;
-                }
-                g2.translate(-data.jpw / 2, -data.jph / 2);
+                }                g2.translate(-data.jpw / 2, -data.jph / 2);
                 
                 //Display Position
                 double ariawidth    = DatabaseV2.WORKSPACE0.getsaved(); //x
@@ -274,7 +273,7 @@ public class JPanelAutoLevel extends javax.swing.JPanel implements IGUIEvent {
     public JPanelAutoLevel() {
         initComponents();
         
-        NumberFieldManipulator.IAxesEvent axesevent = (NumberFieldManipulator axis) -> {
+        NumberFieldManipulator.IChangeEvent axesevent = (NumberFieldManipulator axis) -> {
             double value;
             try {
                 value = axis.getd();

@@ -133,21 +133,21 @@ public class JPanelCNCMilling extends javax.swing.JPanel implements IGUIEvent{
 
             //StartCorner
             g2.translate(data.jpw / 2, data.jph / 2);
-            switch(Integer.parseInt(DatabaseV2.HOMING.get()))
+            switch(DatabaseV2.EHoming.get()) 
             {
-                case 0:
+                case UPPER_LEFT:
                 default:
-                    g2.scale(1,1);
+                    g2.scale(1,1);                
                     break;
-                case 1:
-                   g2.scale(-1,1);
-                   break;
-                case 2:
-                   g2.scale(1,-1);
-                   break;
-                case 3:                
-                   g2.scale(-1,-1);
-                   break;
+                case UPPER_RIGHT:
+                    g2.scale(-1,1);
+                    break;
+                case LOWER_LEFT:
+                    g2.scale(1,-1);
+                    break;
+                case LOWER_RIGHT:                
+                    g2.scale(-1,-1);
+                    break;
             }
             //Zoom
             double zoom = 1;
@@ -249,7 +249,7 @@ public class JPanelCNCMilling extends javax.swing.JPanel implements IGUIEvent{
             }        
         });
         
-        NumberFieldManipulator.IAxesEvent numbereventxy= new NumberFieldManipulator.IAxesEvent() {
+        NumberFieldManipulator.IChangeEvent numbereventxy= new NumberFieldManipulator.IChangeEvent() {
             @Override
             public void fired(NumberFieldManipulator axis) {
                 Double value;
@@ -269,7 +269,7 @@ public class JPanelCNCMilling extends javax.swing.JPanel implements IGUIEvent{
                 
             }
         };
-        NumberFieldManipulator.IAxesEvent numbereventz= new NumberFieldManipulator.IAxesEvent() {
+        NumberFieldManipulator.IChangeEvent numbereventz= new NumberFieldManipulator.IChangeEvent() {
             @Override
             public void fired(NumberFieldManipulator axis) {
                 Double value;
@@ -289,7 +289,7 @@ public class JPanelCNCMilling extends javax.swing.JPanel implements IGUIEvent{
                 
             }
         };
-        NumberFieldManipulator.IAxesEvent numberevents= new NumberFieldManipulator.IAxesEvent() {
+        NumberFieldManipulator.IChangeEvent numberevents= new NumberFieldManipulator.IChangeEvent() {
             @Override
             public void fired(NumberFieldManipulator axis) {
                 Double value;

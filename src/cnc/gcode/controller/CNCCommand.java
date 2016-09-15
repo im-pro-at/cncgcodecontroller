@@ -337,7 +337,7 @@ public class CNCCommand {
             //No G no M Command => Modal?
             if(p.get(0).letter!='M' && p.get(0).letter!='G'){
                 if(p.contains('X') || p.contains('Y') || p.contains('Z')){
-                    if(DatabaseV2.G0MODAL.get().equals("1")){
+                    if(DatabaseV2.EOnOff.get(DatabaseV2.G0MODAL)==DatabaseV2.EOnOff.ON){
                         //Support Modal G0: X00 Y00 Z00
                         if(c.lastMovetype == Type.G0)
                         {
@@ -345,7 +345,7 @@ public class CNCCommand {
                             message += "Using modal G0! ";
                         }
                     }
-                    if(DatabaseV2.G1MODAL.get().equals("1")){
+                    if(DatabaseV2.EOnOff.get(DatabaseV2.G1MODAL)==DatabaseV2.EOnOff.ON){
                         //Support Modal G1: X00 Y00 Z00
                         if(c.lastMovetype == Type.G1)
                         {
