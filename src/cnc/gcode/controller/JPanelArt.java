@@ -954,8 +954,15 @@ public class JPanelArt extends javax.swing.JPanel implements IGUIEvent{
     private void jBGenerateActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jBGenerateActionPerformed
         
         ArtSettings a= new ArtSettings();
+        try{
+            a.fromString(DatabaseV2.ARTSETTINGS.get());
+        }
+        catch(Exception e){}
         
-        a.fromString(DatabaseV2.ARTSETTINGS.get());
+        if(a.showDialog()==false)
+            return;
+        
+        DatabaseV2.ARTSETTINGS.set(a.toString());
         
         worker= (new PMySwingWorker<DefaultListModel<CNCCommand>,Object>() {
             
@@ -1204,9 +1211,7 @@ public class JPanelArt extends javax.swing.JPanel implements IGUIEvent{
                     
                     model.addElement(command);
                     
-                    for(CNCCommand.Move tm:command.getMoves()){
-                        moves.add(tm);
-                    }
+                    moves.addAll(Arrays.asList(command.getMoves()));
                     
                     progress((int)(50+50.0*(count++)/(cmds.size())), "Process Path");
                     dopause();

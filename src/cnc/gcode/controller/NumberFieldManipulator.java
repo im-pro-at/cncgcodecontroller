@@ -4,6 +4,7 @@
  */
 package cnc.gcode.controller;
 
+import com.sun.jmx.snmp.BerDecoder;
 import java.awt.Point;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -154,9 +155,13 @@ class NumberFieldManipulator {
             return 0.0;
         }
     }
-
+    
+    public void popUpToolTip(String text){
+        popUpToolTip(text, element);
+    }
+    
     // Creates and show a tooltip over the component passed as parameter
-    public void popUpToolTip(String text) {
+    public static void popUpToolTip(String text, JComponent element) {
         // build ToolTip from JComponent
         JToolTip toolTip = element.createToolTip();
         // with the good text
