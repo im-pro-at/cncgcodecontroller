@@ -14,7 +14,7 @@ import javax.swing.SwingUtilities;
  *
  * @author patrick
  */
-public final class MainForm extends javax.swing.JFrame implements IGUIEvent{
+public final class MainForm extends javax.swing.JFrame implements IGUIEvent, ICNCCommandSend{
 
     private IEvent GUIEvent = null;
     
@@ -40,13 +40,25 @@ public final class MainForm extends javax.swing.JFrame implements IGUIEvent{
         IEvent updateGUI = new IEvent() {
             @Override
             public void fired() {
+                boolean running=false;
                 for(IGUIEvent panel:panels)
-                    panel.updateGUI(Communication.isConnected(), jPanelCNCMilling.isRunning() || jPanelAutoLevel1.isWorking()||jPanelBasicControls.isRunning());
+                {
+                    if(panel.isRunning()){
+                        running=true;
+                        break;
+                    }
+                }
+                for(IGUIEvent panel:panels)
+                    panel.updateGUI(Communication.isConnected(), running);
             }
         };
         for(IGUIEvent panel:panels)
         {
             panel.setGUIEvent(updateGUI);
+            
+            if(panel instanceof ICNCCommandSender){
+                ((ICNCCommandSender)panel).getCNCCommandSenderResource(this);
+            }
         }
         
         
@@ -135,6 +147,13 @@ public final class MainForm extends javax.swing.JFrame implements IGUIEvent{
         GUIEvent.fired();
     }
     
+    @Override
+    public void sendCNCSommands(CNCCommand[] commands) {
+        SwingUtilities.invokeLater(() -> {
+            jTabbedPane.setSelectedComponent(jPanelCNCMilling);
+            jPanelCNCMilling.sendCNCCommands(commands);
+        });
+    }
 
     
     /**
@@ -146,12 +165,12 @@ public final class MainForm extends javax.swing.JFrame implements IGUIEvent{
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
-        jTabbedPane2 = new javax.swing.JTabbedPane();
+        jTabbedPane = new javax.swing.JTabbedPane();
         jPanelBasicControls = new cnc.gcode.controller.JPanelSimpleControls();
         jPanelAdvancedControl = new cnc.gcode.controller.JPanelAdvancedControl();
         jPanelAutoLevel1 = new cnc.gcode.controller.JPanelAutoLevel();
-        jPanelCNCMilling = new cnc.gcode.controller.JPanelCNCMilling();
         jPanelArt = new cnc.gcode.controller.JPanelArt();
+        jPanelCNCMilling = new cnc.gcode.controller.JPanelCNCMilling();
         jPanelCommunication = new cnc.gcode.controller.JPanelCommunication();
         jSscrollPaneSettings = new javax.swing.JScrollPane();
         jPanelSettings = new cnc.gcode.controller.JPanelSettings();
@@ -170,17 +189,17 @@ public final class MainForm extends javax.swing.JFrame implements IGUIEvent{
             }
         });
 
-        jTabbedPane2.setName("JSimpleControlPane"); // NOI18N
-        jTabbedPane2.addTab("Simple Controls", jPanelBasicControls);
-        jTabbedPane2.addTab("Advanced Controls", jPanelAdvancedControl);
-        jTabbedPane2.addTab("Auto Level", jPanelAutoLevel1);
-        jTabbedPane2.addTab("CNC Milling", jPanelCNCMilling);
-        jTabbedPane2.addTab("Art", jPanelArt);
-        jTabbedPane2.addTab("Communication", jPanelCommunication);
+        jTabbedPane.setName("JSimpleControlPane"); // NOI18N
+        jTabbedPane.addTab("Simple Controls", jPanelBasicControls);
+        jTabbedPane.addTab("Advanced Controls", jPanelAdvancedControl);
+        jTabbedPane.addTab("Auto Level", jPanelAutoLevel1);
+        jTabbedPane.addTab("Art", jPanelArt);
+        jTabbedPane.addTab("CNC Milling", jPanelCNCMilling);
+        jTabbedPane.addTab("Communication", jPanelCommunication);
 
         jSscrollPaneSettings.setViewportView(jPanelSettings);
 
-        jTabbedPane2.addTab("Settings", jSscrollPaneSettings);
+        jTabbedPane.addTab("Settings", jSscrollPaneSettings);
 
         jBConnect.setText("Connect");
         jBConnect.addActionListener(new java.awt.event.ActionListener() {
@@ -207,12 +226,12 @@ public final class MainForm extends javax.swing.JFrame implements IGUIEvent{
                 .addComponent(jBConnect)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jLStatus, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-            .addComponent(jTabbedPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 1054, Short.MAX_VALUE)
+            .addComponent(jTabbedPane, javax.swing.GroupLayout.DEFAULT_SIZE, 1054, Short.MAX_VALUE)
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
-                .addComponent(jTabbedPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 576, Short.MAX_VALUE)
+                .addComponent(jTabbedPane, javax.swing.GroupLayout.DEFAULT_SIZE, 576, Short.MAX_VALUE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jBConnect)
@@ -269,8 +288,14 @@ public final class MainForm extends javax.swing.JFrame implements IGUIEvent{
     private cnc.gcode.controller.JPanelCommunication jPanelCommunication;
     private cnc.gcode.controller.JPanelSettings jPanelSettings;
     private javax.swing.JScrollPane jSscrollPaneSettings;
-    private javax.swing.JTabbedPane jTabbedPane2;
+    private javax.swing.JTabbedPane jTabbedPane;
     // End of variables declaration//GEN-END:variables
+
+    @Override
+    public boolean isRunning() {
+        return false;
+    }
+
 
     
 

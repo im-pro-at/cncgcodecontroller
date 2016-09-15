@@ -39,13 +39,13 @@
               <EmptySpace max="-2" attributes="0"/>
               <Component id="jLStatus" max="32767" attributes="0"/>
           </Group>
-          <Component id="jTabbedPane2" pref="1054" max="32767" attributes="0"/>
+          <Component id="jTabbedPane" pref="1054" max="32767" attributes="0"/>
       </Group>
     </DimensionLayout>
     <DimensionLayout dim="1">
       <Group type="103" groupAlignment="0" attributes="0">
           <Group type="102" alignment="0" attributes="0">
-              <Component id="jTabbedPane2" pref="576" max="32767" attributes="0"/>
+              <Component id="jTabbedPane" pref="576" max="32767" attributes="0"/>
               <EmptySpace max="-2" attributes="0"/>
               <Group type="103" groupAlignment="3" attributes="0">
                   <Component id="jBConnect" alignment="3" min="-2" max="-2" attributes="0"/>
@@ -59,7 +59,7 @@
     </DimensionLayout>
   </Layout>
   <SubComponents>
-    <Container class="javax.swing.JTabbedPane" name="jTabbedPane2">
+    <Container class="javax.swing.JTabbedPane" name="jTabbedPane">
       <Properties>
         <Property name="name" type="java.lang.String" value="JSimpleControlPane" noResource="true"/>
       </Properties>
@@ -93,20 +93,20 @@
             </Constraint>
           </Constraints>
         </Component>
-        <Component class="cnc.gcode.controller.JPanelCNCMilling" name="jPanelCNCMilling">
-          <Constraints>
-            <Constraint layoutClass="org.netbeans.modules.form.compat2.layouts.support.JTabbedPaneSupportLayout" value="org.netbeans.modules.form.compat2.layouts.support.JTabbedPaneSupportLayout$JTabbedPaneConstraintsDescription">
-              <JTabbedPaneConstraints tabName="CNC Milling">
-                <Property name="tabTitle" type="java.lang.String" value="CNC Milling"/>
-              </JTabbedPaneConstraints>
-            </Constraint>
-          </Constraints>
-        </Component>
         <Component class="cnc.gcode.controller.JPanelArt" name="jPanelArt">
           <Constraints>
             <Constraint layoutClass="org.netbeans.modules.form.compat2.layouts.support.JTabbedPaneSupportLayout" value="org.netbeans.modules.form.compat2.layouts.support.JTabbedPaneSupportLayout$JTabbedPaneConstraintsDescription">
               <JTabbedPaneConstraints tabName="Art">
                 <Property name="tabTitle" type="java.lang.String" value="Art"/>
+              </JTabbedPaneConstraints>
+            </Constraint>
+          </Constraints>
+        </Component>
+        <Component class="cnc.gcode.controller.JPanelCNCMilling" name="jPanelCNCMilling">
+          <Constraints>
+            <Constraint layoutClass="org.netbeans.modules.form.compat2.layouts.support.JTabbedPaneSupportLayout" value="org.netbeans.modules.form.compat2.layouts.support.JTabbedPaneSupportLayout$JTabbedPaneConstraintsDescription">
+              <JTabbedPaneConstraints tabName="CNC Milling">
+                <Property name="tabTitle" type="java.lang.String" value="CNC Milling"/>
               </JTabbedPaneConstraints>
             </Constraint>
           </Constraints>

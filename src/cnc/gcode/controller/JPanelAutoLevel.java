@@ -364,18 +364,18 @@ public class JPanelAutoLevel extends javax.swing.JPanel implements IGUIEvent {
     @Override
     public void updateGUI(boolean serial, boolean isworking) 
     {
-        jTFStartX.setEnabled(!isWorking() && !al.isLeveled());
-        jTFStartY.setEnabled(!isWorking() && !al.isLeveled());
-        jTFEndX.setEnabled(!isWorking() && !al.isLeveled());
-        jTFEndY.setEnabled(!isWorking() && !al.isLeveled());
+        jTFStartX.setEnabled(!isRunning() && !al.isLeveled());
+        jTFStartY.setEnabled(!isRunning() && !al.isLeveled());
+        jTFEndX.setEnabled(!isRunning() && !al.isLeveled());
+        jTFEndY.setEnabled(!isRunning() && !al.isLeveled());
 
                              //START                  ABORT           CLEAR
-        jBAction.setEnabled((!isworking && serial) || isWorking() || (isLeveled()&&!isworking));
+        jBAction.setEnabled((!isworking && serial) || isRunning() || (isLeveled()&&!isworking));
         if(isLeveled())
         {
             jBAction.setText("Clear");
         }
-        else if(isWorking())
+        else if(isRunning())
         {
             jBAction.setText("Abort");
         }
@@ -384,10 +384,10 @@ public class JPanelAutoLevel extends javax.swing.JPanel implements IGUIEvent {
             jBAction.setText("Start");
         }
         
-        jBPause.setEnabled(isWorking());
-        jBPause.setText((isWorking() && worker.isPaused())?"Resume":"Pause");
+        jBPause.setEnabled(isRunning());
+        jBPause.setText((isRunning() && worker.isPaused())?"Resume":"Pause");
 
-        if(isWorking() == false)
+        if(isRunning() == false)
         {
             jPBar.setValue(0);
             jPBar.setString("");
@@ -414,13 +414,14 @@ public class JPanelAutoLevel extends javax.swing.JPanel implements IGUIEvent {
     }
 
     
-    public boolean isWorking()
+    @Override
+    public boolean isRunning()
     {
         return worker != null && worker.isDone() == false;
     }
 
     private void makeNewAl() {
-        if(isWorking() == false)
+        if(isRunning() == false)
         {
             boolean guiupdate = AutoLevelSystem.leveled();
             
@@ -695,7 +696,7 @@ public class JPanelAutoLevel extends javax.swing.JPanel implements IGUIEvent {
         {
             makeNewAl();
         }
-        else if(isWorking())
+        else if(isRunning())
         {
             worker.cancel();
             fireupdateGUI();

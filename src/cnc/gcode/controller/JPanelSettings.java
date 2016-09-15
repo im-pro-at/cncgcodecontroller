@@ -1044,4 +1044,9 @@ public class JPanelSettings extends javax.swing.JPanel implements IGUIEvent{
     private javax.swing.JLabel jLabel49;
     private javax.swing.JLabel jLabel50;
     // End of variables declaration//GEN-END:variables
+
+    @Override
+    public boolean isRunning() {
+        return false;
+    }
 }

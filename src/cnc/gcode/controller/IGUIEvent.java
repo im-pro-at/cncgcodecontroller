@@ -11,7 +11,9 @@ package cnc.gcode.controller;
 public interface IGUIEvent {
 
     public void setGUIEvent(IEvent event);
-
+    
     public void updateGUI(boolean serial, boolean isworking);
+    
+    public boolean isRunning();
     
 }

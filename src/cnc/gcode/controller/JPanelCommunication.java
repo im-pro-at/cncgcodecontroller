@@ -184,4 +184,9 @@ public class JPanelCommunication extends javax.swing.JPanel implements IGUIEvent
     private javax.swing.JScrollPane jScrollPane3;
     private javax.swing.JTextField jTFSend;
     // End of variables declaration//GEN-END:variables
+
+    @Override
+    public boolean isRunning() {
+        return false;
+    }
 }

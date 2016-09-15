@@ -1078,7 +1078,8 @@ public class JPanelSimpleControls extends javax.swing.JPanel implements IGUIEven
                                             }});          
     }
     
-    boolean isRunning() {
+    @Override
+    public boolean isRunning() {
         return worker!=null && !worker.isDone();
     }    
     

@@ -20,6 +20,11 @@ import java.util.ListIterator;
  */
 public class CNCCommand {
 
+    public static interface CNCComandSource
+    {
+        public CNCCommand getcommand() throws Exception;
+    }
+    
     public static class Transform
     {
         private final double movex;
@@ -76,11 +81,13 @@ public class CNCCommand {
         private double[] s;
         private double[] e;
         private Type t;
+        private boolean xyz;
 
-        public Move(double[] s, double[] e, Type t) {
+        public Move(double[] s, double[] e, Type t, boolean xyz) {
             this.s = s;
             this.e = e;
             this.t = t;
+            this.xyz=xyz;
         }
         
         public void scalexy(double[] scale){
@@ -117,6 +124,11 @@ public class CNCCommand {
         public CNCCommand getCNCCommand(){
             return CNCCommand.this;
         }
+
+        public boolean isXyz() {
+            return xyz;
+        }
+        
    }        
    
     public static class Calchelper
@@ -153,9 +165,6 @@ public class CNCCommand {
             return "axes=" + Arrays.toString(axes) + ", lastMovetype=" + lastMovetype + ", time=" + Tools.formatDuration((long)seconds);
         }
 
-        //ignor some Warings:
-        boolean ignorZMoveWaring=false;
-        
     }
     
     public enum State {
@@ -229,11 +238,15 @@ public class CNCCommand {
         }
 
         void setupGraphicsOptions(Graphics2D g, boolean selected) {
+            setupGraphicsOptions(g, selected, getColor());
+        }
+        
+        static void setupGraphicsOptions(Graphics2D g, boolean selected, Color c) {
             g.setStroke(new BasicStroke((float)DatabaseV2.TOOLSIZE.getsaved(), BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND));
             if(selected == false)
             {
                 
-                g.setColor(Tools.setAlpha(getColor(),0.8));
+                g.setColor(Tools.setAlpha(c,0.8));
             }    
             else
             {
@@ -252,6 +265,7 @@ public class CNCCommand {
     private CommandParsing p;
     private String message = "";
     private double[] scale={1,1};
+    private boolean xyzmove=false;
 
     public CNCCommand(String command) {
         this.command = command;  
@@ -480,13 +494,9 @@ public class CNCCommand {
                 }
             case G0:
             case G1:
-                if((p.contains('X')|| p.contains('Y')) && p.contains('Z') && !c.ignorZMoveWaring)
+                if((p.contains('X')|| p.contains('Y')) && p.contains('Z'))
                 {
-                    if(state == State.NORMAL)
-                    {
-                        state = State.WARNING;
-                    }
-                    message += "[X,Y] + Z Move makes problems with visualization! ";
+                    xyzmove=true;
                 }
                 for(int i = 0;i < 4;i++)
                 {
@@ -665,7 +675,7 @@ public class CNCCommand {
             case G1:
             case HOMING:
             case SETPOS:
-                moves.add(new Move(Arrays.copyOfRange(cin.axes, 0, 3), Arrays.copyOfRange(cout.axes, 0, 3), type));
+                moves.add(new Move(Arrays.copyOfRange(cin.axes, 0, 3), Arrays.copyOfRange(cout.axes, 0, 3), type,xyzmove));
                 break;
 
             case ARC:
@@ -744,13 +754,13 @@ public class CNCCommand {
                         position[1] = center_axis1 + r_axis1;
 
                         //Add move
-                        moves.add(new Move(temp, position.clone(), type));
+                        moves.add(new Move(temp, position.clone(), type,xyzmove));
                     }
-                    moves.add(new Move(position.clone(),Arrays.copyOfRange(cout.axes, 0, 3), type));
+                    moves.add(new Move(position.clone(),Arrays.copyOfRange(cout.axes, 0, 3), type,xyzmove));
 
                 }
                 else
-                    moves.add(new Move(Arrays.copyOfRange(cin.axes, 0, 3), Arrays.copyOfRange(cout.axes, 0, 3), type));
+                    moves.add(new Move(Arrays.copyOfRange(cin.axes, 0, 3), Arrays.copyOfRange(cout.axes, 0, 3), type,xyzmove));
                     
                 
                 break;
@@ -810,7 +820,7 @@ public class CNCCommand {
                                     s[i] = move.s[i] + d * part;
                                     e[i] = move.s[i] + d * (part + 1);
                                 }
-                                newmoves.add(new Move(s, e , move.t));
+                                newmoves.add(new Move(s, e , move.t,xyzmove));
                             }
                         }
                     }
@@ -829,7 +839,7 @@ public class CNCCommand {
                 ArrayList<Move> newmoves = new ArrayList<>(moves.length);
                 for(Move move:moves)
                 {
-                    Move compmove = new Move(move.s.clone(), move.s.clone(), move.t);
+                    Move compmove = new Move(move.s.clone(), move.s.clone(), move.t,xyzmove);
                     //calc
                     for(int i = 0;i < 3;i++)
                     {

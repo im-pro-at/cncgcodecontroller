@@ -33,6 +33,11 @@ public class JPanelAdvancedControl extends javax.swing.JPanel implements IGUIEve
 
     private IEvent GUIEvent=null;
 
+    @Override
+    public boolean isRunning() {
+        return false;
+    }
+
     private class PrintableElement {
         boolean arc,ccw;
         double diameter;

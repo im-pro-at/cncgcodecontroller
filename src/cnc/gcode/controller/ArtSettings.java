@@ -135,6 +135,7 @@ public class ArtSettings {
             flow=Boolean.parseBoolean(data[4]);
             iscale=EScale.valueOf(data[5]);
             bit_size=Float.parseFloat(data[6]);
+            DatabaseV2.TOOLSIZE.set(Tools.dtostr(bit_size));
             pline=Float.parseFloat(data[7]);
             psegment=Float.parseFloat(data[8]);
             zmin=Float.parseFloat(data[9]);

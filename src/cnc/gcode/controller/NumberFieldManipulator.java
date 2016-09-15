@@ -4,7 +4,6 @@
  */
 package cnc.gcode.controller;
 
-import com.sun.jmx.snmp.BerDecoder;
 import java.awt.Point;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;

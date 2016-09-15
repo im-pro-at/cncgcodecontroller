@@ -30,6 +30,7 @@ import java.io.PrintWriter;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.logging.Level;
@@ -50,7 +51,7 @@ import javax.swing.plaf.basic.BasicComboBoxRenderer;
 public class JPanelCNCMilling extends javax.swing.JPanel implements IGUIEvent{
 
     private IEvent GUIEvent = null;
-    
+
     private abstract class PMySwingWorker<R, P> extends MySwingWorker<R, P>
     {
 
@@ -130,7 +131,11 @@ public class JPanelCNCMilling extends javax.swing.JPanel implements IGUIEvent{
             g2.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BILINEAR);
 
             //Scalling transforming ...
-
+            if(layers.paintlegend(g2, data.index,data.jpw,data.jph)){
+                data.jpw=data.jpw-100;
+            }
+            
+            
             //StartCorner
             g2.translate(data.jpw / 2, data.jph / 2);
             switch(DatabaseV2.EHoming.get()) 
@@ -434,6 +439,7 @@ public class JPanelCNCMilling extends javax.swing.JPanel implements IGUIEvent{
     }
 
     
+    @Override
     public boolean isRunning()
     {
         return worker != null && !worker.isDone();
@@ -1213,6 +1219,13 @@ public class JPanelCNCMilling extends javax.swing.JPanel implements IGUIEvent{
         executeCNC(0);
     }//GEN-LAST:event_jBMillingActionPerformed
     
+    
+    void sendCNCCommands(CNCCommand[] commands) {
+        Iterator<CNCCommand> i= Arrays.asList(commands).iterator();
+        processCNCCommands(() -> i.hasNext()?i.next():null,commands.length);
+    }
+ 
+     
     private void jLoadFileActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jLoadFileActionPerformed
         JFileChooser fc = DatabaseV2.getFileChooser();
         fc.setFileSelectionMode(JFileChooser.FILES_ONLY);
@@ -1230,7 +1243,41 @@ public class JPanelCNCMilling extends javax.swing.JPanel implements IGUIEvent{
             JOptionPane.showMessageDialog(this, "File cannot be read!");
             return;
         }
+        
+        worker = new PMySwingWorker<ArrayList<CNCCommand>, CNCCommand>() 
+        {
+            @Override
+            protected ArrayList<CNCCommand> doInBackground() throws Exception {
+                try (BufferedReader br = new BufferedReader(new FileReader(f))) 
+                {
+                    ArrayList<CNCCommand> list = new ArrayList<>();
 
+                    //read all elements:
+                    String l;
+                    while((l=br.readLine())!=null){
+                        list.add(new CNCCommand(l));
+                        progress(0, "Read File...");
+                    }
+                    return list;
+                }
+            }
+
+            @Override
+            protected void done(ArrayList<CNCCommand> list, Exception ex, boolean canceled) {
+                if(ex!=null){
+                    JOptionPane.showMessageDialog(JPanelCNCMilling.this, ex.getMessage());
+                }
+                Iterator<CNCCommand> i= list.iterator();
+                processCNCCommands(() ->i.hasNext()?i.next():null,list.size());
+            }
+            
+        };
+        worker.execute();
+        fireupdateGUI();
+    }//GEN-LAST:event_jLoadFileActionPerformed
+
+    
+    private void processCNCCommands(CNCCommand.CNCComandSource source,int length){
         cncLoadedFile   = false;
         layers          = new PrintableLayers();
         jLCNCCommands.setModel(new DefaultComboBoxModel()); //Clear Listbox
@@ -1248,54 +1295,41 @@ public class JPanelCNCMilling extends javax.swing.JPanel implements IGUIEvent{
                 PrintableLayers layer = new PrintableLayers();
                 LinkedList<CNCCommand> cmds = new LinkedList<>();
 
-                String line;
+                CNCCommand command;
                 int warnings = 0;
                 int errors  = 0;
-                long countBytes = 0;
-                long length = f.length();
-
-                if (length == 0)
-                {
-                    length = 1;
-                }
+                long count = 0;
                 
                 CNCCommand start = CNCCommand.getStartCommand();
                 start.calcCommand(c);
                 cmds.add(start);
                 
-                try (BufferedReader br = new BufferedReader(new FileReader(f))) 
+                while((command= source.getcommand() ) != null && !this.isCancelled())
                 {
+                    setProgress((int)(100 * count / length),""+(int)(100 * count / length) + "%");
+                    count++;
+                    CNCCommand.State t = command.calcCommand(c);
 
-                    while((line = br.readLine() ) != null && !this.isCancelled())
+                    layer.processMoves(cmds.size(), command.getMoves());
+
+                    if(t == CNCCommand.State.WARNING)
                     {
-                        countBytes += line.length()+1;
-                        setProgress((int)(100 * countBytes / length),""+(int)(100 * countBytes / length) + "%");
-
-                        CNCCommand command = new CNCCommand(line);
-
-                        CNCCommand.State t = command.calcCommand(c);
-
-                        layer.processMoves(cmds.size(), command.getMoves());
-
-                        if(t == CNCCommand.State.WARNING)
-                        {
-                            warnings++;
-                        }
-                        
-                        if(t == CNCCommand.State.ERROR)
-                        {
-                            errors++;
-                        }
-
-                        cmds.add(command);
-
-                        dopause();
+                        warnings++;
                     }
-                    
-                    for(CNCCommand cmd:cmds)
+
+                    if(t == CNCCommand.State.ERROR)
                     {
-                        model.addElement(cmd);
+                        errors++;
                     }
+
+                    cmds.add(command);
+
+                    dopause();
+                }
+
+                for(CNCCommand cmd:cmds)
+                {
+                    model.addElement(cmd);
                 }
                 JPanelCNCMilling.this.layers=layer;
                 secounds=(long)c.seconds;
@@ -1337,9 +1371,11 @@ public class JPanelCNCMilling extends javax.swing.JPanel implements IGUIEvent{
 
         worker.execute();
 
-        fireupdateGUI();
-    }//GEN-LAST:event_jLoadFileActionPerformed
-
+        fireupdateGUI();        
+    }
+    
+    
+    
     private void jPPaintComponentResized(java.awt.event.ComponentEvent evt) {//GEN-FIRST:event_jPPaintComponentResized
         painter.trigger();
     }//GEN-LAST:event_jPPaintComponentResized
