@@ -666,7 +666,7 @@ public class JPanelSettings extends javax.swing.JPanel implements IGUIEvent{
             JSettingsDialog.SDouble[] settings= new JSettingsDialog.SDouble[3];
             for(int i = 0; i < 3;i++ )
             {
-                settings[i]= new JSettingsDialog.SDouble("Set Size for the " + CommandParsing.axesName[0] + " axis:", DatabaseV2.getWorkspace(i).getsaved());
+                settings[i]= new JSettingsDialog.SDouble("Set Size for the " + CommandParsing.axesName[i] + " axis:", DatabaseV2.getWorkspace(i).getsaved());
                 settings[i].setDmin(Double.MIN_VALUE);
             }
 

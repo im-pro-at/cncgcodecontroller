@@ -1079,8 +1079,8 @@ public class JPanelCNCMilling extends javax.swing.JPanel implements IGUIEvent{
                                 fireupdateGUI();    
                             }
                         });
-                        dopause();
                     }
+                    dopause();
                     
                     if(cmd.getType() == CNCCommand.Type.ENDPROGRAM && cmds[cmds.length - 1] != cmd)
                     {

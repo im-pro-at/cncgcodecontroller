@@ -843,8 +843,7 @@ public class JPanelArt extends javax.swing.JPanel implements IGUIEvent, ICNCComm
                 g2.translate(img.getWidth()/2,img.getHeight()/2);
                 g2.rotate(Math.PI/180*pa);
 
-                //g2.scale(zoom*(pxm?-1:1), zoom*(pym?-1:1));
-                g2.scale(zoom, zoom);
+                g2.scale(zoom*(pxm?-1:1), zoom*(pym?-1:1));
                 g2.translate(-img.getWidth()/2,-img.getHeight()/2);
 
                 g2.drawImage(img, 0, 0, null);
@@ -967,23 +966,27 @@ public class JPanelArt extends javax.swing.JPanel implements IGUIEvent, ICNCComm
                 LinkedList<CNCCommand> cmds = new LinkedList<>();
 
                 //Init CNC
-                cmds.add(CNCCommand.getStartCommand());
+                //cmds.add(CNCCommand.getStartCommand()); will be added in CNCMilling
                 cmds.add(new CNCCommand("G0 X"+Tools.dtostr(px)+" Y"+Tools.dtostr(py)+" F"+Tools.dtostr(a.ftravel)));
+                cmds.add(new CNCCommand("G0 Z"+Tools.dtostr(a.zsave)+" F"+Tools.dtostr(a.ftravel)));
 
                 //Start Spindel
                 cmds.add(new CNCCommand("M4"));
 
                 boolean down=false;
                 int count=0;
+                double lastz=a.zsave;
                 for(ArrayList<Point> path:paths)
                 {
                     for(Point p:path){
                         //calc pos:
                         Point2D.Double ap = new Point2D.Double(px+pxw/pointsx*p.x, py+pyw/pointsy*p.y);
 
-                        if(!boarder.contains(ap)){
+                        if(!boarder.contains(ap) || (z[p.x][p.y]>=a.zsave && lastz>=a.zsave)){
                             if(down){
-                                cmds.add(new CNCCommand("G0 Z"+Tools.dtostr(a.zsave)+" F"+Tools.dtostr(a.ftravel)));
+                                if(Math.abs(lastz-a.zsave)>0.0001){
+                                    cmds.add(new CNCCommand("G0 Z"+Tools.dtostr(a.zsave)+" F"+Tools.dtostr(a.ftravel)));
+                                }
                                 down=false;
                             }
                         }
@@ -991,13 +994,14 @@ public class JPanelArt extends javax.swing.JPanel implements IGUIEvent, ICNCComm
                         {
                             if(!down){
                                 cmds.add(new CNCCommand("G0 X"+Tools.dtostr(ap.x)+" Y"+Tools.dtostr(ap.y)+" F"+Tools.dtostr(a.ftravel)));
-                                cmds.add(new CNCCommand("G1 Z"+Tools.dtostr(z[p.x][p.y])+" F"+Tools.dtostr(a.fmill)));
+                                cmds.add(new CNCCommand("G1 X"+Tools.dtostr(ap.x)+" Y"+Tools.dtostr(ap.y)+" Z"+Tools.dtostr(z[p.x][p.y])+" F"+Tools.dtostr(a.fmill)));
                                 down=true;
                             }
                             else{
                                 cmds.add(new CNCCommand("G1 X"+Tools.dtostr(ap.x)+" Y"+Tools.dtostr(ap.y)+" Z"+Tools.dtostr(z[p.x][p.y])+" F"+Tools.dtostr(a.fmill)));
                             }
                         }
+                        lastz=z[p.x][p.y];
                     }
                     //Move to save height
                     if(down){
