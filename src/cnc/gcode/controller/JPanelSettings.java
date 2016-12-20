@@ -50,13 +50,17 @@ public class JPanelSettings extends javax.swing.JPanel implements IGUIEvent{
         jLSCNCSpindleON.setText(Tools.convertToMultiline(DatabaseV2.SPINDLEON.get()));
         jLSCNCSpindleOFF.setText(Tools.convertToMultiline(DatabaseV2.SPINDLEOFF.get()));
         jLSCNCG0Feedrate.setText(DatabaseV2.GOFEEDRATE.get());
+        jLSCNCAFeedrate.setText(DatabaseV2.AFEEDRATE.get());
         jLSCNCToolSize.setText(DatabaseV2.TOOLSIZE.get());
         jLSCNCOptimiserTime.setText(DatabaseV2.OPTIMISATIONTIMEOUT.get());
-        jLSALOptions.setText(Tools.convertToMultiline("Zero height: " + DatabaseV2.ALZERO +
+        jLSALOptions.setText(Tools.convertToMultiline(
+                                                      "Zero height: " + DatabaseV2.ALZERO +
                                                       "\nMax depth: " + DatabaseV2.ALMAXPROBDEPTH +
                                                       "\nSafe height: " + DatabaseV2.ALSAVEHEIGHT +
                                                       "\nClearence: " + DatabaseV2.ALCLEARANCE +
-                                                       "\nFeedrate: " + DatabaseV2.ALFEEDRATE));
+                                                       "\nFeedrate: " + DatabaseV2.ALFEEDRATE+
+                                                       "\nUse outside the probed area: " + DatabaseV2.ALUSEOUTSIDEPROBEAREA
+                                                     ));
         jLSALDistance.setText(Tools.convertToMultiline("Distance: " + DatabaseV2.ALDISTANCE +       
                                                         "\nMax XY Move Length: " + DatabaseV2.ALMAXMOVELENGTH));
         jLSALStart.setText(Tools.convertToMultiline(DatabaseV2.ALSTARTCODE.get()));
@@ -162,6 +166,9 @@ public class JPanelSettings extends javax.swing.JPanel implements IGUIEvent{
         jLSCG1 = new javax.swing.JLabel();
         jBexport = new javax.swing.JButton();
         jBImport = new javax.swing.JButton();
+        jLabel45 = new javax.swing.JLabel();
+        jBSCNCAFeedrate = new javax.swing.JButton();
+        jLSCNCAFeedrate = new javax.swing.JLabel();
 
         jLabel2.setText("Homing:");
 
@@ -427,6 +434,17 @@ public class JPanelSettings extends javax.swing.JPanel implements IGUIEvent{
             }
         });
 
+        jLabel45.setText("CNC/A max Feedrate:");
+
+        jBSCNCAFeedrate.setText("Change");
+        jBSCNCAFeedrate.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jBSettingsActionPerformed(evt);
+            }
+        });
+
+        jLSCNCAFeedrate.setText("Settings Text");
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
         layout.setHorizontalGroup(
@@ -479,7 +497,8 @@ public class JPanelSettings extends javax.swing.JPanel implements IGUIEvent{
                                     .addComponent(jBSCGrid)
                                     .addComponent(jBSCGridDis)
                                     .addComponent(jBSCG0)
-                                    .addComponent(jBSCG1)))
+                                    .addComponent(jBSCG1)
+                                    .addComponent(jBSCNCAFeedrate)))
                             .addComponent(jLabel44)
                             .addGroup(layout.createSequentialGroup()
                                 .addComponent(jBexport)
@@ -489,31 +508,75 @@ public class JPanelSettings extends javax.swing.JPanel implements IGUIEvent{
                             .addComponent(jLabel49)
                             .addComponent(jLabel50)
                             .addComponent(jLabel47)
-                            .addComponent(jLabel48))
+                            .addComponent(jLabel48)
+                            .addComponent(jLabel45))
                         .addGap(50, 50, 50)
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(jLSCBack)
-                            .addComponent(jLSHomeing)
-                            .addComponent(jLSFastFeedrate)
-                            .addComponent(jLSWorkSpace)
-                            .addComponent(jLSCNCStart)
-                            .addComponent(jLSCNCToolChange)
-                            .addComponent(jLSCNCSpindleON)
-                            .addComponent(jLSCNCSpindleOFF)
-                            .addComponent(jLSCNCG0Feedrate)
-                            .addComponent(jLSCNCToolSize)
-                            .addComponent(jLSCNCOptimiserTime)
-                            .addComponent(jLSALOptions)
-                            .addComponent(jLSALDistance)
-                            .addComponent(jLSALStart)
-                            .addComponent(jLSARC)
-                            .addComponent(jLSBacklash)
-                            .addComponent(jLSmodal)
-                            .addComponent(jLSComType)
-                            .addComponent(jLSCGrid)
-                            .addComponent(jLSCGridDis)
-                            .addComponent(jLSCG0)
-                            .addComponent(jLSCG1))))
+                            .addComponent(jLSCNCAFeedrate)
+                            .addComponent(jLSCNCG0Feedrate)))
+                    .addGroup(layout.createSequentialGroup()
+                        .addGap(312, 312, 312)
+                        .addComponent(jLSCG1))
+                    .addGroup(layout.createSequentialGroup()
+                        .addGap(312, 312, 312)
+                        .addComponent(jLSCG0))
+                    .addGroup(layout.createSequentialGroup()
+                        .addGap(312, 312, 312)
+                        .addComponent(jLSCGridDis))
+                    .addGroup(layout.createSequentialGroup()
+                        .addGap(312, 312, 312)
+                        .addComponent(jLSCGrid))
+                    .addGroup(layout.createSequentialGroup()
+                        .addGap(312, 312, 312)
+                        .addComponent(jLSComType))
+                    .addGroup(layout.createSequentialGroup()
+                        .addGap(312, 312, 312)
+                        .addComponent(jLSmodal))
+                    .addGroup(layout.createSequentialGroup()
+                        .addGap(312, 312, 312)
+                        .addComponent(jLSBacklash))
+                    .addGroup(layout.createSequentialGroup()
+                        .addGap(312, 312, 312)
+                        .addComponent(jLSARC))
+                    .addGroup(layout.createSequentialGroup()
+                        .addGap(312, 312, 312)
+                        .addComponent(jLSALStart))
+                    .addGroup(layout.createSequentialGroup()
+                        .addGap(312, 312, 312)
+                        .addComponent(jLSALDistance))
+                    .addGroup(layout.createSequentialGroup()
+                        .addGap(312, 312, 312)
+                        .addComponent(jLSALOptions))
+                    .addGroup(layout.createSequentialGroup()
+                        .addGap(312, 312, 312)
+                        .addComponent(jLSCNCOptimiserTime))
+                    .addGroup(layout.createSequentialGroup()
+                        .addGap(312, 312, 312)
+                        .addComponent(jLSCNCToolSize))
+                    .addGroup(layout.createSequentialGroup()
+                        .addGap(312, 312, 312)
+                        .addComponent(jLSCNCSpindleOFF))
+                    .addGroup(layout.createSequentialGroup()
+                        .addGap(312, 312, 312)
+                        .addComponent(jLSCNCSpindleON))
+                    .addGroup(layout.createSequentialGroup()
+                        .addGap(312, 312, 312)
+                        .addComponent(jLSCNCToolChange))
+                    .addGroup(layout.createSequentialGroup()
+                        .addGap(312, 312, 312)
+                        .addComponent(jLSCNCStart))
+                    .addGroup(layout.createSequentialGroup()
+                        .addGap(312, 312, 312)
+                        .addComponent(jLSWorkSpace))
+                    .addGroup(layout.createSequentialGroup()
+                        .addGap(312, 312, 312)
+                        .addComponent(jLSFastFeedrate))
+                    .addGroup(layout.createSequentialGroup()
+                        .addGap(312, 312, 312)
+                        .addComponent(jLSHomeing))
+                    .addGroup(layout.createSequentialGroup()
+                        .addGap(312, 312, 312)
+                        .addComponent(jLSCBack)))
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
@@ -559,6 +622,11 @@ public class JPanelSettings extends javax.swing.JPanel implements IGUIEvent{
                     .addComponent(jLabel33)
                     .addComponent(jBSCNCG0Feedrate)
                     .addComponent(jLSCNCG0Feedrate))
+                .addGap(18, 18, 18)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jLabel45)
+                    .addComponent(jBSCNCAFeedrate)
+                    .addComponent(jLSCNCAFeedrate))
                 .addGap(18, 18, 18)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel34)
@@ -629,7 +697,7 @@ public class JPanelSettings extends javax.swing.JPanel implements IGUIEvent{
                     .addComponent(jLabel48)
                     .addComponent(jBSCG1)
                     .addComponent(jLSCG1))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 57, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jBexport)
                     .addComponent(jBImport))
@@ -730,6 +798,17 @@ public class JPanelSettings extends javax.swing.JPanel implements IGUIEvent{
                 DatabaseV2.GOFEEDRATE.set(setting.getText());
             }
         }
+
+        //AFeedrate
+        if(evt.getSource() == jBSCNCAFeedrate)
+        {
+            JSettingsDialog.SDouble setting= new JSettingsDialog.SDouble("Set the feedrate for the G0 move:", DatabaseV2.AFEEDRATE.getsaved());
+            setting.setDmin(Double.MIN_VALUE);
+            if(JSettingsDialog.showSettingsDialog("Feedrate",setting))
+            {
+                DatabaseV2.AFEEDRATE.set(setting.getText());
+            }
+        }
         
         //Tooldiameter
         if(evt.getSource() == jBSCNCToolSize)
@@ -756,20 +835,26 @@ public class JPanelSettings extends javax.swing.JPanel implements IGUIEvent{
         //AL Options
         if(evt.getSource() == jBSALOptions)
         {
-            JSettingsDialog.SDouble[] settings= new JSettingsDialog.SDouble[5];
-
+            JSettingsDialog.Setting[] settings= new JSettingsDialog.Setting[6];
+            JSettingsDialog.SDouble dsetting;
+            
             settings[0]= new JSettingsDialog.SDouble("The absolute position where the Autoleveling is correcting. \nSo after level correction, this Z value will have the probed value. (Normally it is 0)", DatabaseV2.ALZERO.getsaved());
-            settings[1]= new JSettingsDialog.SDouble("How deep the system tries to probe. (You should home your system before Autoleveling.) \nIn absolute position it is \"Zero height\" - this value.", DatabaseV2.ALMAXPROBDEPTH.getsaved());
-            settings[1].setDmin(-1.0);
-            settings[1].setDmax(DatabaseV2.WORKSPACE2.getsaved());
-            settings[2]= new JSettingsDialog.SDouble("Absolute height where the CNC can move safely without problems. \nThe first probing will also start from this position!", DatabaseV2.ALSAVEHEIGHT.getsaved());
-            settings[2].setDmin(-DatabaseV2.WORKSPACE2.getsaved());
-            settings[2].setDmax(DatabaseV2.WORKSPACE2.getsaved());
-            settings[3]= new JSettingsDialog.SDouble("The clearance to the object between two probes.", DatabaseV2.ALCLEARANCE.getsaved());
-            settings[3].setDmin(0.0);
-            settings[3].setDmax(DatabaseV2.WORKSPACE2.getsaved());
-            settings[4]= new JSettingsDialog.SDouble("The feedrate used for the probing", DatabaseV2.ALFEEDRATE.getsaved());
-            settings[4].setDmin(0.0);
+            dsetting= new JSettingsDialog.SDouble("How deep the system tries to probe. (You should home your system before Autoleveling.) \nIn absolute position it is \"Zero height\" - this value.", DatabaseV2.ALMAXPROBDEPTH.getsaved());
+            dsetting.setDmin(-1.0);
+            dsetting.setDmax(DatabaseV2.WORKSPACE2.getsaved());
+            settings[1]=dsetting;
+            dsetting= new JSettingsDialog.SDouble("Absolute height where the CNC can move safely without problems. \nThe first probing will also start from this position!", DatabaseV2.ALSAVEHEIGHT.getsaved());
+            dsetting.setDmin(-DatabaseV2.WORKSPACE2.getsaved());
+            dsetting.setDmax(DatabaseV2.WORKSPACE2.getsaved());
+            settings[2]=dsetting;
+            dsetting= new JSettingsDialog.SDouble("The clearance to the object between two probes.", DatabaseV2.ALCLEARANCE.getsaved());
+            dsetting.setDmin(0.0);
+            dsetting.setDmax(DatabaseV2.WORKSPACE2.getsaved());
+            settings[3]=dsetting;
+            dsetting= new JSettingsDialog.SDouble("The feedrate used for the probing", DatabaseV2.ALFEEDRATE.getsaved());
+            dsetting.setDmin(0.0);
+            settings[4]=dsetting;
+            settings[5] = new JSettingsDialog.SEnum<>("Use interpolation if our point is outside the probed area:",DatabaseV2.EOnOff.get(DatabaseV2.ALUSEOUTSIDEPROBEAREA));
 
             if(JSettingsDialog.showSettingsDialog("Auto leveling settings", settings))
             {
@@ -778,6 +863,7 @@ public class JPanelSettings extends javax.swing.JPanel implements IGUIEvent{
                 DatabaseV2.ALSAVEHEIGHT.set(settings[2].getText());
                 DatabaseV2.ALCLEARANCE.set(settings[3].getText());
                 DatabaseV2.ALFEEDRATE.set(settings[4].getText());
+                DatabaseV2.ALUSEOUTSIDEPROBEAREA.set(settings[5].getText());
             }
 
         }
@@ -986,6 +1072,7 @@ public class JPanelSettings extends javax.swing.JPanel implements IGUIEvent{
     private javax.swing.JButton jBSCG1;
     private javax.swing.JButton jBSCGrid;
     private javax.swing.JButton jBSCGridDis;
+    private javax.swing.JButton jBSCNCAFeedrate;
     private javax.swing.JButton jBSCNCG0Feedrate;
     private javax.swing.JButton jBSCNCOptimiserTime;
     private javax.swing.JButton jBSCNCSpindleOFF;
@@ -1009,6 +1096,7 @@ public class JPanelSettings extends javax.swing.JPanel implements IGUIEvent{
     private javax.swing.JLabel jLSCG1;
     private javax.swing.JLabel jLSCGrid;
     private javax.swing.JLabel jLSCGridDis;
+    private javax.swing.JLabel jLSCNCAFeedrate;
     private javax.swing.JLabel jLSCNCG0Feedrate;
     private javax.swing.JLabel jLSCNCOptimiserTime;
     private javax.swing.JLabel jLSCNCSpindleOFF;
@@ -1038,6 +1126,7 @@ public class JPanelSettings extends javax.swing.JPanel implements IGUIEvent{
     private javax.swing.JLabel jLabel42;
     private javax.swing.JLabel jLabel43;
     private javax.swing.JLabel jLabel44;
+    private javax.swing.JLabel jLabel45;
     private javax.swing.JLabel jLabel46;
     private javax.swing.JLabel jLabel47;
     private javax.swing.JLabel jLabel48;

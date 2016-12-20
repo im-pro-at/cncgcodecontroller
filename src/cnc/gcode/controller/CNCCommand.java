@@ -78,15 +78,17 @@ public class CNCCommand {
     
     public class Move
     {
-        private double[] s;
-        private double[] e;
-        private Type t;
-        private boolean xyz;
+        private final double[] s;
+        private final double[] e;
+        private double a;
+        private final Type t;
+        private final boolean xyz;
 
-        public Move(double[] s, double[] e, Type t, boolean xyz) {
+        public Move(double[] s, double[] e, double a, Type t, boolean xyz) {
             this.s = s;
             this.e = e;
             this.t = t;
+            this.a = a;
             this.xyz=xyz;
         }
         
@@ -114,6 +116,11 @@ public class CNCCommand {
             double dz = s[2] - e[2];
             return Math.sqrt(dx * dx + dy * dy + dz * dz);
         }
+        
+        public double getA(){
+            return a;
+        }
+        
         public double getDistanceXY()
         {
             double dx = s[0]- e[0];
@@ -137,7 +144,7 @@ public class CNCCommand {
                                     Double.NaN,
                                     Double.NaN,
                                     Double.NaN}; //X,Y,Z,F
-
+        
         Type lastMovetype = Type.UNKNOWN;
         double seconds = 0;
         
@@ -219,7 +226,7 @@ public class CNCCommand {
          */
         public final static List<Type> ALLOWEDFOROPTIMISER = Collections.unmodifiableList(Arrays.asList(EMPTY, G0, G1, ARC, SPINDLEON, SPINDLEOFF, MXX, PAUSE)); 
         
-        private Color color;
+        private final Color color;
 
         private Type(Color color) 
         {
@@ -259,22 +266,24 @@ public class CNCCommand {
     
     private State state = State.UNKNOWN;
     private Type type   = Type.UNKNOWN;
-    private String command;
+    private final String command;
     private Calchelper cin;
     private Calchelper cout;
     private CommandParsing p;
     private String message = "";
     private double[] scale={1,1};
+    private double apmm=0;
     private boolean xyzmove=false;
 
     public CNCCommand(String command) {
         this.command = command;  
     }
     
-    private CNCCommand(String command, double scalex, double scaley) {
+    private CNCCommand(String command, double scalex, double scaley, double apmm) {
         this.command = command;  
         this.scale[0]=scalex;
         this.scale[1]=scaley;
+        this.apmm=apmm;
     }
     
     public static CNCCommand getStartCommand()
@@ -302,10 +311,10 @@ public class CNCCommand {
         {
             return getALStartCommand();
         }
-        return new CNCCommand(command,scale[0],scale[1]);
+        return new CNCCommand(command,scale[0],scale[1],apmm);
     }
     
-    public CNCCommand clone(double scalex, double scaley)
+    public CNCCommand clone(double scalex, double scaley, double apmm)
     {
         if(type == Type.STARTCOMMAND)
         {
@@ -315,7 +324,7 @@ public class CNCCommand {
         {
             return getALStartCommand();
         }
-        return new CNCCommand(command,scalex,scaley);
+        return new CNCCommand(command,scalex,scaley,apmm);
     }
     
     public State calcCommand(Calchelper c)
@@ -493,6 +502,11 @@ public class CNCCommand {
                     message += "ARC has to have I and J as parameters! ";
                 }
             case G0:
+                if(p.contains('A'))
+                {
+                    state = State.ERROR;
+                    message += "A with G0 Move is dangerous!";
+                }
             case G1:
                 if((p.contains('X')|| p.contains('Y')) && p.contains('Z'))
                 {
@@ -580,7 +594,7 @@ public class CNCCommand {
         }
 
         //Calc Time used:
-        Move[] moves = getMoves();
+        Move[] moves = getMoves();    
         if(moves.length > 0)
             for(Move move:moves)
             {
@@ -592,7 +606,25 @@ public class CNCCommand {
                 {
                     f = DatabaseV2.GOFEEDRATE.getsaved();
                 }
-                c.seconds += d / f * 60;
+                
+                d=d / f * 60;
+                
+                //Take A into account
+                double da;
+                if(apmm==0 || type!=Type.G1){
+                    da=move.getA()/DatabaseV2.AFEEDRATE.getsaved()*60;
+                }
+                else{
+                    da=(move.getDistanceXY()*apmm)/DatabaseV2.AFEEDRATE.getsaved()*60;            
+                }
+                
+                if(da>d){ 
+                    c.seconds += da;                
+                }
+                else{
+                    c.seconds += d;                
+                }
+                
 
                 //If not a Number:
                 if(Double.isNaN(c.seconds))
@@ -616,6 +648,9 @@ public class CNCCommand {
                         {
                             used = true;
                         }
+                    }
+                    if(move.a!=0){
+                        used=true;
                     }
                     if(used == false)
                     {
@@ -675,7 +710,7 @@ public class CNCCommand {
             case G1:
             case HOMING:
             case SETPOS:
-                moves.add(new Move(Arrays.copyOfRange(cin.axes, 0, 3), Arrays.copyOfRange(cout.axes, 0, 3), type,xyzmove));
+                moves.add(new Move(Arrays.copyOfRange(cin.axes, 0, 3), Arrays.copyOfRange(cout.axes, 0, 3),p.contains('A')?p.get('A').value:0.0, type,xyzmove));
                 break;
 
             case ARC:
@@ -754,13 +789,13 @@ public class CNCCommand {
                         position[1] = center_axis1 + r_axis1;
 
                         //Add move
-                        moves.add(new Move(temp, position.clone(), type,xyzmove));
+                        moves.add(new Move(temp, position.clone(),0, type,xyzmove));
                     }
-                    moves.add(new Move(position.clone(),Arrays.copyOfRange(cout.axes, 0, 3), type,xyzmove));
+                    moves.add(new Move(position.clone(),Arrays.copyOfRange(cout.axes, 0, 3),0, type,xyzmove));
 
                 }
                 else
-                    moves.add(new Move(Arrays.copyOfRange(cin.axes, 0, 3), Arrays.copyOfRange(cout.axes, 0, 3), type,xyzmove));
+                    moves.add(new Move(Arrays.copyOfRange(cin.axes, 0, 3), Arrays.copyOfRange(cout.axes, 0, 3),0, type,xyzmove));
                     
                 
                 break;
@@ -784,6 +819,15 @@ public class CNCCommand {
             case G1:
             case ARC:
                 Move[] moves = getMoves();
+                
+                //Do add laser
+                if(apmm>0 && type==Type.G1){
+                    for(Move move:moves)
+                    {
+                        if(Double.isNaN(move.getDistanceXY())==false)
+                            move.a=move.getDistanceXY()*apmm;
+                    }
+                }                
                 
                 //Do Repositoning
                 for(Move move:moves)
@@ -820,7 +864,7 @@ public class CNCCommand {
                                     s[i] = move.s[i] + d * part;
                                     e[i] = move.s[i] + d * (part + 1);
                                 }
-                                newmoves.add(new Move(s, e , move.t,xyzmove));
+                                newmoves.add(new Move(s, e ,move.a/parts ,move.t,xyzmove));
                             }
                         }
                     }
@@ -839,7 +883,7 @@ public class CNCCommand {
                 ArrayList<Move> newmoves = new ArrayList<>(moves.length);
                 for(Move move:moves)
                 {
-                    Move compmove = new Move(move.s.clone(), move.s.clone(), move.t,xyzmove);
+                    Move compmove = new Move(move.s.clone(), move.s.clone(),0, move.t,xyzmove);
                     //calc
                     for(int i = 0;i < 3;i++)
                     {
@@ -885,6 +929,10 @@ public class CNCCommand {
                             cmd += " " + CommandParsing.axesName[i] + Tools.dtostr(move.e[i]);
                             doMove = true;
                         }
+                    if(move.a!=0 && Double.isNaN(move.a)==false){
+                        cmd += " " + 'A' + Tools.dtostr(move.a);                        
+                        doMove = true;
+                    }
                     if(doMove == false)
                     {
                         continue;

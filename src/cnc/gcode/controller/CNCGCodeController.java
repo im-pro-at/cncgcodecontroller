@@ -10,6 +10,7 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.ArrayList;
+import javax.swing.JOptionPane;
 import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
 
@@ -153,6 +154,10 @@ public class CNCGCodeController {
             System.out.println("Done!");
             
             System.exit(0);
+        }
+        
+        if(!System.getProperty("os.arch").contains("64")){
+            JOptionPane.showMessageDialog(null, "This Program schuld be run on Java 64bit to avoid memory Problems!");
         }
         
         try{

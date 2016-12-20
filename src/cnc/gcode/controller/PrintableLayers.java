@@ -111,7 +111,13 @@ public class PrintableLayers {
         public XYZ(int index, CNCCommand.Move m) 
         {
             super(index);
-            z=(m.getStart()[2]+m.getEnd()[2])/2;
+            if(m.isXyz()){
+                z=(m.getStart()[2]+m.getEnd()[2])/2;
+            }
+            else
+            {
+                z=m.getA()/m.getDistanceXY();
+            }
             line = new Line2D.Double(m.getStart()[0], m.getStart()[1], m.getEnd()[0],  m.getEnd()[1]);
         }
 
@@ -151,14 +157,24 @@ public class PrintableLayers {
                 return;
             }
 
-            if(!Double.isNaN(move.getDistance()) && move.isXyz()){
-                //XYZ Move!
+            if(!Double.isNaN(move.getDistance()) && (move.isXyz() || (!Double.isNaN(move.getA()) && move.getA()!=0))){
                 if(!layers.containsKey(Double.NaN)){
                     layers.put(Double.NaN, new LinkedList<>());
                 }
-                zmin=Math.min(Math.min(ez, ez),zmin);
-                zmax=Math.max(Math.max(ez, ez),zmax);
-                layers.get(Double.NaN).add(new XYZ(index, move));
+                if(move.isXyz())
+                {
+                    //XYZ Move!
+                    zmin=Math.min(Math.min(sz, ez),zmin);
+                    zmax=Math.max(Math.max(sz, ez),zmax);
+                    layers.get(Double.NaN).add(new XYZ(index, move));
+                }
+                else
+                {
+                    //A Move!
+                    zmin=Math.min(move.getA()/move.getDistanceXY() ,zmin);
+                    zmax=Math.max(move.getA()/move.getDistanceXY() ,zmax);
+                    layers.get(Double.NaN).add(new XYZ(index, move));                    
+                }
             }
             else{
                 //Add layer if new
@@ -214,7 +230,7 @@ public class PrintableLayers {
         for (int i = 0; i < keys.length; i++) 
         {
             if(Double.isNaN(keys[i])){
-               slayers[i] = "XYZ Moves"; 
+               slayers[i] = "XYZ/A Moves"; 
             }
             else{
                 slayers[i] = Tools.dtostr(keys[i]+offset);

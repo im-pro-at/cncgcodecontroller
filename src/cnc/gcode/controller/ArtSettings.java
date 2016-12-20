@@ -45,6 +45,13 @@ public class ArtSettings {
         }
     }
 
+    public enum EMode{
+        LASER,
+        MILLING;
+    }
+    
+    
+    
     //Image prosessing
     public int ires=20; //Internal resulution for calculation
     public Color bgc=Color.WHITE; //Background Color
@@ -54,23 +61,35 @@ public class ArtSettings {
     public EScale iscale=EScale.SMOOTH; //Scale algorithem
 
     //Gcode Parameters
-    public float bit_size= 1; // Diameter of your bit.
-    public float pline=50;    // Line distance in % of bit size
-    public float psegment=50; // Sigment length in % of bit size
-    public float zmin=0;      // milling deth
-    public float zmax=-2;      
-    public float zsave=10;    // save moving hight
+    public double bit_size= 1; // Diameter of your bit.
+    public double pline=50;    // Line distance in % of bit size
+    public double psegment=50; // Sigment length in % of bit size
 
-    public float ftravel=500; //Trefel speed
-    public float fmill=50;    //Milling speed
+    public double ftravel=500; //Trefel speed
 
     public EPathtype pathtype=EPathtype.XLINES;   //possible Path algorithems
     public boolean sweep=false;
     public boolean mdirx=false;
     public boolean mdiry=true;
-            
+
+    public EMode mode= EMode.MILLING;
+    
+    //Mill spesific
+    public double zmin=0;      // milling deth
+    public double zmax=-2;      
+    public double zsave=10;    // save moving hight
+    public double fmill=50;    //Milling speed
+
+    //Laser spesific
+    public double zlaser=0;
+    public double amin=0;      // milling deth
+    public double amax=100;      
+    public double aignor=5;    // save moving hight
+    public double faon=10000;    //Milling speed
+    
+    
     public boolean showDialog(){
-        JSettingsDialog.Setting[] settings= new JSettingsDialog.Setting[18];
+        JSettingsDialog.Setting[] settings= new JSettingsDialog.Setting[26];
         settings[0]= new JSettingsDialog.SInteger("Internal resulution for calculation pixel/mm", ires);
         ((JSettingsDialog.SInteger)settings[0]).setImin(0);
         settings[1]= new JSettingsDialog.Scolor("Background Color", bgc);
@@ -86,17 +105,34 @@ public class ArtSettings {
         settings[8]= new JSettingsDialog.SDouble("Sigment length in % of bit size", psegment);
         ((JSettingsDialog.SDouble)settings[8]).setDmin((double)Float.MIN_VALUE);
         ((JSettingsDialog.SDouble)settings[8]).setDmax(100.0);
-        settings[9]= new JSettingsDialog.SDouble("Minimal milling deth", zmin);
-        settings[10]= new JSettingsDialog.SDouble("Maximal milling deth", zmax);
-        settings[11]= new JSettingsDialog.SDouble("Save moving Hight", zsave);
-        settings[12]= new JSettingsDialog.SDouble("Trefel speed", ftravel);
-        ((JSettingsDialog.SDouble)settings[12]).setDmin((double)Float.MIN_VALUE);
-        settings[13]= new JSettingsDialog.SDouble("Milling speed", fmill);
-        ((JSettingsDialog.SDouble)settings[13]).setDmin((double)Float.MIN_VALUE);
-        settings[14]= new JSettingsDialog.SEnum<>("Possible Path algorithems", pathtype);
-        settings[15]= new JSettingsDialog.SBoolean("Sweep lines", sweep);
-        settings[16]= new JSettingsDialog.SBoolean("Invert X milling direction", mdirx);
-        settings[17]= new JSettingsDialog.SBoolean("Invert Y milling direction", mdiry);
+        settings[9]= new JSettingsDialog.SDouble("Trefel speed", ftravel);
+        ((JSettingsDialog.SDouble)settings[9]).setDmin((double)Float.MIN_VALUE);
+        settings[10]= new JSettingsDialog.SEnum<>("Possible Path algorithems", pathtype);
+        settings[11]= new JSettingsDialog.SBoolean("Sweep lines", sweep);
+        settings[12]= new JSettingsDialog.SBoolean("Invert X milling direction", mdirx);
+        settings[13]= new JSettingsDialog.SBoolean("Invert Y milling direction", mdiry);
+        
+        settings[14]= new JSettingsDialog.SEnum<>("Mode",mode);
+        
+        settings[15]= new JSettingsDialog.STitel("Milling Mode specific settings:");
+        
+        settings[16]= new JSettingsDialog.SDouble("Minimal milling deth", zmin);
+        settings[17]= new JSettingsDialog.SDouble("Maximal milling deth", zmax);
+        settings[18]= new JSettingsDialog.SDouble("Save moving Hight", zsave);
+        settings[19]= new JSettingsDialog.SDouble("Milling speed", fmill);
+        ((JSettingsDialog.SDouble)settings[19]).setDmin((double)Float.MIN_VALUE);
+
+        settings[20]= new JSettingsDialog.STitel("Laser Mode specific settings:");
+        settings[21]= new JSettingsDialog.SDouble("Operating height", zlaser);        
+        settings[22]= new JSettingsDialog.SDouble("Minimal A/mm", amin);
+        ((JSettingsDialog.SDouble)settings[22]).setDmin(0.0);
+        settings[23]= new JSettingsDialog.SDouble("Maximal A/mm", amax);
+        ((JSettingsDialog.SDouble)settings[23]).setDmin(0.0);
+        settings[24]= new JSettingsDialog.SDouble("Ignor A/mm under", aignor);
+        ((JSettingsDialog.SDouble)settings[24]).setDmin(0.0);
+        settings[25]= new JSettingsDialog.SDouble("Engrave speed", faon);
+        ((JSettingsDialog.SDouble)settings[25]).setDmin((double)Float.MIN_VALUE);
+        
         
         
         if(JSettingsDialog.showSettingsDialog("Art Settings", settings)){
@@ -106,18 +142,25 @@ public class ArtSettings {
             fedge=((JSettingsDialog.SBoolean)settings[3]).getValue();
             flow=((JSettingsDialog.SBoolean)settings[4]).getValue();
             iscale=((JSettingsDialog.SEnum<EScale>)settings[5]).getValue();
-            bit_size=(float)((JSettingsDialog.SDouble)settings[6]).getValue();
-            pline=(float)((JSettingsDialog.SDouble)settings[7]).getValue();
-            psegment=(float)((JSettingsDialog.SDouble)settings[8]).getValue();
-            zmin=(float)((JSettingsDialog.SDouble)settings[9]).getValue();
-            zmax=(float)((JSettingsDialog.SDouble)settings[10]).getValue();
-            zsave=(float)((JSettingsDialog.SDouble)settings[11]).getValue();
-            ftravel=(float)((JSettingsDialog.SDouble)settings[12]).getValue();
-            fmill=(float)((JSettingsDialog.SDouble)settings[13]).getValue();
-            pathtype=((JSettingsDialog.SEnum<EPathtype>)settings[14]).getValue();
-            sweep=((JSettingsDialog.SBoolean)settings[15]).getValue();
-            mdirx=((JSettingsDialog.SBoolean)settings[16]).getValue();
-            mdiry=((JSettingsDialog.SBoolean)settings[17]).getValue();
+            bit_size=((JSettingsDialog.SDouble)settings[6]).getValue();
+            DatabaseV2.TOOLSIZE.set(Tools.dtostr(bit_size));
+            pline=((JSettingsDialog.SDouble)settings[7]).getValue();
+            psegment=((JSettingsDialog.SDouble)settings[8]).getValue();
+            ftravel=((JSettingsDialog.SDouble)settings[9]).getValue();
+            pathtype=((JSettingsDialog.SEnum<EPathtype>)settings[10]).getValue();
+            sweep=((JSettingsDialog.SBoolean)settings[11]).getValue();
+            mdirx=((JSettingsDialog.SBoolean)settings[12]).getValue();
+            mdiry=((JSettingsDialog.SBoolean)settings[13]).getValue();
+            mode=((JSettingsDialog.SEnum<EMode>)settings[14]).getValue();
+            zmin=((JSettingsDialog.SDouble)settings[16]).getValue();
+            zmax=((JSettingsDialog.SDouble)settings[17]).getValue();
+            zsave=((JSettingsDialog.SDouble)settings[18]).getValue();
+            fmill=((JSettingsDialog.SDouble)settings[19]).getValue();
+            zlaser=((JSettingsDialog.SDouble)settings[21]).getValue();
+            amin=((JSettingsDialog.SDouble)settings[22]).getValue();
+            amax=((JSettingsDialog.SDouble)settings[23]).getValue();
+            aignor=((JSettingsDialog.SDouble)settings[24]).getValue();
+            faon=((JSettingsDialog.SDouble)settings[25]).getValue();
             return true;
         }
         return false;
@@ -134,19 +177,24 @@ public class ArtSettings {
             fedge=Boolean.parseBoolean(data[3]);
             flow=Boolean.parseBoolean(data[4]);
             iscale=EScale.valueOf(data[5]);
-            bit_size=Float.parseFloat(data[6]);
-            DatabaseV2.TOOLSIZE.set(Tools.dtostr(bit_size));
-            pline=Float.parseFloat(data[7]);
-            psegment=Float.parseFloat(data[8]);
-            zmin=Float.parseFloat(data[9]);
-            zmax=Float.parseFloat(data[10]);
-            zsave=Float.parseFloat(data[11]);
-            ftravel=Float.parseFloat(data[12]);
-            fmill=Float.parseFloat(data[13]);
-            pathtype=EPathtype.valueOf(data[14]);
-            sweep=Boolean.parseBoolean(data[15]);
-            mdirx=Boolean.parseBoolean(data[16]);
-            mdiry=Boolean.parseBoolean(data[17]);            
+            bit_size=DatabaseV2.TOOLSIZE.getsaved();
+            pline=Double.parseDouble(data[6]);
+            psegment=Double.parseDouble(data[7]);
+            ftravel=Double.parseDouble(data[8]);
+            pathtype=EPathtype.valueOf(data[9]);
+            sweep=Boolean.parseBoolean(data[10]);
+            mdirx=Boolean.parseBoolean(data[11]);
+            mdiry=Boolean.parseBoolean(data[12]);
+            mode=EMode.valueOf(data[13]);
+            zmin=Double.parseDouble(data[14]);
+            zmax=Double.parseDouble(data[15]);
+            zsave=Double.parseDouble(data[16]);
+            fmill=Double.parseDouble(data[17]);
+            zlaser=Double.parseDouble(data[18]);
+            amin=Double.parseDouble(data[19]);
+            amax=Double.parseDouble(data[20]);
+            aignor=Double.parseDouble(data[21]);
+            faon=Double.parseDouble(data[22]);
         }
         catch(Exception e){
             e.printStackTrace();
@@ -156,25 +204,30 @@ public class ArtSettings {
 
     @Override
     public String toString() {
-        String[] data=new String[18];
+        String[] data=new String[23];
         data[0]=String.valueOf(ires);
         data[1]=String.valueOf(bgc.getRGB());
         data[2]=String.valueOf(fembossing);
         data[3]=String.valueOf(fedge);
         data[4]=String.valueOf(flow);
         data[5]=iscale.name();
-        data[6]=String.valueOf(bit_size);
-        data[7]=String.valueOf(pline);
-        data[8]=String.valueOf(psegment);
-        data[9]=String.valueOf(zmin);
-        data[10]=String.valueOf(zmax);
-        data[11]=String.valueOf(zsave);
-        data[12]=String.valueOf(ftravel);
-        data[13]=String.valueOf(fmill);
-        data[14]=pathtype.name();
-        data[15]=String.valueOf(sweep);
-        data[16]=String.valueOf(mdirx);
-        data[17]=String.valueOf(mdiry);
+        data[6]=String.valueOf(pline);
+        data[7]=String.valueOf(psegment);
+        data[8]=String.valueOf(ftravel);
+        data[9]=pathtype.name();
+        data[10]=String.valueOf(sweep);
+        data[11]=String.valueOf(mdirx);
+        data[12]=String.valueOf(mdiry);
+        data[13]=String.valueOf(mode);
+        data[14]=String.valueOf(zmin);
+        data[15]=String.valueOf(zmax);
+        data[16]=String.valueOf(zsave);
+        data[17]=String.valueOf(fmill);
+        data[18]=String.valueOf(zlaser);        
+        data[19]=String.valueOf(amin);
+        data[20]=String.valueOf(amax);
+        data[21]=String.valueOf(aignor);
+        data[22]=String.valueOf(faon);
         return String.join("|", data);
     }
 

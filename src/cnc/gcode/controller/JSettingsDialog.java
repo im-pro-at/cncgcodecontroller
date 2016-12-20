@@ -50,6 +50,31 @@ public class JSettingsDialog extends javax.swing.JDialog {
         
         public abstract boolean isValid();
         
+        public abstract String getText();
+        
+    }
+    
+    public static class STitel extends Setting{
+
+        public STitel(String label) {
+            super(label);
+        }
+
+        @Override
+        public Component getElement() {
+            return null;
+        }
+
+        @Override
+        public boolean isValid() {
+            return true;
+        }
+
+        @Override
+        public String getText() {
+            return super.label;
+        }
+        
     }
     
     public static class Scolor extends Setting{
@@ -82,6 +107,11 @@ public class JSettingsDialog extends javax.swing.JDialog {
         
         public Color getValue(){
             return jlable.getBackground();
+        }
+
+        @Override
+        public String getText() {
+            return ""+getValue().getRGB();
         }
         
     }
@@ -319,6 +349,11 @@ public class JSettingsDialog extends javax.swing.JDialog {
         public E getValue(){
             return (E)jCB.getSelectedItem();
         }
+
+        @Override
+        public String getText() {
+            return getValue().name();
+        }
     }
 
     public static class SBoolean extends Setting{
@@ -342,6 +377,11 @@ public class JSettingsDialog extends javax.swing.JDialog {
 
         public boolean getValue(){
             return (Boolean)jCB.getSelectedItem();
+        }
+
+        @Override
+        public String getText() {
+            return ""+getValue();
         }
     }
 
@@ -371,7 +411,8 @@ public class JSettingsDialog extends javax.swing.JDialog {
             JTextArea description = new JTextArea(s.getLabel());
             description.setEditable(false);
             jSettingsPanel.add(description);
-            jSettingsPanel.add(s.getElement());
+            if(s.getElement()!=null)
+                jSettingsPanel.add(s.getElement());
         }
         this.pack();
         

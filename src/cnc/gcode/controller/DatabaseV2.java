@@ -45,6 +45,7 @@ public enum DatabaseV2 {
     SPINDLEON("M?"),
     SPINDLEOFF("M5"),
     GOFEEDRATE(Tools.dtostr(100.0)),
+    AFEEDRATE(Tools.dtostr(100.0)),
     TOOLSIZE(Tools.dtostr(0.5)),
     OPTIMISATIONTIMEOUT(Tools.dtostr(10)),
     
@@ -56,6 +57,7 @@ public enum DatabaseV2 {
     ALFEEDRATE(Tools.dtostr(10.0)),
     ALDISTANCE(Tools.dtostr(10.0)),
     ALMAXMOVELENGTH(Tools.dtostr(1.0)), 
+    ALUSEOUTSIDEPROBEAREA(EOnOff.OFF.name()), 
     ALSTARTCODE("G28"), 
     
     //ARC
