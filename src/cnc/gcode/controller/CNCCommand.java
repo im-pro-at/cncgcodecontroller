@@ -658,7 +658,7 @@ public class CNCCommand {
                         {
                             state = State.WARNING;
                         }
-                        message += "Command without any movement! ";
+                        message += "Command without any movment! ";
                     }
                     
                     if(move.s[2] != move.e[2] && Double.isNaN(move.e[2]) == false)
@@ -812,23 +812,23 @@ public class CNCCommand {
     String[] execute(Transform t, boolean autoleveling, boolean noshort) {
         ArrayList<String> cmds = new ArrayList<>();
         String cmd;
+        Move[] moves = getMoves();
         switch(type)
         {
             //Move
-            case G0:
             case G1:
             case ARC:
-                Move[] moves = getMoves();
-                
                 //Do add laser
-                if(apmm>0 && type==Type.G1){
+                if(apmm>0){
                     for(Move move:moves)
                     {
                         if(Double.isNaN(move.getDistanceXY())==false)
                             move.a=move.getDistanceXY()*apmm;
                     }
                 }                
-                
+            
+            case G0:
+
                 //Do Repositoning
                 for(Move move:moves)
                 {
@@ -933,7 +933,7 @@ public class CNCCommand {
                         cmd += " " + 'A' + Tools.dtostr(move.a);                        
                         doMove = true;
                     }
-                    if(doMove == false)
+                    if(doMove == false && !Double.isNaN(cin.axes[3]) && !Double.isNaN(cout.axes[3]) && cin.axes[3] == cout.axes[3])
                     {
                         continue;
                     }

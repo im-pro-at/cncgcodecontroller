@@ -991,9 +991,9 @@ public class JPanelArt extends javax.swing.JPanel implements IGUIEvent, ICNCComm
                             //calc pos:
                             Point2D.Double ap = new Point2D.Double(px+pxw/pointsx*p.x, py+pyw/pointsy*p.y);
 
-                            if(!boarder.contains(ap) || (scale[p.x][p.y]>=a.zsave && lastz>=a.zsave)){
+                            if(!boarder.contains(ap) || (scale[p.x][p.y]>=a.zignor && lastz>=a.zignor)){
                                 if(down){
-                                    if(Math.abs(lastz-a.zsave)>0.0001){
+                                    if(Math.abs(lastz-a.zignor)>0.0001){
                                         cmds.add(new CNCCommand("G0 Z"+Tools.dtostr(a.zsave)+" F"+Tools.dtostr(a.ftravel)));
                                     }
                                     down=false;

@@ -77,6 +77,7 @@ public class ArtSettings {
     //Mill spesific
     public double zmin=0;      // milling deth
     public double zmax=-2;      
+    public double zignor=-2;      
     public double zsave=10;    // save moving hight
     public double fmill=50;    //Milling speed
 
@@ -89,7 +90,7 @@ public class ArtSettings {
     
     
     public boolean showDialog(){
-        JSettingsDialog.Setting[] settings= new JSettingsDialog.Setting[26];
+        JSettingsDialog.Setting[] settings= new JSettingsDialog.Setting[27];
         settings[0]= new JSettingsDialog.SInteger("Internal resulution for calculation pixel/mm", ires);
         ((JSettingsDialog.SInteger)settings[0]).setImin(0);
         settings[1]= new JSettingsDialog.Scolor("Background Color", bgc);
@@ -118,19 +119,20 @@ public class ArtSettings {
         
         settings[16]= new JSettingsDialog.SDouble("Minimal milling deth", zmin);
         settings[17]= new JSettingsDialog.SDouble("Maximal milling deth", zmax);
-        settings[18]= new JSettingsDialog.SDouble("Save moving Hight", zsave);
-        settings[19]= new JSettingsDialog.SDouble("Milling speed", fmill);
+        settings[18]= new JSettingsDialog.SDouble("Go to save Hight over", zignor);
+        settings[19]= new JSettingsDialog.SDouble("Save moving Hight", zsave);
+        settings[20]= new JSettingsDialog.SDouble("Milling speed", fmill);
         ((JSettingsDialog.SDouble)settings[19]).setDmin((double)Float.MIN_VALUE);
 
-        settings[20]= new JSettingsDialog.STitel("Laser Mode specific settings:");
-        settings[21]= new JSettingsDialog.SDouble("Operating height", zlaser);        
-        settings[22]= new JSettingsDialog.SDouble("Minimal A/mm", amin);
+        settings[21]= new JSettingsDialog.STitel("Laser Mode specific settings:");
+        settings[22]= new JSettingsDialog.SDouble("Operating height", zlaser);        
+        settings[23]= new JSettingsDialog.SDouble("Minimal A/mm", amin);
         ((JSettingsDialog.SDouble)settings[22]).setDmin(0.0);
-        settings[23]= new JSettingsDialog.SDouble("Maximal A/mm", amax);
+        settings[24]= new JSettingsDialog.SDouble("Maximal A/mm", amax);
         ((JSettingsDialog.SDouble)settings[23]).setDmin(0.0);
-        settings[24]= new JSettingsDialog.SDouble("Ignor A/mm under", aignor);
+        settings[25]= new JSettingsDialog.SDouble("Ignor A/mm under", aignor);
         ((JSettingsDialog.SDouble)settings[24]).setDmin(0.0);
-        settings[25]= new JSettingsDialog.SDouble("Engrave speed", faon);
+        settings[26]= new JSettingsDialog.SDouble("Engrave speed", faon);
         ((JSettingsDialog.SDouble)settings[25]).setDmin((double)Float.MIN_VALUE);
         
         
@@ -154,13 +156,14 @@ public class ArtSettings {
             mode=((JSettingsDialog.SEnum<EMode>)settings[14]).getValue();
             zmin=((JSettingsDialog.SDouble)settings[16]).getValue();
             zmax=((JSettingsDialog.SDouble)settings[17]).getValue();
-            zsave=((JSettingsDialog.SDouble)settings[18]).getValue();
-            fmill=((JSettingsDialog.SDouble)settings[19]).getValue();
-            zlaser=((JSettingsDialog.SDouble)settings[21]).getValue();
-            amin=((JSettingsDialog.SDouble)settings[22]).getValue();
-            amax=((JSettingsDialog.SDouble)settings[23]).getValue();
-            aignor=((JSettingsDialog.SDouble)settings[24]).getValue();
-            faon=((JSettingsDialog.SDouble)settings[25]).getValue();
+            zignor=((JSettingsDialog.SDouble)settings[18]).getValue();
+            zsave=((JSettingsDialog.SDouble)settings[19]).getValue();
+            fmill=((JSettingsDialog.SDouble)settings[20]).getValue();
+            zlaser=((JSettingsDialog.SDouble)settings[22]).getValue();
+            amin=((JSettingsDialog.SDouble)settings[23]).getValue();
+            amax=((JSettingsDialog.SDouble)settings[24]).getValue();
+            aignor=((JSettingsDialog.SDouble)settings[25]).getValue();
+            faon=((JSettingsDialog.SDouble)settings[26]).getValue();
             return true;
         }
         return false;
@@ -188,13 +191,14 @@ public class ArtSettings {
             mode=EMode.valueOf(data[13]);
             zmin=Double.parseDouble(data[14]);
             zmax=Double.parseDouble(data[15]);
-            zsave=Double.parseDouble(data[16]);
-            fmill=Double.parseDouble(data[17]);
-            zlaser=Double.parseDouble(data[18]);
-            amin=Double.parseDouble(data[19]);
-            amax=Double.parseDouble(data[20]);
-            aignor=Double.parseDouble(data[21]);
-            faon=Double.parseDouble(data[22]);
+            zignor=Double.parseDouble(data[16]);
+            zsave=Double.parseDouble(data[17]);
+            fmill=Double.parseDouble(data[18]);
+            zlaser=Double.parseDouble(data[19]);
+            amin=Double.parseDouble(data[20]);
+            amax=Double.parseDouble(data[21]);
+            aignor=Double.parseDouble(data[22]);
+            faon=Double.parseDouble(data[23]);
         }
         catch(Exception e){
             e.printStackTrace();
@@ -204,7 +208,7 @@ public class ArtSettings {
 
     @Override
     public String toString() {
-        String[] data=new String[23];
+        String[] data=new String[24];
         data[0]=String.valueOf(ires);
         data[1]=String.valueOf(bgc.getRGB());
         data[2]=String.valueOf(fembossing);
@@ -221,13 +225,14 @@ public class ArtSettings {
         data[13]=String.valueOf(mode);
         data[14]=String.valueOf(zmin);
         data[15]=String.valueOf(zmax);
-        data[16]=String.valueOf(zsave);
-        data[17]=String.valueOf(fmill);
-        data[18]=String.valueOf(zlaser);        
-        data[19]=String.valueOf(amin);
-        data[20]=String.valueOf(amax);
-        data[21]=String.valueOf(aignor);
-        data[22]=String.valueOf(faon);
+        data[16]=String.valueOf(zignor);
+        data[17]=String.valueOf(zsave);
+        data[18]=String.valueOf(fmill);
+        data[19]=String.valueOf(zlaser);        
+        data[20]=String.valueOf(amin);
+        data[21]=String.valueOf(amax);
+        data[22]=String.valueOf(aignor);
+        data[23]=String.valueOf(faon);
         return String.join("|", data);
     }
 
