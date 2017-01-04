@@ -611,7 +611,7 @@ public class CNCCommand {
                 
                 //Take A into account
                 double da;
-                if(apmm==0 || type!=Type.G1){
+                if(apmm==0 || type==Type.G0){
                     da=move.getA()/DatabaseV2.AFEEDRATE.getsaved()*60;
                 }
                 else{
