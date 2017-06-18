@@ -74,6 +74,7 @@ public enum DatabaseV2 {
     
     //Communication Type
     COMTYPE(Communication.MARLIN.toString()),   
+    CSTREAMAHEAD(EOnOff.OFF.name()),   
     
     //Color Settings:
     CBACKGROUND(""+Color.WHITE.getRGB()),
@@ -86,7 +87,7 @@ public enum DatabaseV2 {
     ARTSETTINGS((new ArtSettings()).toString()),
     ;
     
-    enum EHoming{
+    public enum EHoming{
        //Homing Point 0= upper left; 1= upper right; 2= lower left; 3= lower right;
         UPPER_LEFT,
         UPPER_RIGHT,
@@ -107,7 +108,7 @@ public enum DatabaseV2 {
         }
     }
     
-    enum EOnOff{
+    public enum EOnOff{
         ON,
         OFF;
         

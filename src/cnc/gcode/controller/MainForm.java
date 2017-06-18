@@ -64,51 +64,7 @@ public final class MainForm extends javax.swing.JFrame implements IGUIEvent, ICN
         
         
         //Show Comports/Speeds avilable (Can take secounds to load!)
-        (new Thread(new Runnable() {
-            @Override
-            public void run() {
-                final ArrayList<String> ports = Communication.getPortsNames();
-                if(ports.isEmpty())
-                {
-                    ports.add("No serial port found!");
-                }
-                
-                final ArrayList<Integer> speeds= Communication.getPortsSpeeds();
-                SwingUtilities.invokeLater(new Runnable() {
-                    @Override
-                    public void run() {
-                        jCBPort.setModel(new DefaultComboBoxModel(ports.toArray(new String[0])));
-                        jCBSpeed.setModel(new DefaultComboBoxModel(speeds.toArray(new Integer[0])));
-
-                        int index = 0;
-                        //Load last Comport   
-                        for (String port:ports) 
-                        {
-                            if(port.equals(DatabaseV2.PORT.get()))
-                            {
-                                jCBPort.setSelectedIndex(index);
-                                break;
-                            }
-                            index++;
-                        }
-                        
-                        //Load last Speed   
-                        index = 0;
-                        for (Integer speed:speeds) 
-                        {
-                            if(speed.toString().equals(DatabaseV2.SPEED.get()))
-                            {
-                                jCBSpeed.setSelectedIndex(index);
-                                break;
-                            }
-                            index++;
-                        }
-                        
-                        jLStatus.setText(Communication.getStatus());
-                    }
-                });
-            }
-        })).start();
+        updateComportList();
         
         Communication.addChangedEvent(new IEvent() {
             @Override
@@ -210,6 +166,13 @@ public final class MainForm extends javax.swing.JFrame implements IGUIEvent, ICN
 
         jLStatus.setText("Loading...");
 
+        jCBPort.setToolTipText("Right Click to Refresh");
+        jCBPort.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                jCBPortMouseClicked(evt);
+            }
+        });
+
         jLabel6.setText("@");
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
@@ -271,7 +234,65 @@ public final class MainForm extends javax.swing.JFrame implements IGUIEvent, ICN
         DatabaseV2.PORT.set((String)jCBPort.getModel().getSelectedItem());
         DatabaseV2.SPEED.set(((Integer)jCBSpeed.getSelectedItem()).toString());
     }//GEN-LAST:event_jBConnectActionPerformed
+
+    private void jCBPortMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jCBPortMouseClicked
+        if(SwingUtilities.isRightMouseButton(evt)){
+            jCBPort.setModel(new DefaultComboBoxModel());
+            jCBSpeed.setModel(new DefaultComboBoxModel());
+            updateComportList();
+        }
+    }//GEN-LAST:event_jCBPortMouseClicked
    
+    
+    private void updateComportList(){
+        (new Thread(new Runnable() {
+            @Override
+            public void run() {
+                final ArrayList<String> ports = Communication.getPortsNames();
+                if(ports.isEmpty())
+                {
+                    ports.add("No serial port found!");
+                }
+                
+                final ArrayList<Integer> speeds= Communication.getPortsSpeeds();
+                SwingUtilities.invokeLater(new Runnable() {
+                    @Override
+                    public void run() {
+                        jCBPort.setModel(new DefaultComboBoxModel(ports.toArray(new String[0])));
+                        jCBSpeed.setModel(new DefaultComboBoxModel(speeds.toArray(new Integer[0])));
+
+                        int index = 0;
+                        //Load last Comport   
+                        for (String port:ports) 
+                        {
+                            if(port.equals(DatabaseV2.PORT.get()))
+                            {
+                                jCBPort.setSelectedIndex(index);
+                                break;
+                            }
+                            index++;
+                        }
+                        
+                        //Load last Speed   
+                        index = 0;
+                        for (Integer speed:speeds) 
+                        {
+                            if(speed.toString().equals(DatabaseV2.SPEED.get()))
+                            {
+                                jCBSpeed.setSelectedIndex(index);
+                                break;
+                            }
+                            index++;
+                        }
+                        
+                        jLStatus.setText(Communication.getStatus());
+                    }
+                });
+            }
+        })).start();
+        
+    }
+    
 
     
     // Variables declaration - do not modify//GEN-BEGIN:variables

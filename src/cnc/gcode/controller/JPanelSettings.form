@@ -19,10 +19,6 @@
           <Group type="102" attributes="0">
               <Group type="103" groupAlignment="0" attributes="0">
                   <Group type="102" attributes="0">
-                      <EmptySpace min="10" pref="10" max="-2" attributes="0"/>
-                      <Component id="jLabel43" min="-2" max="-2" attributes="0"/>
-                  </Group>
-                  <Group type="102" attributes="0">
                       <EmptySpace max="-2" attributes="0"/>
                       <Group type="103" groupAlignment="0" attributes="0">
                           <Group type="102" alignment="0" attributes="0">
@@ -68,6 +64,7 @@
                                   <Component id="jBSCG0" alignment="0" min="-2" max="-2" attributes="0"/>
                                   <Component id="jBSCG1" alignment="0" min="-2" max="-2" attributes="0"/>
                                   <Component id="jBSCNCAFeedrate" alignment="0" min="-2" max="-2" attributes="0"/>
+                                  <Component id="jBSCStreamAhead" alignment="0" min="-2" max="-2" attributes="0"/>
                               </Group>
                           </Group>
                           <Component id="jLabel44" alignment="0" min="-2" max="-2" attributes="0"/>
@@ -82,12 +79,17 @@
                           <Component id="jLabel47" alignment="0" min="-2" max="-2" attributes="0"/>
                           <Component id="jLabel48" alignment="0" min="-2" max="-2" attributes="0"/>
                           <Component id="jLabel45" alignment="0" min="-2" max="-2" attributes="0"/>
+                          <Component id="jLabel51" alignment="0" min="-2" max="-2" attributes="0"/>
                       </Group>
                       <EmptySpace min="-2" pref="50" max="-2" attributes="0"/>
                       <Group type="103" groupAlignment="0" attributes="0">
                           <Component id="jLSCNCAFeedrate" alignment="0" min="-2" max="-2" attributes="0"/>
                           <Component id="jLSCNCG0Feedrate" alignment="0" min="-2" max="-2" attributes="0"/>
                       </Group>
+                  </Group>
+                  <Group type="102" attributes="0">
+                      <EmptySpace min="10" pref="10" max="-2" attributes="0"/>
+                      <Component id="jLabel43" min="-2" max="-2" attributes="0"/>
                   </Group>
                   <Group type="102" attributes="0">
                       <EmptySpace min="312" pref="312" max="-2" attributes="0"/>
@@ -169,9 +171,12 @@
                       <EmptySpace min="312" pref="312" max="-2" attributes="0"/>
                       <Component id="jLSHomeing" min="-2" max="-2" attributes="0"/>
                   </Group>
-                  <Group type="102" attributes="0">
+                  <Group type="102" alignment="0" attributes="0">
                       <EmptySpace min="312" pref="312" max="-2" attributes="0"/>
-                      <Component id="jLSCBack" min="-2" max="-2" attributes="0"/>
+                      <Group type="103" groupAlignment="0" attributes="0">
+                          <Component id="jLSCStreamAhead" min="-2" max="-2" attributes="0"/>
+                          <Component id="jLSCBack" min="-2" max="-2" attributes="0"/>
+                      </Group>
                   </Group>
               </Group>
               <EmptySpace max="32767" attributes="0"/>
@@ -288,6 +293,12 @@
                   <Component id="jLabel44" alignment="3" min="-2" max="-2" attributes="0"/>
                   <Component id="jBSComType" alignment="3" min="-2" max="-2" attributes="0"/>
                   <Component id="jLSComType" alignment="3" min="-2" max="-2" attributes="0"/>
+              </Group>
+              <EmptySpace type="separate" max="-2" attributes="0"/>
+              <Group type="103" groupAlignment="3" attributes="0">
+                  <Component id="jLabel51" alignment="3" min="-2" max="-2" attributes="0"/>
+                  <Component id="jBSCStreamAhead" alignment="3" min="-2" max="-2" attributes="0"/>
+                  <Component id="jLSCStreamAhead" alignment="3" min="-2" max="-2" attributes="0"/>
               </Group>
               <EmptySpace type="separate" max="-2" attributes="0"/>
               <Group type="103" groupAlignment="3" attributes="0">
@@ -632,6 +643,24 @@
       </Events>
     </Component>
     <Component class="javax.swing.JLabel" name="jLSComType">
+      <Properties>
+        <Property name="text" type="java.lang.String" value="Settings Text"/>
+      </Properties>
+    </Component>
+    <Component class="javax.swing.JLabel" name="jLabel51">
+      <Properties>
+        <Property name="text" type="java.lang.String" value="Stream ahead"/>
+      </Properties>
+    </Component>
+    <Component class="javax.swing.JButton" name="jBSCStreamAhead">
+      <Properties>
+        <Property name="text" type="java.lang.String" value="Change"/>
+      </Properties>
+      <Events>
+        <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="jBSettingsActionPerformed"/>
+      </Events>
+    </Component>
+    <Component class="javax.swing.JLabel" name="jLSCStreamAhead">
       <Properties>
         <Property name="text" type="java.lang.String" value="Settings Text"/>
       </Properties>

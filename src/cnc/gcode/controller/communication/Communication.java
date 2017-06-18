@@ -10,8 +10,6 @@ import cnc.gcode.controller.IEvent;
 import cnc.gcode.controller.MyException;
 import cnc.gcode.controller.ObjectProxy;
 import cnc.gcode.controller.Tools;
-import java.lang.reflect.InvocationTargetException;
-import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.logging.Level;
@@ -163,7 +161,7 @@ public enum Communication {
         }
         @Override
         protected boolean internal_isbusy(){
-            return cmdHistroy.size() > receiveCount;
+            return cmdHistroy.size() > (receiveCount +(DatabaseV2.EOnOff.get(DatabaseV2.CSTREAMAHEAD)==DatabaseV2.EOnOff.ON?3:0));
         }
         @Override
         protected boolean internal_isConnected(){
@@ -309,7 +307,7 @@ public enum Communication {
         }
         @Override
         protected boolean internal_isbusy(){
-            return sendcount > resivecount;
+            return sendcount > (resivecount+(DatabaseV2.EOnOff.get(DatabaseV2.CSTREAMAHEAD)==DatabaseV2.EOnOff.ON?3:0));
         }
         @Override
         protected boolean internal_isConnected(){
@@ -463,7 +461,7 @@ public enum Communication {
         }
         @Override
         protected boolean internal_isbusy(){
-            return resivecount ==0 || sendcount > resivecount;
+            return resivecount ==0 || sendcount > (resivecount+(DatabaseV2.EOnOff.get(DatabaseV2.CSTREAMAHEAD)==DatabaseV2.EOnOff.ON?3:0));
         }
         @Override
         protected boolean internal_isConnected(){

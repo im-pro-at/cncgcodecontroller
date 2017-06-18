@@ -4,9 +4,6 @@
  */
 package cnc.gcode.controller.communication;
 
-import gnu.io.NRSerialPort;
-import java.io.InputStream;
-import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Timer;

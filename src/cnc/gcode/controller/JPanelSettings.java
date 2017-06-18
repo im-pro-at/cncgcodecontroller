@@ -72,6 +72,7 @@ public class JPanelSettings extends javax.swing.JPanel implements IGUIEvent{
         }
         jLSmodal.setText(Tools.convertToMultiline("Allow G1: "+DatabaseV2.EOnOff.get(DatabaseV2.G1MODAL).name()+"\nAllow G0: "+DatabaseV2.EOnOff.get(DatabaseV2.G0MODAL).name()));
         jLSComType.setText(DatabaseV2.COMTYPE.get());
+        jLSCStreamAhead.setText(DatabaseV2.CSTREAMAHEAD.get());
         jLSCBack.setBackground(new Color(Integer.parseInt(DatabaseV2.CBACKGROUND.get())));
         jLSCGrid.setBackground(new Color(Integer.parseInt(DatabaseV2.CGRID.get())));
         jLSCGridDis.setText(DatabaseV2.CGRIDDISTANCE.getsaved()>0?""+DatabaseV2.CGRIDDISTANCE.get():"OFF");        
@@ -149,6 +150,9 @@ public class JPanelSettings extends javax.swing.JPanel implements IGUIEvent{
         jLabel44 = new javax.swing.JLabel();
         jBSComType = new javax.swing.JButton();
         jLSComType = new javax.swing.JLabel();
+        jLabel51 = new javax.swing.JLabel();
+        jBSCStreamAhead = new javax.swing.JButton();
+        jLSCStreamAhead = new javax.swing.JLabel();
         jLabel46 = new javax.swing.JLabel();
         jBSCBack = new javax.swing.JButton();
         jLSCBack = new javax.swing.JLabel();
@@ -357,6 +361,17 @@ public class JPanelSettings extends javax.swing.JPanel implements IGUIEvent{
 
         jLSComType.setText("Settings Text");
 
+        jLabel51.setText("Stream ahead");
+
+        jBSCStreamAhead.setText("Change");
+        jBSCStreamAhead.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jBSettingsActionPerformed(evt);
+            }
+        });
+
+        jLSCStreamAhead.setText("Settings Text");
+
         jLabel46.setText("Background color:");
 
         jBSCBack.setText("Change");
@@ -452,9 +467,6 @@ public class JPanelSettings extends javax.swing.JPanel implements IGUIEvent{
             .addGroup(layout.createSequentialGroup()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(layout.createSequentialGroup()
-                        .addGap(10, 10, 10)
-                        .addComponent(jLabel43))
-                    .addGroup(layout.createSequentialGroup()
                         .addContainerGap()
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addGroup(layout.createSequentialGroup()
@@ -498,7 +510,8 @@ public class JPanelSettings extends javax.swing.JPanel implements IGUIEvent{
                                     .addComponent(jBSCGridDis)
                                     .addComponent(jBSCG0)
                                     .addComponent(jBSCG1)
-                                    .addComponent(jBSCNCAFeedrate)))
+                                    .addComponent(jBSCNCAFeedrate)
+                                    .addComponent(jBSCStreamAhead)))
                             .addComponent(jLabel44)
                             .addGroup(layout.createSequentialGroup()
                                 .addComponent(jBexport)
@@ -509,11 +522,15 @@ public class JPanelSettings extends javax.swing.JPanel implements IGUIEvent{
                             .addComponent(jLabel50)
                             .addComponent(jLabel47)
                             .addComponent(jLabel48)
-                            .addComponent(jLabel45))
+                            .addComponent(jLabel45)
+                            .addComponent(jLabel51))
                         .addGap(50, 50, 50)
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addComponent(jLSCNCAFeedrate)
                             .addComponent(jLSCNCG0Feedrate)))
+                    .addGroup(layout.createSequentialGroup()
+                        .addGap(10, 10, 10)
+                        .addComponent(jLabel43))
                     .addGroup(layout.createSequentialGroup()
                         .addGap(312, 312, 312)
                         .addComponent(jLSCG1))
@@ -576,7 +593,9 @@ public class JPanelSettings extends javax.swing.JPanel implements IGUIEvent{
                         .addComponent(jLSHomeing))
                     .addGroup(layout.createSequentialGroup()
                         .addGap(312, 312, 312)
-                        .addComponent(jLSCBack)))
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(jLSCStreamAhead)
+                            .addComponent(jLSCBack))))
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
@@ -672,6 +691,11 @@ public class JPanelSettings extends javax.swing.JPanel implements IGUIEvent{
                     .addComponent(jLabel44)
                     .addComponent(jBSComType)
                     .addComponent(jLSComType))
+                .addGap(18, 18, 18)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jLabel51)
+                    .addComponent(jBSCStreamAhead)
+                    .addComponent(jLSCStreamAhead))
                 .addGap(18, 18, 18)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel46)
@@ -953,6 +977,16 @@ public class JPanelSettings extends javax.swing.JPanel implements IGUIEvent{
                 DatabaseV2.COMTYPE.set(Communication.values()[options].toString());
             }
         }
+
+        //CStreamAhead
+        if(evt.getSource() == jBSCStreamAhead)
+        {
+            JSettingsDialog.SEnum<DatabaseV2.EOnOff> setting= new JSettingsDialog.SEnum<>("Stream 3 commands ahead:",DatabaseV2.EOnOff.get(DatabaseV2.G1MODAL));
+            if(JSettingsDialog.showSettingsDialog("Stream ahead:",new JSettingsDialog.Setting[]{setting}))
+            {
+                setting.getValue().set(DatabaseV2.CSTREAMAHEAD);
+            }
+        }
         
         //Colors
         if(evt.getSource() == jBSCBack)
@@ -1080,6 +1114,7 @@ public class JPanelSettings extends javax.swing.JPanel implements IGUIEvent{
     private javax.swing.JButton jBSCNCStart;
     private javax.swing.JButton jBSCNCToolChange;
     private javax.swing.JButton jBSCNCToolSize;
+    private javax.swing.JButton jBSCStreamAhead;
     private javax.swing.JButton jBSComType;
     private javax.swing.JButton jBSFastFeedrate;
     private javax.swing.JButton jBSHoming;
@@ -1104,6 +1139,7 @@ public class JPanelSettings extends javax.swing.JPanel implements IGUIEvent{
     private javax.swing.JLabel jLSCNCStart;
     private javax.swing.JLabel jLSCNCToolChange;
     private javax.swing.JLabel jLSCNCToolSize;
+    private javax.swing.JLabel jLSCStreamAhead;
     private javax.swing.JLabel jLSComType;
     private javax.swing.JLabel jLSFastFeedrate;
     private javax.swing.JLabel jLSHomeing;
@@ -1132,6 +1168,7 @@ public class JPanelSettings extends javax.swing.JPanel implements IGUIEvent{
     private javax.swing.JLabel jLabel48;
     private javax.swing.JLabel jLabel49;
     private javax.swing.JLabel jLabel50;
+    private javax.swing.JLabel jLabel51;
     // End of variables declaration//GEN-END:variables
 
     @Override
