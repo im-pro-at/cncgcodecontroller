@@ -891,7 +891,7 @@ public class JPanelAutoLevel extends javax.swing.JPanel implements IGUIEvent {
 
                             if(pos == false)
                             {
-                                throw new MyException("Timeout: No position report!");
+                                throw new MyException("Timeout: No position report!\nFor GRPL you neet to set $10=2 for this to work!");
                             }
                             
                             double thitValue = hitvalue;
