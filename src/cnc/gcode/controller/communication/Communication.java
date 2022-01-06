@@ -489,7 +489,7 @@ public enum Communication {
                 {
                     Double[] dpos=new Double[3];
                     for(int i=0;i<3;i++)
-                        dpos[i]=Tools.strtod(line.split(":")[2].split(",")[i]);
+                        dpos[i]=Tools.strtod(line.split("WPos:")[1].split(",")[i]);
                     
                     return dpos;
                 }
