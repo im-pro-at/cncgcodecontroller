@@ -8,6 +8,7 @@ If you use a reprap Controller (like Marlin ...) for a CNC machine then this is 
 * Loading cnc files
 * Preview of cnc file
 * Autoleveling (at this point only for Marlin firmware because of hit endstop message)
+  * for GRPL you neet to set $10=2 for this to work!
 * Optimise G0 movements
 * Most commonly used Gcodes are translated for a Reprap Controller (Tested with Marlin)
 * Backlash correction
