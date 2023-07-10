@@ -81,6 +81,7 @@ public class CNCCommand {
         private final double[] s;
         private final double[] e;
         private double a;
+        private double spindle;
         private final Type t;
         private final boolean xyz;
 
@@ -658,7 +659,8 @@ public class CNCCommand {
                         {
                             state = State.WARNING;
                         }
-                        message += "Command without any movment! ";
+                        message += "Command without any movment! Preserving anyway ";
+                        used = true;
                     }
                     
                     if(move.s[2] != move.e[2] && Double.isNaN(move.e[2]) == false)
