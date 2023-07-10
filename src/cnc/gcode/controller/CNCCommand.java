@@ -81,16 +81,27 @@ public class CNCCommand {
         private final double[] s;
         private final double[] e;
         private double a;
+        private double spindle;
         private final Type t;
         private final boolean xyz;
 
-        public Move(double[] s, double[] e, double a, Type t, boolean xyz) {
+        public Move(double[] s, double[] e, double a, Type t, boolean xyz, double spindle) {
             this.s = s;
             this.e = e;
             this.t = t;
             this.a = a;
             this.xyz=xyz;
+            this.spindle=spindle;
         }
+        
+        public Move(double[] s, double[] e, double a, Type t, boolean xyz) {
+           this.s = s;
+           this.e = e;
+           this.t = t;
+           this.a = a;
+           this.xyz=xyz;
+           this.spindle = Double.NaN;
+       }
         
         public void scalexy(double[] scale){
             for(int i=0;i<2;i++){
@@ -120,6 +131,10 @@ public class CNCCommand {
         public double getA(){
             return a;
         }
+        
+        public double getSpindle(){
+           return spindle;
+       }
         
         public double getDistanceXY()
         {
@@ -652,13 +667,17 @@ public class CNCCommand {
                     if(move.a!=0){
                         used=true;
                     }
+                    if(Double.isNaN(move.spindle) == false){
+                       message += "Spindle speed set";
+                       used=true;
+                   }
                     if(used == false)
                     {
                         if(state == State.NORMAL)
                         {
                             state = State.WARNING;
                         }
-                        message += "Command without any movment! ";
+                        message += "Command without any movment!";
                     }
                     
                     if(move.s[2] != move.e[2] && Double.isNaN(move.e[2]) == false)
@@ -710,7 +729,11 @@ public class CNCCommand {
             case G1:
             case HOMING:
             case SETPOS:
-                moves.add(new Move(Arrays.copyOfRange(cin.axes, 0, 3), Arrays.copyOfRange(cout.axes, 0, 3),p.contains('A')?p.get('A').value:0.0, type,xyzmove));
+                if(p.contains('S')){
+                  moves.add(new Move(Arrays.copyOfRange(cin.axes, 0, 3), Arrays.copyOfRange(cout.axes, 0, 3),p.contains('A')?p.get('A').value:0.0, type,xyzmove, p.get('S').value));
+               } else {
+                  moves.add(new Move(Arrays.copyOfRange(cin.axes, 0, 3), Arrays.copyOfRange(cout.axes, 0, 3),p.contains('A')?p.get('A').value:0.0, type,xyzmove));
+               }
                 break;
 
             case ARC:
@@ -933,6 +956,12 @@ public class CNCCommand {
                         cmd += " " + 'A' + Tools.dtostr(move.a);                        
                         doMove = true;
                     }
+                    
+                    if(Double.isNaN(move.spindle)==false){
+                       cmd += " " + 'S' + Tools.dtostr(move.spindle);                        
+                       doMove = true;
+                   }
+                    
                     if(doMove == false && !Double.isNaN(cin.axes[3]) && !Double.isNaN(cout.axes[3]) && cin.axes[3] == cout.axes[3])
                     {
                         continue;
